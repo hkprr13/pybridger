@@ -197,7 +197,7 @@ class Column:
     @public
     def notIn (self, *values):
         """NOT IN演算子"""
-        return Condition(self.tableName, self.columnName, "NOTIN", (values))
+        return Condition(self.tableName, self.columnName, "NOT IN", (values))
     #---------------------------------------------------------------------------
     @public
     def between(self, before, after):

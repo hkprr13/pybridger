@@ -1,11 +1,12 @@
 #-------------------------------------------------------------------------------
-from .base     import MySqlEngine
-from .base     import Sqlite3Engine
-from ..common  import public          #パブリックメソッド
-from ..column  import Column
-from ..model   import Model           # モデルクラス
-from ..manager import Select          # SELECT句クラス
-from ..config  import Config
+from .base      import MySqlEngine      # MySQL
+from .base      import Sqlite3Engine    # Sqlite3
+from .base      import PostgreSqlEngine # PostgreSQL
+from ..common   import public           # パブリックメソッド
+from ..column   import Column           # カラムクラス
+from ..model    import Model            # モデルクラス
+from ..manager  import Select           # SELECT句クラス
+from ..config   import Config           # コンフィグクラス
 #-------------------------------------------------------------------------------
 class Engine:
     """
@@ -20,7 +21,9 @@ class Engine:
             hostName      : str | None = None,
             userName      : str | None = None,
             password      : str | None = None,
-            database      : str | None = None
+            database      : str | None = None,
+            port          : int | None = None,
+            logFile       : str | None = None
         ):
         """
         エンジンを初期化し、接続情報を登録する。
@@ -36,6 +39,8 @@ class Engine:
         self.userName      = userName
         self.password      = password
         self.database      = database
+        self.port          = port
+        self.logFile       = logFile
     #---------------------------------------------------------------------------
     @public
     def launch(self) -> None:
@@ -44,21 +49,37 @@ class Engine:
         Raises:
             ModuleNotFoundError : 未対応のエンジン名が指定された場合
         """
-        if self.sqlEngineName == "sqlite3":
+        if self.sqlEngineName.lower() == "sqlite3":
             if self.database:
                 self.sqlEngine = Sqlite3Engine(
-                    databasePath = self.database
+                    databasePath = self.database,
+                    logFile      = self.logFile
                 )
             else:
                 raise Exception("データベースを指定してください")
-        elif self.sqlEngineName == "mysql":
+        elif self.sqlEngineName.lower() == "mysql":
             if  self.hostName and self.userName \
             and self.password and self.database:
                 self.sqlEngine = MySqlEngine(
                     hostName     = self.hostName,
                     userName     = self.userName,
                     password     = self.password,
-                    databaseName = self.database
+                    databaseName = self.database,
+                    logFile      = self.logFile
+                )
+            else:
+                raise Exception("引数を指定ください")
+        elif self.sqlEngineName.lower() == "postgresql":
+            if  self.hostName and self.userName \
+            and self.password and self.database \
+            and self.port:
+                self.sqlEngine = PostgreSqlEngine(
+                    hostName     = self.hostName,
+                    userName     = self.userName,
+                    password     = self.password,
+                    databaseName = self.database,
+                    port         = self.port,
+                    logFile      = self.logFile
                 )
             else:
                 raise Exception("引数を指定ください")

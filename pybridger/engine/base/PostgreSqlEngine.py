@@ -1,13 +1,6 @@
 #-------------------------------------------------------------------------------
 # psycopgのインストールが出来ているかどうか確認
-try:
-    import psycopg
-except Exception as e:
-    raise Exception(
-        "psycopgがインストールされていません\n"
-        "下記をターミナルで実行してください\n"
-        "pip install psycopg[binary]"
-    )
+
 #-------------------------------------------------------------------------------
 from typing         import Any                  # Any型クラス
 from .SqlEngine     import SqlEngine            # 基底SQLエンジンクラス
@@ -60,7 +53,17 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
         self.databaseName = databaseName
         self.port         = port
         # インスタンス変数,(オブジェクト)
-        self.sqlEngine  = psycopg
+        # インスタンスされたタイミングでインポートを行う
+        try:
+            import psycopg
+            self.sqlEngine  = psycopg
+        except Exception as e:
+            raise Exception(
+                "psycopgがインストールされていません\n"
+                "下記をターミナルで実行してください\n"
+                "pip install psycopg[binary]"
+            )
+        # コネクトオブジェクトとカーソルオブジェクトの初期化
         self.conn = None
         self.cur  = None
         # ログの初期設定
@@ -281,6 +284,12 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
             msg = "ロールバックに失敗しました"
             self.__logError(msg)
             raise Exception(f"{msg}: {e}")
+    #---------------------------------------------------------------------------
+    @override
+    @public
+    def fetchall(self):
+        if not self.cur is None:
+            return self.cur.fetchall()
     #---------------------------------------------------------------------------
     @override
     @public

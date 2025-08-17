@@ -29,7 +29,7 @@ class Migration:
         super().__init__()
         self.__migrationsDir = migrationsDir
         os.makedirs(migrationsDir, exist_ok = True)
-        self.__sqlEngine.execute(self.__buildCreateTableSql)
+        self.__sqlEngine.execute(self.__buildCreateTableQuery)
         self.__sqlEngine.commit()
         print("初期化完了")
     #---------------------------------------------------------------------------
@@ -46,7 +46,7 @@ class Migration:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __buildCreateTableSql(self):
+    def __buildCreateTableQuery(self):
         query = "CREATE TABLE IF NOT EXISTS migration (" \
             + "id INTEGER PRIMARY KEY auto_increment, " \
             + "name text, applied_at TEXT)"

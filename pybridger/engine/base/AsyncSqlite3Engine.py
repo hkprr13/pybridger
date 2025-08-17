@@ -239,7 +239,6 @@ class AsyncSqlite3Engine(SqlEngine, Sqlite3DateTypes):
             msg = "コネクトとカーソルのクローズに失敗しました"
             self.__logError(msg)
             raise Exception(f"{msg}: {e}") 
-    #---------------------------------------
     #---------------------------------------------------------------------------
     @override
     @public

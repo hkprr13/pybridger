@@ -3,15 +3,27 @@ from __future__ import annotations # 循環インポートを回避する用
 from typing import TYPE_CHECKING   
 #-------------------------------------------------------------------------------
 if TYPE_CHECKING:
-    from ..engine import Sqlite3Engine      # 
-    from ..engine import AsyncSqlite3Engine #
-    from ..engine import MySqlEngine        #
-    from ..engine import AsyncMySqlEngine   #
+    from ..engine import Sqlite3Engine          # 
+    from ..engine import AsyncSqlite3Engine     #
+    from ..engine import MySqlEngine            #
+    from ..engine import AsyncMySqlEngine       #
+    from ..engine import PostgreSqlEngine       #
+    from ..engine import AsyncPostgreSqlEngine  #
 #-------------------------------------------------------------------------------
 class Config:
-    sqlEngine      : Sqlite3Engine       | MySqlEngine      | None = None
-    asyncSqlEngine : AsyncSqlite3Engine  | AsyncMySqlEngine | None = None
+    # 同期版のエンジン
+    sqlEngine : Sqlite3Engine    \
+              | MySqlEngine      \
+              | PostgreSqlEngine \
+              | None = None
+    # 非同期版のエンジン
+    asyncSqlEngine : AsyncSqlite3Engine    \
+                   | AsyncMySqlEngine      \
+                   | AsyncPostgreSqlEngine \
+                   | None = None
+    # データベース
     database : str | None = None
+    # 比較用
     sqlite3Engine      : Sqlite3Engine
     MySqlEngine        : MySqlEngine
     asyncSqlite3Engine : AsyncSqlite3Engine

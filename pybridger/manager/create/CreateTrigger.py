@@ -34,7 +34,7 @@ class CreateTrigger(Base):
             trigger.commit()
         """
         super().__init__(tableName)
-        self.__query = self.__buildQuery(
+        self.query = self.__buildQuery(
             tableName   = tableName,
             triggerName = triggerName,
             timing      = timing,
@@ -75,6 +75,6 @@ class CreateTrigger(Base):
             query += "DELETE " # 末尾にスペース
         else:
             raise Exception(f"使えない引数:{event} を指定しています。")
-        query += f"ON {tableName} EACH ROW BIGIN {body} END;"
+        query += f"ON {tableName} EACH ROW BEGIN {body} END;"
         return query
 #-------------------------------------------------------------------------------

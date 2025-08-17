@@ -1,31 +1,11 @@
 #-------------------------------------------------------------------------------
-# psycopgのインストールが出来ているかどうか確認
-try:
-    import psycopg
-except Exception as e:
-    raise Exception(
-        "psycopgがインストールされていません\n"
-        "下記をターミナルで実行してください\n"
-        "pip install psycopg[binary]"
-    )
-#-------------------------------------------------------------------------------
-# 非同期psycopgのインストールが出来ているかどうか確認
-try:
-    from psycopg import AsyncConnection, AsyncCursor
-except Exception as e:
-    raise Exception(
-        "非同期psycopgがインストールされていません\n"
-        "下記をターミナルで実行してください\n"
-        "pip install psycopg[async]"
-    )
-#-------------------------------------------------------------------------------
 from typing         import Any                  # Any型クラス
 from .SqlEngine     import SqlEngine            # 基底SQLエンジンクラス
 from .datetypes     import PostgreSqlDateTypes  # PostgreSQLのデータ型クラス
 from ...common      import override             # オーバライドメソッド
 from ...common      import public               # パブリックメソッド
 from ...common      import private              # プライベートメソッド
-from ...Log          import Log                  # ログクラス
+from ...Log          import Log                 # ログクラス
 #-------------------------------------------------------------------------------
 class AsyncPostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
     """
@@ -70,7 +50,26 @@ class AsyncPostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
         self.databaseName = databaseName
         self.port         = port
         # インスタンス変数,(オブジェクト)
-        self.sqlEngine  = psycopg
+        # インスタンスされたタイミングでインポートを行う
+        try:
+            # psycopgのインストールが出来ているかどうか確認
+            import psycopg
+            self.sqlEngine  = psycopg
+        except Exception as e:
+            raise Exception(
+                "psycopgがインストールされていません\n"
+                "下記をターミナルで実行してください\n"
+                "pip install psycopg[binary]"
+            )
+        try:
+            # 非同期psycopgのインストールが出来ているかどうか確認
+            from psycopg import AsyncConnection, AsyncCursor
+        except Exception as e:
+            raise Exception(
+                "非同期psycopgがインストールされていません\n"
+                "下記をターミナルで実行してください\n"
+                "pip install psycopg[async]"
+            )
         self.conn : AsyncConnection | None = None
         self.cur  : AsyncCursor     | None = None
         # ログの初期設定
@@ -123,7 +122,7 @@ class AsyncPostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
    #---------------------------------------------------------------------------
     @override
     @public
-    async def connect(self) -> AsyncConnection:
+    async def connect(self) -> Any:
         """
         非同期でデータベースの接続
         Returns:
@@ -147,7 +146,7 @@ class AsyncPostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
     #---------------------------------------------------------------------------
     @override
     @public
-    async def cursor(self) -> AsyncCursor:
+    async def cursor(self) -> Any:
         """
         非同期でカーソルの作成
         Returns:
