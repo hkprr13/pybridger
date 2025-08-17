@@ -11,14 +11,5 @@ class AsyncDropTable(AsyncBase):
             tableName (str) : テーブル名
         """
         super().__init__(tableName)
-        self.__query = f"DROP TABLE {self.tableName}"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    async def execute(self):
-        await self.sqlEngine.execute(self.__query)
+        self.query = f"DROP TABLE {self.tableName}"
 #-------------------------------------------------------------------------------

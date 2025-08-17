@@ -20,15 +20,5 @@ class AsyncCreateTable(AsyncBase):
         """
         super().__init__(tableName)
         # クエリ
-        self.__query = f"CREATE TABLE {tableName} ({columns});"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    async def execute(self):
-        return await super().execute(self.__query)
+        self.query = f"CREATE TABLE {tableName} ({columns});"
 #-------------------------------------------------------------------------------

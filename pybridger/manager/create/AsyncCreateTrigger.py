@@ -34,7 +34,7 @@ class AsyncCreateTrigger(AsyncBase):
             trigger.commit()
         """
         super().__init__(tableName)
-        self.__query = self.__buildQuery(
+        self.query = self.__buildQuery(
             tableName   = tableName,
             triggerName = triggerName,
             timing      = timing,
@@ -77,14 +77,4 @@ class AsyncCreateTrigger(AsyncBase):
             raise Exception(f"使えない引数:{event} を指定しています。")
         query += f"ON {tableName} EACH ROW BIGIN {body} END;"
         return query
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self) -> str:
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    async def execute(self):
-        return await super().execute(self.__query)
 #-------------------------------------------------------------------------------

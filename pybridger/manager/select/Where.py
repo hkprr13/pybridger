@@ -19,28 +19,16 @@ class Where(Base):
             value     (tuple) : 値
         """
         super().__init__(tableName) 
-        self.__query = f"SELECT {columns} " \
-                     + f"FROM {self.tableName} WHERE {condition};"
-        self.__value = value
-    #---------------------------------------------------------------------------
-    @property
-    @public
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @property
-    @public
-    def value(self):
-        """値"""
-        return self.__value
+        self.query = f"SELECT {columns} " \
+                   + f"FROM {self.tableName} WHERE {condition};"
+        self.value = value
     #---------------------------------------------------------------------------
     def inSubQuery(self, subQuery):
-        query  = self.__query[:-1]
+        query  = self.query[:-1]
         sQuery = subQuery[:-1]
         query += f" IN ({sQuery});"
         cur = self.sqlEngine.cursor()
-        cur.execute(query, self.__value)
+        cur.execute(query, self.value)
         return cur.fetchall()
     #---------------------------------------------------------------------------
     @public
@@ -49,10 +37,6 @@ class Where(Base):
         
         """
         cur = self.sqlEngine.cursor()
-        cur.execute(self.query, self.__value)
+        cur.execute(self.query, self.value)
         return cur.fetchall()
-    #---------------------------------------------------------------------------
-    @public
-    def execute(self):
-        return super().execute(self.query, self.__value)
 #-------------------------------------------------------------------------------

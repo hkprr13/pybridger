@@ -18,14 +18,5 @@ class AsyncCreateIndex(AsyncBase):
             columns   (str) : カラム
         """
         super().__init__(tableName)
-        self.__query = f"CREATE {indexName} ON {tableName} ({columns});"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        return self.__query 
-    #---------------------------------------------------------------------------
-    @public
-    async def exexute(self):
-        await self.sqlEngine.execute(self.__query)
+        self.query = f"CREATE {indexName} ON {tableName} ({columns});"
 #-------------------------------------------------------------------------------

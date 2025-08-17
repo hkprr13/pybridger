@@ -52,7 +52,7 @@ class GroupBy(Base):
     def having(self, aggregate):
         """
             GROUP BY + HAVING構文を用いて集計条件付きレコードを取得する
-            Parameters:
+            Args:
                 aggregate (Column) : HAVING句で使用する集計関数付きカラム
                                      例: Column("COUNT(*) > 1")
             Returns:

@@ -8,7 +8,8 @@ from .datetypes     import PostgreSqlDateTypes  # PostgreSQLのデータ型ク�
 from ...common      import override             # オーバライドメソッド
 from ...common      import public               # パブリックメソッド
 from ...common      import private              # プライベートメソッド
-from ...Log          import Log                  # ログクラス
+from ...Log         import Log                  # ログクラス
+from ...query       import Query                # クエリクラス
 #-------------------------------------------------------------------------------
 class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
     """
@@ -164,36 +165,42 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
     #---------------------------------------------------------------------------
     @override
     @public
-    def execute(self, query: Any, value: tuple = ()) -> None:
+    def execute(self, query: Query, value: tuple = ()) -> None:
         """
         クエリの実行
+        Args:
+            query (Query)   : SQL文
+            value (tuple)   : プレイスホルダーに渡す値
         Raises:
             Exception : クエリの実行に失敗した場合
         """
         try:
-            self.__logDebug(f"クエリ:{query}, 値:{value}")
-            self.cursor().execute(query, value)
+            self.__logDebug(f"クエリ:{query.sql}, 値:{value}")
+            self.cursor().execute(query.sql, value)
         except Exception as e:
             msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{value}"
+            qmsg = f"クエリ:{query.sql}, 値:{value}"
             self.__logError(msg)
             self.__logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    def executeAny(self, query: Any, data: list[tuple[str]]) -> None:
+    def executeAny(self, query : Query, data: list[tuple[str]]) -> None:
         """
         クエリの実行(複数)
+        Args:
+            query (Query)            : クエリ文
+            data  (list[tuple[str]]) : プレイスホルダーに渡す値
         Raises:
             Exception : クエリの実行に失敗した場合
         """
         try:
-            self.__logDebug(f"クエリ:{query}, 値:{data}")
-            self.cursor().executemany(query, data)
+            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
+            self.cursor().executemany(query.sql, data)
         except Exception as e:
             msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{data}"
+            qmsg = f"クエリ:{query.sql}, 値:{data}"
             self.__logError(msg)
             self.__logError(qmsg)
             raise Exception(f"{msg}: {e}")

@@ -31,24 +31,8 @@ class AsyncInsertRecords(AsyncBase):
             "?", self.sqlEngine.PLACEHOLDER
         )
         # クエリ
-        self.__query = f"INSERT INTO {self.tableName} "\
-                     + f"({columns}) VALUES ({placeHolders});"
+        self.query = f"INSERT INTO {self.tableName} "\
+                   + f"({columns}) VALUES ({placeHolders});"
         # 値
-        self.__data = data
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def data(self):
-        """値"""
-        return self.__data
-    #---------------------------------------------------------------------------
-    @public
-    async def execute(self):
-        return await super().executeAny(self.__query, self.__data)
+        self.data = data
 #-------------------------------------------------------------------------------

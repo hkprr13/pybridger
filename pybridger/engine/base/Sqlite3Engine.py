@@ -150,7 +150,7 @@ class Sqlite3Engine(SqlEngine, Sqlite3DateTypes):
         """
         クエリを実行
         Args:
-            query (str)     : 実行するクエリ文
+            query (Query)   : SQL文
             value (tuple)   : プレイスホルダーに渡す値
         Raises:
             Exception : クエリの実行に失敗した場合
@@ -170,6 +170,9 @@ class Sqlite3Engine(SqlEngine, Sqlite3DateTypes):
     def executeAny(self, query : Query, data: list[tuple[str]]):
         """
         クエリの実行(複数)
+        Args:
+            query (Query)            : クエリ文
+            data  (list[tuple[str]]) : プレイスホルダーに渡す値
         Raises:
             Exception : クエリの実行に失敗した場合
         """

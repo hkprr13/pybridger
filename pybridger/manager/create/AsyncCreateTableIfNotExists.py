@@ -16,15 +16,5 @@ class AsyncCreateTableIfNotExists(AsyncBase):
             columns   (str) : CREATE TABLE (...);の...部分
         """
         super().__init__(tableName)
-        self.__query = f"CREATE TABLE IF NOT EXISTS {tableName} ({columns});"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    async def execute(self):
-        return await super().execute(self.__query)
+        self.query = f"CREATE TABLE IF NOT EXISTS {tableName} ({columns});"
 #-------------------------------------------------------------------------------

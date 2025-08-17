@@ -6,6 +6,7 @@ from ...common      import override         # オーバライドメソッド
 from ...common      import public           # パブリックメソッド
 from ...common      import private          # プライベートメソッド
 from ...Log         import Log              # ログクラス
+from ...query       import Query            # クエリクラス
 #-------------------------------------------------------------------------------
 class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
     """
@@ -163,48 +164,45 @@ class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
     #---------------------------------------------------------------------------
     @override
     @public
-    async def execute(self, query: str, value: tuple = ()): 
+    async def execute(self, query: Query, value: tuple = ()): 
         """
         非同期にSQLクエリを実行する
         Args:
-            query (str)     : SQL文
+            query (Query)   : SQL文
             value (tuple)   : プレイスホルダーに渡す値
         Raises:
             Exception : クエリの実行に失敗した場合
         """
         try:
-            self.__logDebug(f"クエリ:{query}, 値:{value}")
+            self.__logDebug(f"クエリ:{query.sql}, 値:{value}")
             cur = await self.cursor()
-            await cur.execute(query, value)
+            await cur.execute(query.sql, value)
         except Exception as e:
             msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{value}"
+            qmsg = f"クエリ:{query.sql}, 値:{value}"
             self.__logError(msg)
             self.__logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------    
     @override
     @public
-    async def executeAny(self, query : str, data : list[tuple[str]]) -> None:
+    async def executeAny(self, query : Query, data : list[tuple[str]]) -> None:
         """
         非同期にSQLクエリ(複数)を実行する
         Args:
-            query (str)              : クエリ文
-            value (list[tuple[str]]) : プレイスホルダーに渡す値
-        Args:
-            query (str)             : SQL文
-            value (list[tuple[str]) : プレイスホルダーに渡す値
+            query (Query)            : クエリ文
+            data  (list[tuple[str]]) : プレイスホルダーに渡す値
         Raises:
             Exception : クエリの実行に失敗した場合
         """
         try:
-            self.__logDebug(f"クエリ:{query}, 値:{data}")
+            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
             # カーソルオブジェクトはコルーチンの完了を持って設定
             cur = await self.cursor()
-            await cur.executemany(query, data)
+            await cur.executemany(query.sql, data)
         except Exception as e:
             msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{data}"
+            qmsg = f"クエリ:{query.sql}, 値:{data}"
             self.__logError(msg)
             self.__logError(qmsg)
             raise Exception(f"{msg}: {e}")

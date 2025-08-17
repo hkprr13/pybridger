@@ -1,11 +1,12 @@
 #-------------------------------------------------------------------------------
-from .base     import AsyncMySqlEngine
-from .base     import AsyncSqlite3Engine
-from ..common  import public          #パブリックメソッド
-from ..column  import Column
-from ..model   import Model           # モデルクラス
-from ..manager import Select          # SELECT句クラス
-from ..config  import Config
+from .base      import AsyncMySqlEngine         # 非同期MySQL
+from .base      import AsyncSqlite3Engine       # 非同期Sqlite3
+from .base      import AsyncPostgreSqlEngine    # 非同期PostgreSQL
+from ..common   import public                   # パブリックメソッド
+from ..column   import Column                   # カラムクラス
+from ..model    import Model                    # モデルクラス
+from ..manager  import Select                   # SELECT句クラス
+from ..config   import Config                   # コンフィグクラス
 #-------------------------------------------------------------------------------
 class AsyncEngine:
     """
@@ -20,7 +21,9 @@ class AsyncEngine:
             hostName      : str | None = None,
             userName      : str | None = None,
             password      : str | None = None,
-            database      : str | None = None
+            database      : str | None = None,
+            port          : int | None = None,
+            logFile       : str | None = None
         ):
         """
         エンジンを初期化し、接続情報を登録する。
@@ -36,6 +39,8 @@ class AsyncEngine:
         self.userName      = userName
         self.password      = password
         self.database      = database
+        self.port          = port
+        self.logFile       = logFile
     #---------------------------------------------------------------------------
     @public
     async def launch(self) -> None:
@@ -58,6 +63,20 @@ class AsyncEngine:
                     userName     = self.userName,
                     password     = self.password,
                     databaseName = self.database
+                )
+            else:
+                raise Exception("引数を指定ください")
+        elif self.sqlEngineName.lower() == "postgresql":
+            if  self.hostName and self.userName \
+            and self.password and self.database \
+            and self.port:
+                self.sqlEngine = AsyncPostgreSqlEngine(
+                    hostName     = self.hostName,
+                    userName     = self.userName,
+                    password     = self.password,
+                    databaseName = self.database,
+                    port         = self.port,
+                    logFile      = self.logFile
                 )
             else:
                 raise Exception("引数を指定ください")

@@ -51,12 +51,6 @@ class Select(Base):
             columnsList.append(f"{col.tableName}.{col.columnName}")
         return columnsList
     #---------------------------------------------------------------------------
-    @property
-    @public
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
     @public
     def getRecord(self) -> list:
         """
