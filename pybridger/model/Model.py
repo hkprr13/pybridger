@@ -134,6 +134,10 @@ class Model(metaclass = ModelMeta):
         else:  fk = ""
         return fk
     #---------------------------------------------------------------------------
+    @classmethod
+    def checkDatatypes(cls):
+        print(cls.__dict__)
+    #---------------------------------------------------------------------------
     # パブリックメソッド
     #---------------------------------------------------------------------------
     # CREATE系
@@ -409,6 +413,7 @@ class Model(metaclass = ModelMeta):
         # 値をストックに格納
         # カラム数に応じて, プレイスホルダー数を決定
         for key, value in columns.items():
+            Model()
             cols         += f"{key}, "
             placeHolders += "?, "
             values.append(value)
@@ -636,6 +641,8 @@ class Model(metaclass = ModelMeta):
             if hasattr(isinstance, key):
                 setattr(instance, key, value)
         return instance
+    #---------------------------------------------------------------------------
+
     #---------------------------------------------------------------------------
     def __and__(self, other):
         return f"{self} {other}"

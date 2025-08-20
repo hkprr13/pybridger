@@ -24,8 +24,10 @@ class Config:
     # データベース
     database : str | None = None
     # 比較用
-    sqlite3Engine      : Sqlite3Engine
-    MySqlEngine        : MySqlEngine
-    asyncSqlite3Engine : AsyncSqlite3Engine
-    asyncMySqlEngine   : AsyncMySqlEngine
+    sqlite3Engine           : Sqlite3Engine
+    mySqlEngine             : MySqlEngine
+    postgreSqlEngine        : PostgreSqlEngine
+    asyncSqlite3Engine      : AsyncSqlite3Engine
+    asyncMySqlEngine        : AsyncMySqlEngine
+    asyncPostgreSqlEngine   : AsyncPostgreSqlEngine
 #-------------------------------------------------------------------------------
