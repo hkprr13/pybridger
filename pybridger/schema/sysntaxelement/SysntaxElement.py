@@ -1,48 +1,63 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from ...errors      import EngineUndefinedError # エラー
-from ...errors      import EngineSetupError     # エラー
-from ...common      import public               # パブリックデコレーター
-from ...config      import Config               # コンフィグクラス
+from typing         import Any
+from ...errors      import EngineUndefinedError
+from ...errors      import EngineSetupError
+from ...common      import public
+from ...config      import Config
 #-------------------------------------------------------------------------------
 class SysntaxElement:
     TEXTNOTSUPPORTED: str = "Not supported"
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
+        # Use Any here, subclasses will define the specific type
         self.query : Any
     #---------------------------------------------------------------------------
     @public
     def checkSettingEngine(self):
-        # 同期エンジンと非同期エンジンが未設定なら
+        # If synchronous and asynchronous engines are not set
         if Config.sqlEngine is None and Config.asyncSqlEngine is None:
             raise EngineUndefinedError()
-        # 同期エンジンが設定かつ、非同期エンジンが未設定
+        # Synchronous engine is set, but asynchronous engine is not set
         elif Config.asyncSqlEngine is None and Config.sqlEngine is not None:
             self.sqlEngine = Config.sqlEngine
-        # 同期エンジンが未設定かつ、非同期エンジンが設定されている
+        # Synchronous engine is not set and asynchronous engine is set
         elif Config.sqlEngine is None and Config.asyncSqlEngine is not None:
             self.sqlEngine = Config.asyncSqlEngine
         else:
             raise EngineSetupError()
     #---------------------------------------------------------------------------
     @public
-    def mysql(self) -> None: ...
+    def mysql(self) -> None:
+        """
+        MySQL
+        """
     #---------------------------------------------------------------------------
     @public
-    def sqlite3(self) -> None: ...
+    def sqlite3(self) -> None:
+        """
+        Sqlite3
+        """
     #---------------------------------------------------------------------------
     @public
-    def postgresql(self) -> None: ...
+    def postgresql(self) -> None:
+        """
+        PostgreSQL
+        """
     #---------------------------------------------------------------------------
     @public
     def toQuery(self) -> Any:
+        # Check engine
         self.checkSettingEngine()
+        # MySQL
         if self.sqlEngine == Config.mySqlEngine:
             self.mysql()
+        # Sqlite3
         elif self.sqlEngine == Config.sqlite3Engine:
             self.sqlite3()
+        # PostgreSQL
         elif self.sqlEngine == Config.postgreSqlEngine:
             self.postgresql()
+        # Other
         else:
             raise EngineUndefinedError()
         return self.query

@@ -1,9 +1,8 @@
 #-------------------------------------------------------------------------------
-from .Constraint    import Constraint  # 基底クラス
-from ...common      import override     # オーバライドデコレーター
-from ...common      import private      # プライベートデコレーター
-from ...common      import public       # パブリックデコレーター
-from ...mapper      import Query        # クエリクラス
+from .Constraint    import Constraint
+from ...common      import override
+from ...common      import private
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
 class ForeignKey(Constraint):
     """
@@ -21,6 +20,14 @@ class ForeignKey(Constraint):
             referenceName (str)         : It is the reference format of "table.column"
             onUpdate      (bool | None) : Whether or not to apply ON UPDATE CASCADE. If None, it is not specified. 
             onDelete      (bool | None) : Whether or not to apply ON DELETE CASCADE. If None, it is not specified. 
+        Examples:
+            ```
+            ForeignKey(
+                referenceName = "User.id"
+                onUpdate      = True
+                onDelete      = True
+            )
+            ```
         """
         self.__setReferenceName(referenceName)
         self.__onUpdate = onUpdate

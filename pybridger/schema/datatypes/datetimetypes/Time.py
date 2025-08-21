@@ -1,13 +1,13 @@
 #-------------------------------------------------------------------------------
-from .DateTimeType      import DateTimeType         # 日時型
-from ....common         import override             # オーバライドデコレーター
-from ....common         import private              # プライベートデコレーター
-from ....mapper         import Query                # クエリクラス
+from .DateTimeType      import DateTimeType
+from ....common         import override
+from ....common         import private
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class Time(DateTimeType):
     """
-    時刻型
-    サポートされているSQL(MySQL, PostgreSQL)
+    Time type
+    Supported SQL (MySQL, PostgreSQL)
     """
     def __init__(
             self,
@@ -36,18 +36,21 @@ class Time(DateTimeType):
         return Query(query)
     #---------------------------------------------------------------------------
     @override
+    @private
     def mysql(self) -> None:
         self.query  = Query(f"TIME({self.__precision})")
         self.format = self.__setFormat()
         self.range  = "-838:59:59~838:59:59"
     #---------------------------------------------------------------------------
     @override
+    @private
     def sqlite3(self) -> None:
         self.query  = self.TEXTNOTSUPPORTED
         self.format = self.TEXTNOTSUPPORTED
         self.range  = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
+    @private
     def postgresql(self) -> None:
         self.query  = self.__setPostgresqlQuery()
         self.format = self.__setFormat()

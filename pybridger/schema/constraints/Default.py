@@ -13,6 +13,10 @@ class Default(Constraint):
         Initalize default constraint object
         Args:
             value (str | int | float | bool) : defalut value
+        Examples:
+            ```
+            Defalut(1)
+            ```
         """
         self.__value = value
     #---------------------------------------------------------------------------

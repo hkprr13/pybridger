@@ -1,28 +1,14 @@
 #-------------------------------------------------------------------------------
-from typing         import Any              # Any型クラス
-from .SqlEngine     import SqlEngine        # 基底SQLエンジンクラス
-from .datetypes     import MySqlDateTypes   # MySQLのデータ型クラス
-from ...common      import interface        # インタフェースデコレーター
-from ...common      import internal         # 内部専用デコレーター
-from ...common      import override         # オーバライドメソッド
-from ...common      import public           # パブリックメソッド
-from ...common      import private          # プライベートメソッド
-from ...Log         import Log              # ログクラス
-from ...query       import Query            # クエリクラス
+from typing         import Any
+from .SqlEngine     import SqlEngine
+from ...common      import override
+from ...common      import public
+from ...common      import private
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
-class MySqlEngine(SqlEngine, MySqlDateTypes):
+class MySqlEngine(SqlEngine):
     """
-    MySQLエンジンクラス
-    Attributes:
-        hostName     (str)             : ホスト名
-        userName     (str)             : ユーザー名
-        password     (str)             : パスワード
-        databaseName (str)             : データベース名
-        sqlEngine    (mysql.connector) : mysql.connectorクラス
-        conn         (Any | None)      : mysqlコネクトオブジェクト
-        cur          (Any | None)      : mysqlカーソルオブジェクト
-        __isLog      (bool)            : ログフラグ 
-        __Log        (Log)             : ログオブジェクト
+    Defined MySQL engine class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -34,81 +20,31 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
             logFile      : str | None = None
         ):
         """
-        MySQLエンジンの初期化
+        Initalize MySQL engine class
         Args:
-            hostName     (str)        : ホスト名
-            userName     (str)        : ユーザー名
-            password     (str)        : パスワード
-            databaseName (str)        : データベース名
-            logFile      (str | None) : ログファイル名
+            hostName     (str)        : host
+            userName     (str)        : user name
+            password     (str)        : password
+            databaseName (str)        : database
+            logFile      (str | None) : Specify to obtain the log file.
         """
         super().__init__()
-        # インスタンス変数
         self.hostName     = hostName
         self.userName     = userName
         self.password     = password
         self.databaseName = databaseName
-        # インスタンス変数(オブジェクト)
-        # インスタンスされたタイミングでインポートを行う
         try:
             import mysql.connector
             self.sqlEngine  = mysql.connector
         except Exception as e:
             raise Exception(
-                "mysql.connnectorがインストールされていません\n"
-                "下記をターミナルで実行してください\n"
+                "mysql.connnector is not installed\n"
+                "Please execute the following in Terminal\n"
                 "pip install mysql-connector-python"
             )
-        # コネクトオブジェクトとカーソルオブジェクトの初期化
-        self.conn       = None # 初期値はNone
-        self.cur        = None # 初期値はNone
-        # ログの初期設定
-        self.__setLog(logFile)
-    #---------------------------------------------------------------------------
-    @private
-    def __setLog(self, logFile : str | None):
-        """ログクラスとフラグの設定"""
-        # ログファイルが未指定なら
-        if logFile is None:
-            self.__isLog = False
-            self.__log   = None
-        # ログファイルが指定されていれば
-        elif logFile:
-            self.__isLog = True
-            self.__log   = Log(logFile)
-        else:
-            self.__isLog = False
-            self.__log   = None
-    #---------------------------------------------------------------------------
-    @private
-    def __logDebug(self, msg):
-        """デバックメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.debug(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logInfo(self, msg):
-        """インフォメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.info(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logWarning(self, msg):
-        """警告メッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.warning(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logError(self, msg):
-        """エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.error(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logCritical(self, msg):
-        """致命的エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.critical(msg)   
+        self.conn = None
+        self.cur  = None
+        self.setLog(logFile)
     #---------------------------------------------------------------------------
     @override
     @public
@@ -129,13 +65,12 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
                 password = self.password,
                 database = self.databaseName
             )
-            # 問題なければ返す
             return self.conn
-        # データベースとの接続が切れた場合
+        # If the connection to the database is lost
         except self.sqlEngine.errors.OperationalError as oe:
             try:
-                self.__logInfo("接続が切れています。再接続を試みます...")
-                # 再接続を試みる
+                self.logInfo("接続が切れています。再接続を試みます...")
+                # Try reconnecting.
                 self.conn = self.sqlEngine.connect(
                     host     = self.hostName,
                     user     = self.userName,
@@ -147,34 +82,34 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
             except Exception as e:
                 msg = "MySQLの再接続に失敗しました"
                 # ログ
-                self.__logError(msg)
+                self.logError(msg)
                 print(f"{msg}: {e}")
                 raise Exception
         # 認証エラーやデータベース指定ミスの場合
         except self.sqlEngine.errors.ProgrammingError as pe:
             msg = "認証エラーやデータベース指定ミスです"
-            self.__logError(msg)
+            self.logError(msg)
             raise Exception(f"{msg}: {pe}")
         # ネットワークの接続やソケットエラーの場合
         except self.sqlEngine.errors.InterfaceError as ie:
             msg = "ソケットエラーやネットワークの接続エラーです"
-            self.__logError(msg)
+            self.logError(msg)
             raise Exception(f"{msg}: {ie}")
         except self.sqlEngine.errors.Error as e:
             # ユーザ名またはパスワードが違う場合
             if e.errno == 1045:
                 msg = "ユーザ名またはパスワードが間違っています"
-                self.__logError(msg)
+                self.logError(msg)
                 raise Exception(msg)
             # 指定されたデータベースが存在しない場合
             elif e.errno == 1049:
                 msg = "指定されたデータベースが存在しません"
-                self.__logError(msg)
+                self.logError(msg)
                 raise Exception(msg)
             # その他
             else:
                 msg = f"MySQLエラー({e.errno})です"
-                self.__logError(msg)
+                self.logError(msg)
                 raise Exception(f"{msg}: {e.msg}")
     #---------------------------------------------------------------------------
     @override
@@ -182,7 +117,7 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
     def cursor(
             self,
             dictionary : bool = False
-        ) -> Any: # Anyじゃないとエラーになりやすい
+        ) -> Any:
         """
         カーソルの作成
         Args:
@@ -206,7 +141,7 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
             return self.cur
         except Exception as e:
             msg = "カーソルの作成に失敗しました"
-            self.__logError(msg)
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
@@ -221,13 +156,13 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
             Exception : クエリの実行に失敗した場合
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{value}")
+            self.logDebug(f"クエリ:{query.sql}, 値:{value}")
             self.cursor().execute(query.sql, value)
         except Exception as e:
             msg  = "クエリの実行に失敗しました"
             qmsg = f"クエリ:{query}, 値:{value}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
@@ -242,13 +177,13 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
             Exception : クエリの実行に失敗した場合
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
+            self.logDebug(f"クエリ:{query.sql}, 値:{data}")
             self.cursor().executemany(query.sql, data)
         except Exception as e:
             msg  = "クエリの実行に失敗しました"
             qmsg = f"クエリ:{query}, 値:{data}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
@@ -265,46 +200,9 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
         except Exception as e:
             # コミットが失敗した場合ロールバックする
             msg = "コミットが失敗したためロールバックしました"
-            self.__logError(msg)
+            self.logError(msg)
             self.rollback()
             raise Exception(f"{msg}: {e}")
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    def connectOpen(self) -> None:
-        """
-        コネクトとカーソルの開放
-        Raises:
-            Exception : コネクトとカーソルの開放に失敗した場合
-        """
-        try:
-            self.connect()
-            self.cursor()
-        except Exception as e:
-            msg = "コネクトとカーソルの開放に失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}")        
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    def connectClose(self) -> None:
-        """
-        コネクションとカーソルのクローズ
-        Raises:
-            Exception : コネクトとカーソルのクローズに失敗した場合
-        """
-        try:
-            # コネクトが接続していれば
-            if self.conn and self.conn.is_connected():
-                if self.cur is not None:
-                    self.cur.close()
-                self.conn.close()
-                self.conn = None # 初期値に戻す
-                self.cur  = None # 初期値に戻す
-        except Exception as e:
-            msg = "コネクトとカーソルのクローズに失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
@@ -319,7 +217,7 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
                 self.cursor().execute("START TRANSACTION")
         except Exception as e:
             msg = "トランザクションに失敗しました"
-            self.__logError(msg)
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
@@ -335,7 +233,7 @@ class MySqlEngine(SqlEngine, MySqlDateTypes):
                 self.conn.rollback()
         except Exception as e:
             msg = "ロールバックに失敗しました"
-            self.__logError(msg)
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override

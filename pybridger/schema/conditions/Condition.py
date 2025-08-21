@@ -4,7 +4,7 @@ from ...common      import public   # パブリックデコレーター
 #-------------------------------------------------------------------------------
 class Condition:
     """
-    条件式クラス
+    Defined condition class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -15,7 +15,7 @@ class Condition:
             right     : Any | None = None
         ):
         """
-        条件式クラス
+        Initialize condition object
         Args:
             tableName (str | None) : テーブル名
             left      (Any)        : 左の条件

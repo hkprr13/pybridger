@@ -1,26 +1,16 @@
 #-------------------------------------------------------------------------------
-from typing         import Any              # Any型クラス
-from .SqlEngine     import SqlEngine        # 基底SQLエンジンクラス
-from .datetypes     import MySqlDateTypes   # MySQLのデータ型クラス
-from ...common      import override         # オーバライドメソッド
-from ...common      import public           # パブリックメソッド
-from ...common      import private          # プライベートメソッド
-from ...Log         import Log              # ログクラス
-from ...query       import Query            # クエリクラス
+from typing         import Any
+from .SqlEngine     import SqlEngine
+from .datetypes     import MySqlDateTypes
+from ...common      import override
+from ...common      import public
+from ...common      import private
+from ...utils       import Log
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
 class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
     """
-    非同期MySQLエンジンクラス
-    Attributes:
-        hostName     (str)        : ホスト名
-        userName     (str)        : ユーザー名
-        password     (str)        : パスワード
-        databaseName (str)        : データベース名
-        sqlEngine    (aiomysql)   : aiomysqlクラス
-        conn         (Any | None) : aiomysqlコネクトオブジェクト
-        cur          (Any | None) : aiomysqlカーソルオブジェクト
-        __isLog      (bool)       : ログフラグ 
-        __Log        (Log)        : ログオブジェクト
+    Asynchronous engine class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -30,48 +20,45 @@ class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
         password     : str,
         databaseName : str,
         logFile      : str | None = None
-    ):
+    ) -> None:
         """
-        非同期MySQLエンジンの初期化
+        Initalize asynchronous engine class
         Args:
-            hostName     (str)        : ホスト名
-            userName     (str)        : ユーザー名
-            password     (str)        : パスワード
-            databaseName (str)        : データベース名
-            logFile      (str | None) : ログファイル名
+            hostName     (str)        : host
+            userName     (str)        : user name
+            password     (str)        : password
+            databaseName (str)        : database
+            logFile      (str | None) : Specify to obtain the log file.
         """
         super().__init__()
-        # インスタンス変数
         self.hostName     = hostName
         self.userName     = userName
         self.password     = password
         self.databaseName = databaseName
-        # インスタンスされたタイミングでインポートを行う
-        # インスタンス変数(オブジェクト)
+        # Display an error message when the driver is not installed
         try:
             import aiomysql
             self.sqlEngine  = aiomysql
-         # ドライバがインストールされていない場合エラーメッセージを表示させる
         except Exception as e:
             raise Exception(
-                "mysql.connnectorがインストールされていません\n"
-                "下記をターミナルで実行してください\n"
+                "mysql.connnector is not installed\n"
+                "Please execute the following in Terminal\n"
                 "pip install aiomysql"
             )
-        # コネクトオブジェクトとカーソルオブジェクトの初期化
-        self.conn = None # 初期値はNone
-        self.cur  = None # 初期値はNone
-        # ログの初期設定
+        self.conn = None # Initial value is None
+        self.cur  = None # Initial value is None
         self.__setLog(logFile)
     #---------------------------------------------------------------------------
     @private
     def __setLog(self, logFile : str | None):
-        """ログクラスとフラグの設定"""
-        # ログファイルが未指定なら
+        """
+        Setting Log class and log flag
+        Args:
+            logFile (str | None) : log file 
+        """
         if logFile is None:
             self.__isLog = False
             self.__log   = None
-        # ログファイルが指定されていれば
         elif logFile:
             self.__isLog = True
             self.__log   = Log(logFile)
@@ -80,31 +67,43 @@ class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
             self.__log   = None
     #---------------------------------------------------------------------------
     @private
-    def __logDebug(self, msg):
-        """デバックメッセージ"""
+    def __logDebug(self, msg) -> None:
+        """
+        Debug message
+        Args:
+            msg (str) : message
+        """
         if self.__isLog and self.__log is not None:
             self.__log.debug(msg)
     #---------------------------------------------------------------------------
     @private
-    def __logInfo(self, msg):
-        """インフォメッセージ"""
+    def __logInfo(self, msg) -> None:
+        """
+        Debug message
+        Args:
+            msg (str) : message
+        """
         if self.__isLog and self.__log is not None:
             self.__log.info(msg)
     #---------------------------------------------------------------------------
     @private
-    def __logWarning(self, msg):
-        """警告メッセージ"""
+    def __logWarning(self, msg) -> None:
+        """
+        Debug message
+        Args:
+            msg (str) : message
+        """
         if self.__isLog and self.__log is not None:
             self.__log.warning(msg)
     #---------------------------------------------------------------------------
     @private
-    def __logError(self, msg):
+    def __logError(self, msg) -> None:
         """エラーメッセージ"""
         if self.__isLog and self.__log is not None:
             self.__log.error(msg)
     #---------------------------------------------------------------------------
     @private
-    def __logCritical(self, msg):
+    def __logCritical(self, msg) -> None:
         """致命的エラーメッセージ"""
         if self.__isLog and self.__log is not None:
             self.__log.critical(msg)   

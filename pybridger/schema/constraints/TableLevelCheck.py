@@ -15,10 +15,8 @@ class TableLevelCheck(Constraint):
     ) -> None:
         """
         Initialize table-level check constraint object
-        
         Args:
             conditons (tuple[str]) : Conditional expressions specified as strings.
-
         Examples:
             ```
             class Employees(Model):
@@ -37,10 +35,10 @@ class TableLevelCheck(Constraint):
 
     @public
     def __buildTableLevelCheckQuery(self) -> Query:
-        """_summary_
-
+        """
+        Build query for table-level check constraint 
         Returns:
-            Query: _description_
+            Query: 
         """
         query = ""
         for cond in self.__conditions:

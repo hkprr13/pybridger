@@ -1,17 +1,17 @@
 #-------------------------------------------------------------------------------
 from ..datatypes    import DataType
-from ..constraints  import AutoIncrement      # 自動採番 
-from ..constraints  import PrimaryKey         # 主キークラス
-from ..constraints  import Default            # デフォルト値クラス
-from ..constraints  import NotNull            # NotNullクラス
-from ..constraints  import Unique             # ユニーク設定クラス
-from ..constraints  import Check              # CHECK制約クラス
-from ..constraints  import TableLevelCheck    # CHCEK制約(テーブルレベル)
-from ..constraints  import ForeignKey         # 外部キー制約クラス
-from ...common      import public             # パブリックメソッド
-from ...common      import private            # プライベートメソッド
-from ..conditions   import Condition          # 条件クラス
-from ..conditions   import ConditionGroup     # 条件クラス
+from ..constraints  import AutoIncrement
+from ..constraints  import PrimaryKey
+from ..constraints  import Default
+from ..constraints  import NotNull
+from ..constraints  import Unique
+from ..constraints  import Check
+from ..constraints  import TableLevelCheck
+from ..constraints  import ForeignKey
+from ...common      import public
+from ...common      import private
+from ..conditions   import Condition
+from ..conditions   import ConditionGroup
 from ...mapper      import Query
 from ...errors      import DataTypeUndefinedError
 #-------------------------------------------------------------------------------
@@ -19,8 +19,6 @@ class Column:
     """
     Define the columns and column information
     """
-    #---------------------------------------------------------------------------
-
     #---------------------------------------------------------------------------
     def __init__(
         self,
@@ -50,7 +48,12 @@ class Column:
             ValueError : When the data type is undefined
         Examples:
             ```
-                
+            User(Model):
+                id = Column(
+                    dataType        = Integer(),
+                    isPrimaryKey    = True,
+                    isAutoIncrement = True,
+            )
             ```
             
         """

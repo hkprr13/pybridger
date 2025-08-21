@@ -1,29 +1,42 @@
 #-------------------------------------------------------------------------------
-from __future__ import annotations # 循環インポートを回避する用
+from __future__ import annotations # To avoid circular imports
 from typing import TYPE_CHECKING   
 #-------------------------------------------------------------------------------
 if TYPE_CHECKING:
-    from ..engine import Sqlite3Engine          # 
-    from ..engine import AsyncSqlite3Engine     #
-    from ..engine import MySqlEngine            #
-    from ..engine import AsyncMySqlEngine       #
-    from ..engine import PostgreSqlEngine       #
-    from ..engine import AsyncPostgreSqlEngine  #
+    from ..engine import Sqlite3Engine
+    from ..engine import AsyncSqlite3Engine
+    from ..engine import MySqlEngine
+    from ..engine import AsyncMySqlEngine
+    from ..engine import PostgreSqlEngine
+    from ..engine import AsyncPostgreSqlEngine
 #-------------------------------------------------------------------------------
 class Config:
-    # 同期版のエンジン
+    """
+    Defined config class
+    Attributes:
+        sqlEngine      (Sqlite3Engine      | MySqlEngine      | PostgreSqlEngine      | None) : Initial value None
+        asyncSqlEngine (AsyncSqlite3Engine | AsyncMySqlEngine | AsyncPostgreSqlEngine | None) : Initial value None
+        database       (str | None) : database
+        sqlite3Engine         (Sqlite3Engine)         : Sqlite3
+        mySqlEngine           (MySqlEngine)           : MySQL
+        postgreSqlEngine      (PostgreSqlEngine)      : PostgreSQL
+        asyncSqlite3Engine    (AsyncSqlite3Engine)    : Sqlite3(Asynchronous)
+        asyncMySqlEngine      (AsyncMySqlEngine)      : MySQL(Asynchronous)
+        asyncPostgreSqlEngine (AsyncPostgreSqlEngine) : PostgreSQL(Asynchronous)
+    """
+    # Synchronous engine
     sqlEngine : Sqlite3Engine    \
               | MySqlEngine      \
               | PostgreSqlEngine \
               | None = None
-    # 非同期版のエンジン
+    # Asynchronous engine
     asyncSqlEngine : AsyncSqlite3Engine    \
                    | AsyncMySqlEngine      \
                    | AsyncPostgreSqlEngine \
                    | None = None
-    # データベース
+    # database
     database : str | None = None
-    # 比較用
+    # Engines
     sqlite3Engine           : Sqlite3Engine
     mySqlEngine             : MySqlEngine
     postgreSqlEngine        : PostgreSqlEngine

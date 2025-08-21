@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
-from .Constraint    import Constraint # 基底クラス
-from ...common      import override     # オーバライドデコレーター
-from ...mapper      import Query        # クエリクラス
+from .Constraint    import Constraint
+from ...common      import override
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
 class Check(Constraint):
     """
@@ -12,6 +12,10 @@ class Check(Constraint):
         Initialize check constraint object
         Args:
             condtions (str) : conditional expression by specify string
+        Examples:
+        ```
+            Check('id >= 1')
+        ```
         """
         self.__conditions = conditons
     #---------------------------------------------------------------------------
