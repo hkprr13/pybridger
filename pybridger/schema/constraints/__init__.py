@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 from .AutoIncrement     import AutoIncrement
 from .Check             import Check
-from .Constraints       import Constraints
+from .Constraint        import Constraint
 from .Default           import Default
 from .ForeignKey        import ForeignKey
 from .NotNull           import NotNull
@@ -12,7 +12,7 @@ from .Unique            import Unique
 __all__ = [
     "AutoIncrement",
     "Check",
-    "Constraints",
+    "Constraint",
     "Default",
     "ForeignKey",
     "NotNull",

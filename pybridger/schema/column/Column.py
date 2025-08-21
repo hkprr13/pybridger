@@ -74,7 +74,7 @@ class Column:
         self.defaultQuery         : Query = self.__buildDefaultQuery()
         self.checkQuery           : Query = self.__buildCheckQuery()
         self.tableLevelCheckQuery : Query = self.__buildTableLevelCheckQuery()
-        self.foreignKeyQuery      : Query = 
+        self.foreignKeyQuery      : Query = self.__buildForeignKeyQuery()
         # public attributes (column name & table name)
         self.columnName : str
         self.tableName  : str 
@@ -185,8 +185,16 @@ class Column:
             return Query("")
     #---------------------------------------------------------------------------
     def __buildForeignKeyQuery(self) -> Query:
-        return Query("")
-    #---------------------------------------------------------------------------
+        """
+        private method
+        build query for foreign key constraints
+        Returns:
+            Query : query object
+        """
+        if self.__foreignKey:
+            return self.__foreignKey.toQuery()
+        else:
+            return Query("")
     #---------------------------------------------------------------------------
     @public
     def toQuery(self):
@@ -198,22 +206,22 @@ class Column:
     #---------------------------------------------------------------------------
     @public
     def like(self, value):
-        """LIKE演算子"""
+        """LINK operator"""
         return Condition(self.tableName, self.columnName, "LIKE", value)
     #---------------------------------------------------------------------------
     @public
     def In (self, *values):
-        """IN演算子"""
+        """IN operator"""
         return Condition(self.tableName, self.columnName, "IN", values)
     #---------------------------------------------------------------------------
     @public
     def notIn (self, *values):
-        """NOT IN演算子"""
+        """NOT IN operator"""
         return Condition(self.tableName, self.columnName, "NOT IN", (values))
     #---------------------------------------------------------------------------
     @public
     def between(self, before, after):
-        """BETWEEN演算子"""
+        """BETWEEN operator"""
         return Condition(
             self.tableName, self.columnName, "BETWEEN", (before, after)
         )
@@ -223,49 +231,49 @@ class Column:
     #---------------------------------------------------------------------------
     def __eq__(self, value):
         """
-        等価比較演算子 ==
+        equivalent comparison
         """
         return Condition(self.tableName, self.columnName, "=", value)
     #---------------------------------------------------------------------------
     def __ne__(self, value):
         """
-        不等比較演算子 !=
+        inequality comparison
         """
         return Condition(self.tableName, self.columnName, "!=", value)
     #---------------------------------------------------------------------------
     def __lt__(self, value):
         """
-        小なり演算子 <
+        less than
         """
         return Condition(self.tableName, self.columnName, "<", value)
     #---------------------------------------------------------------------------
     def __le__(self, value):
         """
-        以下演算子 <=
+        Below
         """
         return Condition(self.tableName, self.columnName, "<=", value)
     #---------------------------------------------------------------------------
     def __gt__(self, value):
         """
-        大なり演算子 >
+        Greater than
         """
         return Condition(self.tableName, self.columnName, ">", value)
     #---------------------------------------------------------------------------
     def __ge__(self, value):
         """
-        以上演算子 >=
+        Above
         """
         return Condition(self.tableName, self.columnName, ">=", value)
     #---------------------------------------------------------------------------
     def __and__(self, value):
         """
-        AND演算子 AND
+        AND
         """
         return ConditionGroup(self.tableName, self.columnName, "AND", value)
     #---------------------------------------------------------------------------
     def __or__(self, value):
         """
-        OR演算子 OR
+        OR
         """
         return ConditionGroup(self.tableName, self.columnName, "OR", value)
 #-------------------------------------------------------------------------------

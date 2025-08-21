@@ -1,15 +1,15 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  # 基底クラス
+from .Constraint    import Constraint # 基底クラス
 from ...common      import override     # オーバライドデコレーター
 from ...mapper      import Query        # クエリクラス
 #-------------------------------------------------------------------------------
-class Check(Constraints):
+class Check(Constraint):
     """
-    Defined check constraints
+    Defined check constraint class
     """
     def __init__(self, conditons : str) -> None:
         """
-        Initialize check constraints object
+        Initialize check constraint object
         Args:
             condtions (str) : conditional expression by specify string
         """

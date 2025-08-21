@@ -1,13 +1,13 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  # 基底クラス
+from .Constraint    import Constraint  # 基底クラス
 from ...common      import override     # オーバライドデコレーター
 from ...common      import private      # プライベートデコレーター
 from ...common      import public       # パブリックデコレーター
 from ...mapper      import Query        # クエリクラス
 #-------------------------------------------------------------------------------
-class ForeignKey(Constraints):
+class ForeignKey(Constraint):
     """
-    外部キー制約の定義クラス
+    Defined foreign key constraint class
     """
     def __init__(
             self,
@@ -16,63 +16,57 @@ class ForeignKey(Constraints):
             onDelete      : bool | None = None
         ):
         """
-        外部キー制約の定義クラス 
-        Args: 
-            referenceName (str)  : "table.column" 形式の参照名 
-            onUpdate      (bool | None) : ON UPDATE CASCADE の適用有無 
-                                          Noneなら未明示 
-            onDelete      (bool | None) : ON DELETE CASCADE の適用有無 
-                                          Noneなら未明示 
+        Intialize foreign key constraint object
+        Args:
+            referenceName (str)         : It is the reference format of "table.column"
+            onUpdate      (bool | None) : Whether or not to apply ON UPDATE CASCADE. If None, it is not specified. 
+            onDelete      (bool | None) : Whether or not to apply ON DELETE CASCADE. If None, it is not specified. 
         """
         self.__setReferenceName(referenceName)
-        # カラムの変更があった場合,更新するかどうか
-        self.onUpdate = onUpdate
-        # カラムの変更があった場合,削除するかどうか
-        self.onDelete = onDelete
+        self.__onUpdate = onUpdate
+        self.__onDelete = onDelete
     #---------------------------------------------------------------------------
     @private
     def __setReferenceName(self, referenceName : str):
-        # 文字列かどうか判断
+        # Determine whether it is a string
         if not isinstance(referenceName, str):
-            raise TypeError("文字列である必要があります")
+            raise TypeError("The reference name must be a string")
         else: pass
         strings : list = referenceName.split(".")
-        # 指定された文字列を分離させる
         # User.user_id
         if  len(strings) == 2:
-            # 参照先のテーブル
+            # referenced table 
             self.referencedTable  = strings[0] # User
-            # 参照先のカラム
+            # referenced column 
             self.referencedColumn = strings[1] # user_id
         else:
             raise ValueError(
-                f"入力された値 '{referenceName}' が間違っています"
+                f"The value'{referenceName}' is incorrect"
             )
     #---------------------------------------------------------------------------
     @private
     def __buildForeignKeyQuery(self) -> Query:
         """
-        外部キー制約のクエリを返す
+        private method
+        Build query for default
         Returns:
-            str : 外部キー制約のSQL文
+            Query : query
         Notes:
-            FOREIGN KEY (~~~) ... で出力されるのでカラム名が決定したら
-            ~~~を入れ替える必要あり
+            Since it is output as FOREIGN KEY (~~~),
+            it is necessary to replace ~~~ once the column name has been decided.
         """
         # SQL
         query = f"FOREIGN KEY (~~~) "\
             + f"REFERENCES {self.referencedTable}({self.referencedColumn})"
-        # 更新時に連動するなら
-        if self.onUpdate is None:
-            pass # Noneならqueryに未明示
-        elif self.onUpdate == True:
+        if self.__onUpdate is None:
+            pass # If None, query is not specified
+        elif self.__onUpdate == True:
             query += " ON UPDATE CASCADE"
         else:
             query += " ON UPDATE NO ACTION"
-        # 削除時に連動するなら
-        if self.onDelete is None:
-            pass # Noneならqueryに未明示
-        elif self.onDelete == True:
+        if self.__onDelete is None:
+            pass # If None, query is not specified
+        elif self.__onDelete == True:
             query += " ON DELETE CASCADE"
         else:
             query += " ON DELETE NO ACTION"
@@ -89,45 +83,4 @@ class ForeignKey(Constraints):
     @override
     def postgresql(self) -> None:
         self.query  = self.__buildForeignKeyQuery()
-    #---------------------------------------------------------------------------
-    @public
-    def getReferencedTable(self) -> str:
-        """
-        参照先のテーブル名の取得
-        Returns:
-            参照先のテーブル名
-        """
-        return self.referencedTable
-    #---------------------------------------------------------------------------
-    @public
-    def getReferencedColumn(self) -> str:
-        """
-        参照先のテーブルのカラムの取得
-        Returns:
-            str : 参照先のテーブルのカラム
-        """
-        return self.referencedColumn
-    #---------------------------------------------------------------------------
-    @public
-    def getOnUpdate(self) -> bool | None:
-        """
-        更新時に連動するかを取得
-        Returns:
-            bool : 更新するならTrue
-                   しないならFalse
-                   未明示ならNone
-        """
-        return self.onUpdate
-    #---------------------------------------------------------------------------
-    @public
-    def getOnDelete(self) -> bool  | None:
-        """
-        削除時に連動するかを取得
-        Returns:
-            bool : 更新するならTrue
-                   しないならFalse
-                   未明示ならNone
-        """
-        return self.onDelete
-
 #-------------------------------------------------------------------------------

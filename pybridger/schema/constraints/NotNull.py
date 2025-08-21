@@ -1,19 +1,18 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  # 基底クラス
-from ...common      import override     # オーバライドデコレーター
-from ...common      import private      # プライベートデコレーター
-from ...common      import public       # パブリックデコレーター
-from ...mapper      import Query        # クエリクラス
+from .Constraint    import Constraint
+from ...common      import override
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
-class NotNull(Constraints):
+class NotNull(Constraint):
     """
-    Defined not null constraints
+    Defined not null constraint
     """
     #---------------------------------------------------------------------------
     def __init__(self):
         """
-        Intialize not null constraints object
+        Intialize not null constraint object
         """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     def mysql(self) -> None:

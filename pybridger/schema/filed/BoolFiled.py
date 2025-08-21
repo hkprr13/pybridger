@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
 from .Filed         import Filed        # 基底クラス
 from ..datatypes    import Boolean      # 論理値型
-from ..constraints  import ForeignKey   #
+from ..constraint  import ForeignKey   #
 from ..common       import private
 #-------------------------------------------------------------------------------
 class BoolFiled(Filed):

@@ -1,16 +1,16 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  
+from .Constraint    import Constraint
 from ...common      import override     
 from ...common      import private     
 from ...mapper      import Query       
 #-------------------------------------------------------------------------------
-class Default(Constraints):
+class Default(Constraint):
     """
-    Defined default constraints
+    Defined default constraint
     """
     def __init__(self, value: str | int | float | bool):
         """
-        Initalize default constraints object
+        Initalize default constraint object
         Args:
             value (str | int | float | bool) : defalut value
         """
@@ -20,7 +20,7 @@ class Default(Constraints):
     def __buildDefaultQuery(self) -> Query:
         """
         private method
-        Build query for default 
+        Build query for default
         Returns:
             Query : query object
         """

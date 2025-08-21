@@ -1,14 +1,12 @@
 # -------------------------------------------------------------------------------
-from .Constraints import Constraints  # 基底クラス
-from ...common import override     # オーバライドデコレーター
-from ...common import public       # パブリックデコレーター
-from ...mapper import Query        # クエリクラス
+from .Constraint    import Constraint
+from ...common      import override
+from ...common      import public
+from ...mapper      import Query
 # -------------------------------------------------------------------------------
-
-
-class TableLevelCheck(Constraints):
+class TableLevelCheck(Constraint):
     """
-    Defined table-level check constraints
+    Defined table-level check constraint
     """
 # 
     def __init__(
@@ -16,7 +14,7 @@ class TableLevelCheck(Constraints):
         *conditons: tuple[str]
     ) -> None:
         """
-        Initialize table-level check constraints object
+        Initialize table-level check constraint object
         
         Args:
             conditons (tuple[str]) : Conditional expressions specified as strings.
@@ -39,6 +37,11 @@ class TableLevelCheck(Constraints):
 
     @public
     def __buildTableLevelCheckQuery(self) -> Query:
+        """_summary_
+
+        Returns:
+            Query: _description_
+        """
         query = ""
         for cond in self.__conditions:
             query += f"CHECK ({cond}),"

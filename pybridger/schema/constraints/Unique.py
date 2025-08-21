@@ -1,16 +1,15 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  # 基底クラス
-from ...common      import override     # オーバライドデコレーター
-from ...common      import private      # プライベートデコレーター
-from ...mapper      import Query        # クエリクラス
+from .Constraint    import Constraint
+from ...common      import override
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
-class Unique(Constraints):
+class Unique(Constraint):
     """
-    Defined unique constraints
+    Defined unique constraint
     """
     def __init__(self):
         """
-        Initialize unique constraints object
+        Initialize unique constraint object
         """
     #---------------------------------------------------------------------------
     @override

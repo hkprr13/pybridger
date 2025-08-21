@@ -1,6 +1,8 @@
 #-------------------------------------------------------------------------------
 from sysntaxelement     import SysntaxElement
 #-------------------------------------------------------------------------------
-class Constraints(SysntaxElement):
-    """制約基底クラス"""
+class Constraint(SysntaxElement):
+    """
+    Defined constraint base class
+    """
 #-------------------------------------------------------------------------------

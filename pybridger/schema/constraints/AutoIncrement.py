@@ -1,9 +1,18 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  # 基底クラス
+from .Constraint    import Constraint  # 基底クラス
 from ...common      import override     # オーバライドデコレーター
 from ...mapper      import Query        # クエリクラス
 #-------------------------------------------------------------------------------
-class AutoIncrement(Constraints):
+class AutoIncrement(Constraint):
+    """
+    Defined auto increment constraint class
+    """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        super().__init__()
+        """
+        Initialize auto increment constraint object
+        """
     #---------------------------------------------------------------------------
     @override
     def mysql(self) -> None:

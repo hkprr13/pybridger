@@ -1,20 +1,27 @@
 #-------------------------------------------------------------------------------
-from .Constraints   import Constraints  # 基底クラス
-from ...common      import override     # オーバライドデコレーター
-from ...common      import public       # パブリックデコレーター
-from ...mapper      import Query        # クエリクラス
+from .Constraint    import Constraint
+from ...common      import override 
+from ...common      import public
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
-class PrimaryKey(Constraints):
+class PrimaryKey(Constraint):
     """
-    主キー制約クラス
+    Defined primary key constraint class
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize primary key constraint object
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @public
     def __buildPrimaryKeyQuery(self) -> Query:
         """
-        主キー制約の定義
+        private method
+        Build query for primary key
         Returns:
-            Query : PRIMARY KEYのクエリを返す
+            Query : query
         """
         return Query("PRIMARY KEY")
     #---------------------------------------------------------------------------

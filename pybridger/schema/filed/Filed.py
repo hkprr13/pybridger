@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
 from ..datatypes.DataType import DataType    # データ型　<-インポートエラー回避
 from ..column             import Column      # カラムクラス
-from ..constraints        import Default     # デフォルト値クラス
-from ..constraints        import NotNull     # NotNullクラス
-from ..constraints        import Unique      # ユニーク設定クラス
-from ..constraints        import ForeignKey  # 外部キー制約クラス
+from ..constraint        import Default     # デフォルト値クラス
+from ..constraint        import NotNull     # NotNullクラス
+from ..constraint        import Unique      # ユニーク設定クラス
+from ..constraint        import ForeignKey  # 外部キー制約クラス
 from ..common             import private     # プライベートメソッド
 from ..common             import override    # オーバライドメソッド 
 #-------------------------------------------------------------------------------
