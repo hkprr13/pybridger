@@ -1,30 +1,15 @@
 #-------------------------------------------------------------------------------
-# psycopgのインストールが出来ているかどうか確認
-
+from typing         import Any
+from .SqlEngine     import SqlEngine
+from ...common      import override
+from ...common      import public
+from ...common      import private
+from ...utils       import Log
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型クラス
-from .SqlEngine     import SqlEngine            # 基底SQLエンジンクラス
-from .datetypes     import PostgreSqlDateTypes  # PostgreSQLのデータ型クラス
-from ...common      import override             # オーバライドメソッド
-from ...common      import public               # パブリックメソッド
-from ...common      import private              # プライベートメソッド
-from ...Log         import Log                  # ログクラス
-from ...query       import Query                # クエリクラス
-#-------------------------------------------------------------------------------
-class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
+class PostgreSqlEngine(SqlEngine):
     """
-    PostgreSQLエンジンクラス
-    Attributes:
-        hostName     (str)        : ホスト名
-        userName     (str)        : ユーザー名
-        password     (str)        : パスワード
-        databaseName (str)        : データベース名
-        port         (int)        : ポート番号
-        sqlEngine    (psycopg)    : psycopgクラス
-        conn         (Any | None) : psycopgコネクトオブジェクト
-        cur          (Any | None) : psycopgカーソルオブジェクト
-        __isLog      (bool)       : ログフラグ 
-        __Log        (Log)        : ログオブジェクト
+    Defined PostgreSQL engine class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -35,16 +20,17 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
             databaseName : str,
             port         : int,
             logFile      : str | None = None
-        ):
+        ) -> None:
         """
-        PostgreSQLエンジンの初期化
+        Initalize PostgreSQL engine class
         Args:
-            hostName     (str)        : ホスト名
-            userName     (str)        : ユーザー名
-            password     (str)        : パスワード
-            databaseName (str)        : データベース名
-            port         (str)        : ポート番号
             logFile      (str | None) : ログファイル名
+            hostName     (str)        : host
+            userName     (str)        : user name
+            password     (str)        : password
+            databaseName (str)        : database
+            port         (str)        : ポート番号
+            logFile      (str | None) : Specify to obtain the log file.
         """
         super().__init__()
         # インスタンス変数
@@ -58,70 +44,27 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
         try:
             import psycopg
             self.sqlEngine  = psycopg
-        except Exception as e:
+        except Exception:
             raise Exception(
-                "psycopgがインストールされていません\n"
-                "下記をターミナルで実行してください\n"
+                "psycopg is not installed\n"
+                "Please execute the following in Terminal\n"
                 "pip install psycopg[binary]"
             )
         # コネクトオブジェクトとカーソルオブジェクトの初期化
         self.conn = None
         self.cur  = None
         # ログの初期設定
-        self.__setLog(logFile)
-    #---------------------------------------------------------------------------
-    @private
-    def __setLog(self, logFile : str | None):
-        """ログクラスとフラグの設定"""
-        # ログファイルが未指定なら
-        if logFile is None:
-            self.__isLog = False
-            self.__log   = None
-        # ログファイルが指定されていれば
-        elif logFile:
-            self.__isLog = True
-            self.__log   = Log(logFile)
-        else:
-            self.__isLog = False
-            self.__log   = None
-    #---------------------------------------------------------------------------
-    @private
-    def __logDebug(self, msg):
-        """デバックメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.debug(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logInfo(self, msg):
-        """インフォメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.info(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logWarning(self, msg):
-        """警告メッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.warning(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logError(self, msg):
-        """エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.error(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logCritical(self, msg):
-        """致命的エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.critical(msg)   
+        self.setLog(logFile)
    #---------------------------------------------------------------------------
     @override
     @public
     def connect(self) -> Any:
         """
-        データベースの接続
+        Connect to database
         Returns:
-            Any : コネクトオブジェクトを返す
+            sqlite3.Connection : Returns connect objct
+        Raises:
+            Exception : If the database connection fails
         Raises:
 
         """
@@ -136,165 +79,132 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
             return self.conn
         except Exception as e:
             msg = "データベースの接続に失敗しました"
-            self.__logError(msg)
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     def cursor(self) -> Any:
         """
-        カーソルの作成
+        Creating cursor object
         Returns:
-            Any : カーソルオブジェクトを返す
+            Any : Returns the cursor object
         Raises:
-            Exception : カーソルの失敗した場合
+            Exception : If the cursor fails
         """
         try:
-            assert self.conn is not None # 明示する
+            assert self.conn is not None 
             if self.cur:
                 try:
                     self.cur.close()
                 except Exception:
-                    pass # カーソルが閉じ済みの時用
+                    pass
             self.cur = self.conn.cursor()
             return self.cur
         except Exception as e:
-            msg = "カーソルの作成に失敗しました"
-            self.__logError(msg)
+            msg = "Failed to create cursor"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     def execute(self, query: Query, value: tuple = ()) -> None:
         """
-        クエリの実行
+        Execute query
         Args:
-            query (Query)   : SQL文
-            value (tuple)   : プレイスホルダーに渡す値
+            query (Query)   : query object
+            value (tuple)   : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{value}")
+            qmsg = f"query:{query.sql}, value:{value}"
+            self.logDebug(qmsg)
             self.cursor().execute(query.sql, value)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query.sql}, 値:{value}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     def executeAny(self, query : Query, data: list[tuple[str]]) -> None:
         """
-        クエリの実行(複数)
+        Execute query(multiple)
         Args:
-            query (Query)            : クエリ文
-            data  (list[tuple[str]]) : プレイスホルダーに渡す値
+            query (Query)            : query object
+            data  (list[tuple[str]]) : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
+            qmsg = f"query:{query.sql}, value:{data}"
+            self.logDebug(qmsg)
             self.cursor().executemany(query.sql, data)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query.sql}, 値:{data}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     def commit(self) -> None:
         """
-        データベースにコミットする
+        Commit the transaction
         Raises:
-            Exception : コミットに失敗した場合
+            Exception : If the commit fails
         """
         try:
             if self.conn:
                 self.conn.commit()
         except Exception as e:
-            # コミットが失敗した場合ロールバックする
-            msg = "コミットが失敗したためロールバックしました"
-            self.__logError(msg)
+            msg = "Rollback performed due to failed commit"
+            self.logError(msg)
             self.rollback()
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    def connectOpen(self) -> None:
-        """
-        コネクトとカーソルの開放
-        Raises:
-            Exception : コネクトとカーソルの開放に失敗した場合
-        """
-        try:
-            self.connect()
-            self.cursor()
-        except Exception as e:
-            msg = "コネクトとカーソルの開放に失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}")  
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    def connectClose(self) -> None:
-        """
-        コネクションとカーソルのクローズ
-        Raises:
-            Exception : コネクトとカーソルのクローズに失敗した場合
-        """
-        try:
-            # コネクトが接続していれば
-            if self.conn:
-                if self.cur is not None:
-                    self.cur.close()
-                self.conn.close()
-                self.conn = None # 初期値に戻す
-                self.cur  = None # 初期値に戻す
-        except Exception as e:
-            msg = "コネクトとカーソルのクローズに失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}") 
-    #---------------------------------------------------------------------------
-    @override
-    @public
     def transaction(self) -> None:
         """
-        トランザクション
+        Transaction
         Raises:
-            Exception : トランザクションに失敗した場合
+            Exception : If the transaction fails
         """
         try:
             if self.conn:
                 self.cursor().execute("BEGIN")
         except Exception as e:
-            msg = "トランザクションに失敗しました"
-            self.__logError(msg)
+            msg = "Transaction failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
     def rollback(self) -> None:
         """
-        ロールバック
+        Rollback
         Raises:
-            Exception : ロールバックに失敗した場合
+            Exception : If the rollback fails
         """
         try:
             if self.conn:
                 self.conn.rollback()
         except Exception as e:
-            msg = "ロールバックに失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}")
+            msg = "Rollback failed"
+            self.logError(msg)
+            raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
-    def fetchall(self):
+    def fetchall(self) -> list[Any] | None:
+        """
+        Rollback
+        Raises:
+            Exception : If the rollback fails
+        """
         if not self.cur is None:
             return self.cur.fetchall()
     #---------------------------------------------------------------------------
@@ -302,9 +212,9 @@ class PostgreSqlEngine(SqlEngine, PostgreSqlDateTypes):
     @public
     def isConnected(self) -> bool:
         """
-        MySQLに接続中かどうか返す
+        Returns whether or not connected to MySQL
         Returns:
-            bool : 接続されていればTrue
+            bool : True if connected
         """
         return self.conn is not None
 #-------------------------------------------------------------------------------

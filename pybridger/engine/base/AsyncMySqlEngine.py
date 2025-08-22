@@ -1,16 +1,15 @@
 #-------------------------------------------------------------------------------
 from typing         import Any
 from .SqlEngine     import SqlEngine
-from .datetypes     import MySqlDateTypes
 from ...common      import override
 from ...common      import public
 from ...common      import private
 from ...utils       import Log
 from ...mapper      import Query
 #-------------------------------------------------------------------------------
-class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
+class AsyncMySqlEngine(SqlEngine):
     """
-    Asynchronous engine class
+    Asynchronous MySQL engine class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -41,82 +40,23 @@ class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
             self.sqlEngine  = aiomysql
         except Exception as e:
             raise Exception(
-                "mysql.connnector is not installed\n"
+                "aiomysql is not installed\n"
                 "Please execute the following in Terminal\n"
                 "pip install aiomysql"
             )
         self.conn = None # Initial value is None
         self.cur  = None # Initial value is None
-        self.__setLog(logFile)
-    #---------------------------------------------------------------------------
-    @private
-    def __setLog(self, logFile : str | None):
-        """
-        Setting Log class and log flag
-        Args:
-            logFile (str | None) : log file 
-        """
-        if logFile is None:
-            self.__isLog = False
-            self.__log   = None
-        elif logFile:
-            self.__isLog = True
-            self.__log   = Log(logFile)
-        else:
-            self.__isLog = False
-            self.__log   = None
-    #---------------------------------------------------------------------------
-    @private
-    def __logDebug(self, msg) -> None:
-        """
-        Debug message
-        Args:
-            msg (str) : message
-        """
-        if self.__isLog and self.__log is not None:
-            self.__log.debug(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logInfo(self, msg) -> None:
-        """
-        Debug message
-        Args:
-            msg (str) : message
-        """
-        if self.__isLog and self.__log is not None:
-            self.__log.info(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logWarning(self, msg) -> None:
-        """
-        Debug message
-        Args:
-            msg (str) : message
-        """
-        if self.__isLog and self.__log is not None:
-            self.__log.warning(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logError(self, msg) -> None:
-        """エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.error(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logCritical(self, msg) -> None:
-        """致命的エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.critical(msg)   
+        self.setLog(logFile) 
     #---------------------------------------------------------------------------
     @override
     @public
     async def connect(self) -> Any:
         """
-        非同期でMySQLに接続し、プールを作成
+        Connect to MySQL asynchronously and create a pool
         Returns:
-            Any : コネクトオブジェクトを返す
+            Any : Returns connect objct
         Raises:
-            Exception : データベースの接続に失敗した場合
+            Exception : If the database connection fails
         """
         try:
             self.pool = await self.sqlEngine.create_pool(
@@ -129,176 +69,133 @@ class AsyncMySqlEngine(SqlEngine, MySqlDateTypes):
             self.conn = await self.pool.acquire()
             return self.conn
         except Exception as e:
-            msg = "データベースの接続に失敗しました"
-            self.__logError(msg)
+            msg = "Failed to connect to the database"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    async def cursor(self):
+    async def cursor(self) -> Any:
         """
-        非同期カーソルの作成
-        Args:
-            dictionary (bool) : 辞書型の指定
+        Creating cursor object
         Returns:
-            Any : カーソルオブジェクトを返す
+            Any : Returns the cursor object
         Raises:
-            Exception : カーソルの失敗した場合
+            Exception : If the cursor fails
         """
         try:
-            # 接続してなければ
             if self.conn is None:
                 await self.connect()
-            # 絶対Noneがないと明示する
-            # 接続があればカーソル取得
-            if not self.conn:# 安全チェック
+            if not self.conn:
                 raise Exception
-            # 戻り値は接続オブジェクトのコルーチンの完了を待って設定
+            # The return value is set after waiting 
+            # for the completion of the connection object's coroutine
             self.cur  = await self.conn.cursor()
             return self.cur
         except Exception as e:
-            msg = "カーソルの作成に失敗しました"
-            self.__logError(msg)
+            msg = "Failed to create cursor"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    async def execute(self, query: Query, value: tuple = ()): 
+    async def execute(self, query: Query, value: tuple = ()) -> None: 
         """
-        非同期にSQLクエリを実行する
+        Execute SQL queries asynchronously
         Args:
-            query (Query)   : SQL文
-            value (tuple)   : プレイスホルダーに渡す値
+            query (Query)   : query object
+            value (tuple)   : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{value}")
+            qmsg = f"query:{query.sql}, value:{value}"
+            self.logDebug(qmsg)
             cur = await self.cursor()
             await cur.execute(query.sql, value)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query.sql}, 値:{value}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------    
     @override
     @public
     async def executeAny(self, query : Query, data : list[tuple[str]]) -> None:
         """
-        非同期にSQLクエリ(複数)を実行する
+        Execute SQL queries asynchronously(multiple)
         Args:
-            query (Query)            : クエリ文
-            data  (list[tuple[str]]) : プレイスホルダーに渡す値
+            query (Query)            : query object
+            data  (list[tuple[str]]) : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
-            # カーソルオブジェクトはコルーチンの完了を持って設定
+            qmsg = f"query:{query.sql}, value:{data}"
             cur = await self.cursor()
             await cur.executemany(query.sql, data)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query.sql}, 値:{data}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    async def commit(self):
+    async def commit(self) -> None:
         """
-        非同期にデータベースにコミットする
+        Commit the transaction
         Raises:
-            Exception : コミットに失敗した場合
+            Exception : If the commit fails
         """
         try:
             if self.conn:
                 await self.conn.commit()
         except Exception as e:
-            # コミットが失敗した場合ロールバックする
-            msg = "コミットが失敗したためロールバックしました"
-            self.__logError(msg)
+            msg = "Rollback performed due to failed commit"
+            self.logError(msg)
             await self.rollback()
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    async def connectOpen(self):
+    async def transaction(self) -> None:
         """
-        コネクトとカーソルの開放(非同期)
+        Transaction asynchronously
         Raises:
-            Exception : コネクトとカーソルの開放に失敗した場合
+            Exception : If the transaction fails
         """
         try:
-            await self.connect()
             await self.cursor()
+            await self.execute(Query("START TRANSACTION"))
         except Exception as e:
-            msg = "コネクトとカーソルの開放に失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}")    
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    async def connectClose(self):
-        """
-        非同期でコネクションとカーソルのクローズ
-        Raises:
-            Exception : コネクトとカーソルのクローズに失敗した場合
-        """
-        try:
-            if self.cur:
-                await self.cur.close()
-            if self.conn:
-                self.pool.release(self.conn)
-                self.cur  = None
-                self.conn = None
-        except Exception as e:
-            msg = "コネクトとカーソルのクローズに失敗しました"
-            self.__logError(msg)
+            msg = "Transaction failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
-    async def transaction(self):
+    async def rollback(self) -> None:
         """
-        非同期でトランザクションの開始
+        Rollback asynchronously
         Raises:
-            Exception : トランザクションに失敗した場合
-        """
-        try:
-            await self.cursor()
-            await self.execute("START TRANSACTION")
-        except Exception as e:
-            msg = "トランザクションに失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}") 
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    async def rollback(self):
-        """
-        非同期でトランザクションをロールバックする
-        Raises:
-            Exception : ロールバックに失敗した場合
+            Exception : If the rollback fails
         """
         try:
             if self.conn:
                 await self.conn.rollback()
         except Exception as e:
-            msg = "ロールバックに失敗しました"
-            self.__logError(msg)
+            msg = "Rollback failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     def isConnected(self) -> bool:
         """
-        MySQLに接続中かどうか返す
+        Returns whether or not connected to MySQL
         Returns:
-            bool : 接続されていればTrue
+            bool : True if connected
         """
         return self.conn is not None
 #-------------------------------------------------------------------------------

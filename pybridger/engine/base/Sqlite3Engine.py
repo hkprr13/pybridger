@@ -1,278 +1,189 @@
 #-------------------------------------------------------------------------------
-import sqlite3                              # sqlite3
-from .SqlEngine     import SqlEngine        # 規定SQLエンジンクラス
-from .datetypes     import Sqlite3DateTypes # Sqlite3のデータ型クラス
-from ...common      import override         # オーバライドメソッド
-from ...common      import public           # パブリックメソッド
-from ...common      import private          # プライベートメソッド
-from ...Log         import Log              # ログクラス
-from ...query       import Query            # クエリクラス
+import sqlite3
+from typing         import Any
+from .SqlEngine     import SqlEngine
+from ...common      import override
+from ...common      import public
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
-class Sqlite3Engine(SqlEngine, Sqlite3DateTypes):
+class Sqlite3Engine(SqlEngine):
     """
-    Sqlite3エンジンクラス
-    Attributes:
-        database  (str)                       : データベースパス名
-        sqlEngine (sqlite3)                   : sqlite3クラス
-        conn      (sqlite3.Connection | None) : sqlite3コネクトオブジェクト
-        cur       (sqlite3.Cursor     | None) : sqlite3カーソルオブジェクト
-        __isLog   (bool)                      : ログフラグ 
-        __Log     (Log)                       : ログオブジェクト
+    Defined Sqlite3 engine class
     """
     #---------------------------------------------------------------------------
     def __init__(
             self,
             databasePath : str,
             logFile      : str | None = None
-        ):
+        ) -> None:
         """
-        SQLite3データベース接続エンジンの初期化
+        SInitalize Sqlite3 engine class
         Args:
-            databasePath (str)        : データベースパス
-            logFile      (str | None) : ログファイル名
+            databasePath (str)        : database path
+            logFile      (str | None) : lof file
         """
         super().__init__()
-        # インスタンス変数
         self.database : str = databasePath
-        # インスタンス変数(オブジェクト)
         self.sqlEngine = sqlite3
-        self.conn : sqlite3.Connection | None = None # ← 明示的に定義
-        self.cur  : sqlite3.Cursor     | None = None # ← 明示的に定義
-        # ログの初期設定
-        self.__setLog(logFile)
-    #---------------------------------------------------------------------------
-    @private
-    def __setLog(self, logFile : str | None):
-        """ログクラスとフラグの設定"""
-        # ログファイルが未指定なら
-        if logFile is None:
-            self.__isLog = False
-            self.__log   = None
-        # ログファイルが指定されていれば
-        elif logFile:
-            self.__isLog = True
-            self.__log   = Log(logFile)
-        else:
-            self.__isLog = False
-            self.__log   = None
-    #---------------------------------------------------------------------------
-    @private
-    def __logDebug(self, msg):
-        """デバックメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.debug(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logInfo(self, msg):
-        """インフォメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.info(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logWarning(self, msg):
-        """警告メッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.warning(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logError(self, msg):
-        """エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.error(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logCritical(self, msg):
-        """致命的エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.critical(msg)   
+        self.conn : sqlite3.Connection | None = None
+        self.cur  : sqlite3.Cursor     | None = None
+        self.setLog(logFile)
     #---------------------------------------------------------------------------
     @override
     @public
     def connect(self) -> sqlite3.Connection:
         """
-        データベースの接続
+        Connect to database
         Returns:
-            sqlite3.Connection : コネクトオブジェクト
+            sqlite3.Connection : Returns connect objct
         Raises:
-            Exception : データベースの接続に失敗した場合
+            Exception : If the database connection fails
         """
         try:
             self.conn = self.sqlEngine.connect(self.database)
             return self.conn
         except sqlite3.IntegrityError as e:
-            msg = "制約違反(UNIQUE/NOT NULL/FOREIGN KEY/CHECK)です"
-            self.__logError(msg)
+            msg = "Constraint violation (UNIQUE/NOT NULL/FOREIGN KEY/CHECK)"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
         except sqlite3.OperationalError as e:
-            msg = "ロック/構文/存在しないテーブル/ファイル/I/Oなどのエラーです"
-            self.__logError(msg)
+            msg = "Errors such as lock/syntax/non-existent table/file/I/O, etc"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
         except sqlite3.ProgrammingError as e:
-            msg = "API誤用/バインド不一致/クローズ後操作/スレッド誤用などのエラーです"
-            self.__logError(msg)
+            msg = "These are errors such as API misuse, binding mismatch," \
+                  "post-close operations, and thread misuse."
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
         except sqlite3.InterfaceError as e:
-            msg = "未対応型のバインドなどのエラーです"
-            self.__logError(msg)
+            msg = "This is an error such as an unhandled bind"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
         except sqlite3.DatabaseError as e:
-            msg = "破損/形式不正などのエラーです"
-            self.__logError(msg)
+            msg = "Errors such as damage or incorrect format"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")              
     #---------------------------------------------------------------------------
     @override
     @public
     def cursor(self) -> sqlite3.Cursor:
         """
-        カーソルの作成
+        Creating cursor object
         Returns:
-            sqlite3.Cursor : カーソルオブジェクト
+            Any : Returns the cursor object
         Raises:
-            Exception : カーソルの作成に失敗した場合
+            Exception : If the cursor fails
         """
         try:
-            # 接続してなければ
             if self.conn is None:
                 self.connect()
-            # 絶対Noneがないと明示する
-            # 接続があればカーソル取得
-            assert self.conn is not None # 安全チェック
+            assert self.conn is not None
             self.cur = self.conn.cursor()
             return self.cur
         except Exception as e:
-            msg = "カーソルの作成に失敗しました"
-            self.__logError(msg)
+            msg = "Failed to create cursor"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------    
     @override
     @public
     def execute(self, query : Query, value : tuple = ()) -> None:
         """
-        クエリを実行
+        Execute query
         Args:
-            query (Query)   : SQL文
-            value (tuple)   : プレイスホルダーに渡す値
+            query (Query)   : query object
+            value (tuple)   : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query}, 値:{value}")
+            qmsg = f"query:{query.sql}, value:{value}"
+            self.logDebug(qmsg)
             self.cursor().execute(query.sql, value)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{value}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    def executeAny(self, query : Query, data: list[tuple[str]]):
+    def executeAny(self, query : Query, data: list[tuple[str]]) -> None:
         """
-        クエリの実行(複数)
+        Execute query(multiple)
         Args:
-            query (Query)            : クエリ文
-            data  (list[tuple[str]]) : プレイスホルダーに渡す値
+            query (Query)            : query object
+            data  (list[tuple[str]]) : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
+            qmsg = f"query:{query.sql}, value:{data}"
+            self.logDebug(qmsg)
             self.cursor().executemany(query.sql, data)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{data}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    def commit(self):
+    def commit(self) -> None:
         """
-        データベースにコミットする
+        Commit the transaction
         Raises:
-            Exception : コミットに失敗した場合
+            Exception : If the commit fails
         """
         try:
             if self.conn:
                 self.conn.commit()
         except Exception as e:
-            # コミットが失敗した場合ロールバックする
-            msg = "コミットが失敗したためロールバックしました"
-            self.__logError(msg)
+            msg = "Rollback performed due to failed commit"
+            self.logError(msg)
             self.rollback()
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    def connectOpen(self):
-        """
-        コネクトとカーソルの開放
-        Raises:
-            Exception : コネクトとカーソルの開放に失敗した場合
-        """
-        try:
-            self.connect()
-            self.cursor()
-        except Exception as e:
-            msg = "コネクトとカーソルの開放に失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}")  
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    def connectClose(self) -> None:
-        """
-        コネクションとカーソルのクローズ
-        Raises:
-            Exception : コネクトとカーソルのクローズに失敗した場合
-        """
-        try:
-            # コネクトが接続していれば
-            if self.conn:
-                self.conn.close()
-                self.conn = None
-                self.cur  = None
-        except Exception as e:
-            msg = "コネクトとカーソルのクローズに失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}") 
-    #---------------------------------------------------------------------------
-    @override
-    @public
     def transaction(self) -> None:
         """
-        トランザクション
+        Transaction
         Raises:
-            Exception : トランザクションに失敗した場合
+            Exception : If the transaction fails
         """
         try:
             if self.conn:
                 self.cursor().execute("BEGIN")
         except Exception as e:
-            msg = "トランザクションに失敗しました"
-            self.__logError(msg)
+            msg = "Transaction failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
     def rollback(self) -> None:
         """
-        ロールバック
+        Rollback
         Raises:
-            Exception : ロールバックに失敗した場合
+            Exception : If the rollback fails
         """
         try:
             if self.conn:
                 self.conn.rollback()
         except Exception as e:
-            msg = "ロールバックに失敗しました"
-            self.__logError(msg)
+            msg = "Rollback failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
+    @override
     @public
-    def fetchall(self):
+    def fetchall(self) -> list[Any] | None:
+        """
+        Rollback
+        Raises:
+            Exception : If the rollback fails
+        """
         if not self.cur is None:
             return self.cur.fetchall()
     #---------------------------------------------------------------------------
@@ -280,9 +191,9 @@ class Sqlite3Engine(SqlEngine, Sqlite3DateTypes):
     @public
     def isConnected(self) -> bool:
         """
-        Sqlite3に接続中かどうか返す
+        Returns whether or not connected to MySQL
         Returns:
-            bool : 接続されていればTrue
+            bool : True if connected
         """
         return self.conn is not None
 #-------------------------------------------------------------------------------

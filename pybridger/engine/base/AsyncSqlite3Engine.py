@@ -1,23 +1,15 @@
 #-------------------------------------------------------------------------------
-from typing         import Any              # Anyクラス
-from .SqlEngine     import SqlEngine        # 規定SQLエンジンクラス
-from .datetypes     import Sqlite3DateTypes # Sqlite3のデータ型クラス
-from ...common      import override         # オーバライドメソッド
-from ...common      import public           # パブリックメソッド
-from ...common      import private          # プライベートメソッド
-from ...Log         import Log              # ログクラス
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .SqlEngine     import SqlEngine
+from ...common      import override
+from ...common      import public
+from ...common      import private
+from ...utils       import Log
+from ...mapper      import Query 
 #-------------------------------------------------------------------------------
-class AsyncSqlite3Engine(SqlEngine, Sqlite3DateTypes):
+class AsyncSqlite3Engine(SqlEngine):
     """
-    非同期Sqlite3エンジンクラス
-    Attributes:
-        database  (str)                         : データベースパス名
-        sqlEngine (aiosqlite)                   : sqlite3クラス
-        conn      (aiosqlite.Connection | None) : sqlite3コネクトオブジェクト
-        cur       (aiosqlite.Cursor     | None) : sqlite3カーソルオブジェクト
-        __isLog   (bool)                        : ログフラグ 
-        __Log     (Log)                         : ログオブジェクト
+    Asynchronous Sqlite3 engine class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -32,254 +24,168 @@ class AsyncSqlite3Engine(SqlEngine, Sqlite3DateTypes):
             logFile      (str | None) : ログファイル名
         """
         super().__init__()
-        # インスタンス変数
-        self.database  = databasePath # データベースパス
-        # インスタンス変数(オブジェクト)
-        # インスタンスされたタイミングでインポートを行う
+        self.database  = databasePath
         try:
             import aiosqlite 
-            self.sqlEngine = aiosqlite # 非同期対応のSqlite3エンジン
-        # ドライバがインストールされていない場合エラーメッセージを表示させる
+            self.sqlEngine = aiosqlite
+        # Display an error message when the driver is not installed
         except ImportError:
             raise Exception(
-                "aiosqliteがインストールされていません\n"
-                "下記をターミナルで実行してください\n"
+                "aiosqlite is not installed\n"
+                "Please execute the following in Terminal\n"
                 "pip install aiosqlite"
-            )
-        # コネクトオブジェクトとカーソルオブジェクトの初期化   
-        self.conn : aiosqlite.Connection | None = None # ← 明示的に定義
-        self.cur  : aiosqlite.Cursor     | None = None # ← 明示的に定義
-        # ログの初期設定
-        self.__setLog(logFile)
-    #---------------------------------------------------------------------------
-    @private
-    def __setLog(self, logFile : str | None):
-        """ログクラスとフラグの設定"""
-        # ログファイルが未指定なら
-        if logFile is None:
-            self.__isLog = False
-            self.__log   = None
-        # ログファイルが指定されていれば
-        elif logFile:
-            self.__isLog = True
-            self.__log   = Log(logFile)
-        else:
-            self.__isLog = False
-            self.__log   = None
-    #---------------------------------------------------------------------------
-    @private
-    def __logDebug(self, msg):
-        """デバックメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.debug(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logInfo(self, msg):
-        """インフォメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.info(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logWarning(self, msg):
-        """警告メッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.warning(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logError(self, msg):
-        """エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.error(msg)
-    #---------------------------------------------------------------------------
-    @private
-    def __logCritical(self, msg):
-        """致命的エラーメッセージ"""
-        if self.__isLog and self.__log is not None:
-            self.__log.critical(msg)   
+            ) 
+        self.conn : aiosqlite.Connection | None = None
+        self.cur  : aiosqlite.Cursor     | None = None
+        self.setLog(logFile) 
     #---------------------------------------------------------------------------
     @override
     @public
     async def connect(self) -> Any:
         """
-        非同期でデータベースの接続
+        Connect to database
         Returns:
-            aiosqlite.Connection : コネクトオブジェクト 
+            Any : Returns connect objct
         Raises:
-            Exception : データベースの接続に失敗した場合
+            Exception : If the database connection fails
         """
         try:
-            # 戻り値はエンジンのコルーチンの完了を待って設定
+            # The return value is set after waiting 
+            # for the completion of the connection object's coroutine
             self.conn = await self.sqlEngine.connect(self.database)
             return self.conn
         except Exception as e:
-            msg = "データベースの接続に失敗しました"
-            self.__logError(msg)
+            msg = "Failed to connect to the database"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     async def cursor(self) -> Any:
         """
-        非同期にカーソルを作成
+        Creating cursor object
         Returns:
-            aiosqlite.Cursor : カーソルオブジェクト
+            Any : Returns the cursor object
         Raises:
-            Exception : カーソルの作成に失敗した場合
+            Exception : If the cursor fails
         """
         try:
-            # 接続してなければ
             if self.conn is None:
                 await self.connect()
-            # 絶対Noneがないと明示する
-            # 接続があればカーソル取得
-            if not self.conn:# 安全チェック
+            if not self.conn:
                 raise Exception
-            # 戻り値は接続オブジェクトのコルーチンの完了を待って設定
+            # The return value is set after waiting 
+            # for the completion of the connection object's coroutine
             self.cur = await self.conn.cursor()
             return self.cur
         except Exception as e:
-            msg = "カーソルの作成に失敗しました"
-            self.__logError(msg)
+            msg = "Failed to create cursor"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------    
     @override
     @public
     async def execute(self, query : Query, value : tuple = ()) -> None:
         """
-        非同期にSQLクエリを実行する
+        Execute SQL queries asynchronously
         Args:
-            query (Query)   : SQL文
-            value (tuple)   : プレイスホルダーに渡す値
+            query (Query)   : query object
+            value (tuple)   : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{value}")
-            # カーソルオブジェクトはコルーチンの完了を持って設定
+            qmsg = f"query:{query.sql}, value:{value}"
+            self.logDebug(qmsg)
+            # The return value is set after waiting 
+            # for the completion of the connection object's coroutine
             cur = await self.cursor()
             await cur.execute(query.sql, value)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query.sql}, 値:{value}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------    
     @override
     @public
     async def executeAny(self, query : Query, data : list[tuple[str]]) -> None:
         """
-        非同期にSQLクエリ(複数)を実行する
+        Execute SQL queries asynchronously(multiple)
         Args:
-            query (Query)            : クエリ文
-            data  (list[tuple[str]]) : プレイスホルダーに渡す値
+            query (Query)            : query object
+            data  (list[tuple[str]]) : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.__logDebug(f"クエリ:{query.sql}, 値:{data}")
-            # カーソルオブジェクトはコルーチンの完了を持って設定
+            qmsg = f"query:{query.sql}, value:{data}"
+            # The return value is set after waiting 
+            # for the completion of the connection object's coroutine
             cur = await self.cursor()
             await cur.executemany(query.sql, data)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{data}"
-            self.__logError(msg)
-            self.__logError(qmsg)
+            msg  = "The query failed"       
+            self.logError(msg)
+            self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    async def commit(self):
+    async def commit(self) -> None:
         """
-        非同期にトランザクションにコミットする
+        Commit the transaction
         Raises:
-            Exception : コミットに失敗した場合
+            Exception : If the commit fails
         """
         try:
             if self.conn:
                 await self.conn.commit()
         except Exception as e:
-            # コミットが失敗した場合ロールバックする
-            msg = "コミットが失敗したためロールバックしました"
-            self.__logError(msg)
+            msg = "Rollback performed due to failed commit"
+            self.logError(msg)
             await self.rollback()
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
-    async def connectOpen(self):
-        """
-        コネクトとカーソルの開放(非同期)
-        Raises:
-            Exception : コネクトとカーソルの開放に失敗した場合
-        """
-        try:
-            await self.connect()
-            await self.cursor()
-        except Exception as e:
-            msg = "コネクトとカーソルの開放に失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}") 
-    #---------------------------------------------------------------------------
-    @override
-    @public
-    async def connectClose(self) -> None:
-        """
-        コネクションとカーソルのクローズ(非同期)
-        Raises:
-            Exception : コネクトとカーソルのクローズに失敗した場合
-        """
-        try:
-            # コネクトが接続していれば
-            if self.conn:
-                await self.conn.close()
-                self.conn = None
-                self.cur  = None
-        except Exception as e:
-            msg = "コネクトとカーソルのクローズに失敗しました"
-            self.__logError(msg)
-            raise Exception(f"{msg}: {e}") 
-    #---------------------------------------------------------------------------
-    @override
-    @public
     async def transaction(self) -> None:
         """
-        非同期でトランザクションの開始
+        Transaction asynchronously
         Raises:
-            Exception : トランザクションに失敗した場合
+            Exception : If the transaction fails
         """
         try:
             if self.conn:
-                await self.execute("BEGIN")
+                await self.execute(Query("BEGIN"))
         except Exception as e:
-            msg = "トランザクションに失敗しました"
-            self.__logError(msg)
+            msg = "Transaction failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
     async def rollback(self) -> None:
         """
-        非同期でトランザクションをロールバックする
+        Rollback asynchronously
         Raises:
-            Exception : ロールバックに失敗した場合
+            Exception : If the rollback fails
         """
         try:
             if self.conn:
                 await self.conn.rollback()
         except Exception as e:
-            msg = "ロールバックに失敗しました"
-            self.__logError(msg)
+            msg = "Rollback failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
     @public
     def isConnected(self) -> bool:
         """
-        Sqlite3に接続中かどうか返す
+        Returns whether or not connected to Sqlite3
         Returns:
-            bool : 接続されていればTrue
+            bool : True if connected
         """
         return self.conn is not None
 #-------------------------------------------------------------------------------

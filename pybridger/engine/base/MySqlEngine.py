@@ -1,9 +1,9 @@
 #-------------------------------------------------------------------------------
+from multiprocessing import Value
 from typing         import Any
 from .SqlEngine     import SqlEngine
 from ...common      import override
 from ...common      import public
-from ...common      import private
 from ...mapper      import Query
 #-------------------------------------------------------------------------------
 class MySqlEngine(SqlEngine):
@@ -18,7 +18,7 @@ class MySqlEngine(SqlEngine):
             password     : str,
             databaseName : str,
             logFile      : str | None = None
-        ):
+        ) -> None:
         """
         Initalize MySQL engine class
         Args:
@@ -36,7 +36,7 @@ class MySqlEngine(SqlEngine):
         try:
             import mysql.connector
             self.sqlEngine  = mysql.connector
-        except Exception as e:
+        except Exception:
             raise Exception(
                 "mysql.connnector is not installed\n"
                 "Please execute the following in Terminal\n"
@@ -50,13 +50,13 @@ class MySqlEngine(SqlEngine):
     @public
     def connect(self) -> Any:
         """
-        データベースの接続
+        Connect to database
         Returns:
-            Any : コネクトオブジェクトを返す
+            Any : Returns the connect object
         Raises:
-            ProgrammingError : 認証エラーやデータベース指定ミス
-            InterfaceError   : ソケットエラーやネットワークの接続エラー
-            Error            : その他のMySQLエラー
+            ProgrammingError : Authentication errors and database specification errors
+            InterfaceError   : Socket errors and network connection errors
+            Error            : Other MySQL errors
         """
         try:
             self.conn = self.sqlEngine.connect(
@@ -69,7 +69,9 @@ class MySqlEngine(SqlEngine):
         # If the connection to the database is lost
         except self.sqlEngine.errors.OperationalError as oe:
             try:
-                self.logInfo("接続が切れています。再接続を試みます...")
+                self.logInfo(
+                    "The connection has been lost. Attempting to reconnect..."
+                )
                 # Try reconnecting.
                 self.conn = self.sqlEngine.connect(
                     host     = self.hostName,
@@ -78,69 +80,58 @@ class MySqlEngine(SqlEngine):
                     database = self.databaseName
                 )
                 return self.conn
-            # 再接続に失敗した場合
+            # If reconnection fails
             except Exception as e:
-                msg = "MySQLの再接続に失敗しました"
-                # ログ
+                msg = "Reconnection failed"
                 self.logError(msg)
-                print(f"{msg}: {e}")
                 raise Exception
-        # 認証エラーやデータベース指定ミスの場合
         except self.sqlEngine.errors.ProgrammingError as pe:
-            msg = "認証エラーやデータベース指定ミスです"
+            msg = "Authentication error or database specification error"
             self.logError(msg)
             raise Exception(f"{msg}: {pe}")
-        # ネットワークの接続やソケットエラーの場合
         except self.sqlEngine.errors.InterfaceError as ie:
-            msg = "ソケットエラーやネットワークの接続エラーです"
+            msg = "Socket error or network connection error"
             self.logError(msg)
             raise Exception(f"{msg}: {ie}")
         except self.sqlEngine.errors.Error as e:
-            # ユーザ名またはパスワードが違う場合
             if e.errno == 1045:
-                msg = "ユーザ名またはパスワードが間違っています"
+                msg = "Your username or password is incorrect"
                 self.logError(msg)
                 raise Exception(msg)
-            # 指定されたデータベースが存在しない場合
             elif e.errno == 1049:
-                msg = "指定されたデータベースが存在しません"
+                msg = "The specified database does not exist"
                 self.logError(msg)
                 raise Exception(msg)
             # その他
             else:
-                msg = f"MySQLエラー({e.errno})です"
+                msg = f"MySQL error({e.errno}"
                 self.logError(msg)
                 raise Exception(f"{msg}: {e.msg}")
     #---------------------------------------------------------------------------
     @override
     @public
-    def cursor(
-            self,
-            dictionary : bool = False
-        ) -> Any:
+    def cursor(self) -> Any:
         """
-        カーソルの作成
-        Args:
-            dictionary (bool) : 辞書型の指定
+        Creating cursor object
         Returns:
-            Any : カーソルオブジェクトを返す
+            Any : Returns the cursor object
         Raises:
-            Exception : カーソルの失敗した場合
+            Exception : If the cursor fails
         """
         try:
-            # 接続されていなければ
+            # If not connected
             if self.conn is None or not self.conn.is_connected():
                 self.connect()
-            assert self.conn is not None # 明示する
+            assert self.conn is not None
             if self.cur:
                 try:
                     self.cur.close()
                 except Exception:
-                    pass # カーソルが閉じ済みの時用
-            self.cur = self.conn.cursor(dictionary = dictionary)
+                    pass
+            self.cur = self.conn.cursor()
             return self.cur
         except Exception as e:
-            msg = "カーソルの作成に失敗しました"
+            msg = "Failed to create cursor"
             self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
@@ -148,19 +139,19 @@ class MySqlEngine(SqlEngine):
     @public
     def execute(self, query: Query, value : tuple = ()) -> None:
         """
-        クエリの実行
+        Execute query
         Args:
-            query (Query)   : SQL文
-            value (tuple)   : プレイスホルダーに渡す値
+            query (Query)   : query object
+            value (tuple)   : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.logDebug(f"クエリ:{query.sql}, 値:{value}")
+            qmsg = f"query:{query.sql}, value:{value}"
+            self.logDebug(qmsg)
             self.cursor().execute(query.sql, value)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{value}"
+            msg  = "The query failed"       
             self.logError(msg)
             self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
@@ -169,19 +160,19 @@ class MySqlEngine(SqlEngine):
     @public
     def executeAny(self, query : Query, data : list[tuple[str]]) -> None:
         """
-        クエリの実行(複数)
+        Execute query(multiple)
         Args:
-            query (Query)            : クエリ文
-            data  (list[tuple[str]]) : プレイスホルダーに渡す値
+            query (Query)            : query object
+            data  (list[tuple[str]]) : Value passed to placeholder
         Raises:
-            Exception : クエリの実行に失敗した場合
+            Exception : If the query fails
         """
         try:
-            self.logDebug(f"クエリ:{query.sql}, 値:{data}")
-            self.cursor().executemany(query.sql, data)
+            qmsg = f"query:{query.sql}, value:{data}"
+            self.logDebug(qmsg)
+            self.cursor().executeany(query.sql, data)
         except Exception as e:
-            msg  = "クエリの実行に失敗しました"
-            qmsg = f"クエリ:{query}, 値:{data}"
+            msg  = "The query failed"       
             self.logError(msg)
             self.logError(qmsg)
             raise Exception(f"{msg}: {e}")
@@ -190,16 +181,15 @@ class MySqlEngine(SqlEngine):
     @public
     def commit(self) -> None:
         """
-        データベースにコミットする
+        Commit the transaction
         Raises:
-            Exception : コミットに失敗した場合
+            Exception : If the commit fails
         """
         try:
             if self.conn and self.conn.is_connected():
                 self.conn.commit()
         except Exception as e:
-            # コミットが失敗した場合ロールバックする
-            msg = "コミットが失敗したためロールバックしました"
+            msg = "Rollback performed due to failed commit"
             self.logError(msg)
             self.rollback()
             raise Exception(f"{msg}: {e}")
@@ -208,15 +198,15 @@ class MySqlEngine(SqlEngine):
     @public
     def transaction(self) -> None:
         """
-        トランザクション
+        Transaction
         Raises:
-            Exception : トランザクションに失敗した場合
+            Exception : If the transaction fails
         """
         try:
             if self.conn and self.conn.is_connected():
                 self.cursor().execute("START TRANSACTION")
         except Exception as e:
-            msg = "トランザクションに失敗しました"
+            msg = "Transaction failed"
             self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
@@ -224,21 +214,26 @@ class MySqlEngine(SqlEngine):
     @public
     def rollback(self) -> None:
         """
-        ロールバック
+        Rollback
         Raises:
-            Exception : ロールバックに失敗した場合
+            Exception : If the rollback fails
         """
         try:
             if self.conn and self.conn.is_connected():
                 self.conn.rollback()
         except Exception as e:
-            msg = "ロールバックに失敗しました"
+            msg = "Rollback failed"
             self.logError(msg)
             raise Exception(f"{msg}: {e}") 
     #---------------------------------------------------------------------------
     @override
     @public
-    def fetchall(self):
+    def fetchall(self) -> list[Any] | None:
+        """
+        Rollback
+        Raises:
+            Exception : If the rollback fails
+        """
         if not self.cur is None:
             return self.cur.fetchall()
     #---------------------------------------------------------------------------
@@ -246,9 +241,9 @@ class MySqlEngine(SqlEngine):
     @public
     def isConnected(self) -> bool:
         """
-        MySQLに接続中かどうか返す
+        Returns whether or not connected to MySQL
         Returns:
-            bool : 接続されていればTrue
+            bool : True if connected
         """
         return self.conn is not None and self.conn.is_connected()
 #-------------------------------------------------------------------------------
