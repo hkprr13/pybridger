@@ -1,28 +1,34 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .StringsType   import StringsType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .StringType    import StringType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class Blob(StringsType):
+class Blob(StringType):
     """
-    大きなバイナリ型
-    サポートされているSQL(MySQL, Sqlite3)
+    Define large binary type class
+    Supported SQL (MySQL, Sqlite3)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize Large binary type object
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
+    def mysql(self) -> None:
         self.query : Any = Query("BLOB")
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query  : Any = Query("BLOB")
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.query  : Any = self.TEXTNOTSUPPORTED
 #-------------------------------------------------------------------------------

@@ -1,28 +1,34 @@
 #-------------------------------------------------------------------------------
-from .Constraint    import Constraint
-from ...common      import override
-from ...mapper      import Query
+from typing         import Any
+from .LogicalType   import LogicalType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class AutoIncrement(Constraint):
+class Boolean(LogicalType):
     """
-    Defined auto increment constraint class
+    Define boolen type class
+    Supported SQL (MySQL, Sqlite3, PostgreSQL)
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
+        """
+        Initialize boolen type object
+        """
         super().__init__()
-        """
-        Initialize auto increment constraint object
-        """
     #---------------------------------------------------------------------------
     @override
+    @private
     def mysql(self) -> None:
-        self.query  = Query(f"AUTO_INCREMENT")
+        self.query : Any = Query("BOOLEAN")
     #---------------------------------------------------------------------------
     @override
+    @private
     def sqlite3(self) -> None:
-        self.query  = Query(f"AUTOINCREMENT")
+        self.query : Any = Query("BOOLEAN")
     #---------------------------------------------------------------------------
     @override
+    @private
     def postgresql(self) -> None:
-        self.query  = Query(f"SERIAL")
+        self.query : Any = Query("BOOLEAN")
 #-------------------------------------------------------------------------------

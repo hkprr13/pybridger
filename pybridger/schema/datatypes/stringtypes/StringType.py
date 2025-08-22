@@ -1,8 +1,7 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from ..datatype     import DataType             # データ型クラス
+from ..datatype     import DataType
 #-------------------------------------------------------------------------------
-class StringsType(DataType):
+class StringType(DataType):
     def __init__(self) -> None:
         super().__init__()
         self.length : int 

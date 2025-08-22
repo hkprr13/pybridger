@@ -8,7 +8,7 @@ class Default(Constraint):
     """
     Defined default constraint
     """
-    def __init__(self, value: str | int | float | bool):
+    def __init__(self, value: str | int | float | bool | None) -> None:
         """
         Initalize default constraint object
         Args:
@@ -28,7 +28,9 @@ class Default(Constraint):
         Returns:
             Query : query object
         """
-        if isinstance(self.__value, str):
+        if self.__value is None:
+            return Query("")
+        elif isinstance(self.__value, str):
             return Query(f"DEFAULT '{self.__value}'")
         elif isinstance(self.__value, bool):
             if self.__value:

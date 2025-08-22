@@ -1,15 +1,21 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .IntegerType   import IntegerType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing             import Any
+from .IntegerType       import IntegerType
+from ....common         import override
+from ....common         import private
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class SmallInt(IntegerType):
     """
-    2バイト整数型
-    サポートされているSQL(MySQL, PostgreSQL)
+    Define 2-byte integer type class
+    Supported SQL (MySQL, PostgreSQL)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize 2-byte integer type object
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private

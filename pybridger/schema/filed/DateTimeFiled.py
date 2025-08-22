@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-from .Filed      import Filed    # 基底クラス
-from ..datatypes import DateTime # 日付型
+from .Filed      import Filed
+from ..datatypes import DateTime
 #-------------------------------------------------------------------------------
 class DateTimeFiled(Filed):
     """
@@ -8,24 +8,21 @@ class DateTimeFiled(Filed):
     """
     def __init__(
             self,
-            isNotNull  : bool        = False,
             default    : str  | None = None,
+            check      : str | None = None,
             foreignKey : str  | None = None
         ) -> None:
         """
-        時間型のカラム定義クラスの初期化
+        Initialization of time-type column definition classes
         Args:
-            isNotNull  (bool)       : NotNull制約を有効化するかどうか
-            defalut    (str | None) : デフォルト値を設定するかどうか   
-            foreignKey (str | None) : 外部キー制約の指定  
+            isNotNull  (bool)       : Whether to enable the NotNull constraint
+            defalut    (str | None) : Whether to set a default value   
+            foreignKey (str | None) : Specifies the foreign key constraint
         """
         super().__init__(
-            dataType        = DateTime(), # データ型の指定
-            isPrimaryKey    = False,      # 設定しない
-            isNotNull       = isNotNull,  # 初期化時に依存
-            isUnique        = False,      # 設定しない
-            isAutoincrement = False,      # 設定しない
-            default         = default,    # 初期化時に依存
-            foreignKey      = foreignKey  # 初期化時に依存
+            dataType        = DateTime(),
+            default         = default,
+            check           = check,  
+            foreignKey      = foreignKey
         )
 #-------------------------------------------------------------------------------

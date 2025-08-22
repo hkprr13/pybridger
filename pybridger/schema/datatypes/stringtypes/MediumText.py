@@ -1,28 +1,40 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .StringsType   import StringsType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .StringType    import StringType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class MediumText(StringsType):
+class MediumText(StringType):
     """
-    中程度のText型
-    サポートされているSQL(MySQL)
+    Define mediumn text type class 
+    Supported SQL (MySQL)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize mediumn text type object
+        Args:
+        
+        Examples:
+            ```
+            dataType = MediumText()
+            ```
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
+    def mysql(self) -> None:
         self.query : Any = Query("MEDIUMTEXT")
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
 #-------------------------------------------------------------------------------

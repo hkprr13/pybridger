@@ -3,7 +3,7 @@ from .base      import AsyncMySqlEngine         # 非同期MySQL
 from .base      import AsyncSqlite3Engine       # 非同期Sqlite3
 from .base      import AsyncPostgreSqlEngine    # 非同期PostgreSQL
 from ..common   import public                   # パブリックメソッド
-from ..column   import Column                   # カラムクラス
+from ..schema   import Column                   # カラムクラス
 from ..model    import Model                    # モデルクラス
 from ..manager  import Select                   # SELECT句クラス
 from ..config   import Config                   # コンフィグクラス

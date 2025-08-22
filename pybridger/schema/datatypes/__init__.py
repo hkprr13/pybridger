@@ -1,34 +1,58 @@
 #-------------------------------------------------------------------------------
-# データ型
+# Datatype
 from .datatype              import DataType
-# 日付型
+# Date time types
 from .datetimetypes         import Date
 from .datetimetypes         import DateTime
 from .datetimetypes         import Time
 from .datetimetypes         import TimeStamp
 from .datetimetypes         import Year
-# 整数型
+# Getometry types
+from .geometrytypes         import Box
+from .geometrytypes         import Circle
+from .geometrytypes         import Line
+from .geometrytypes         import Lseg
+from .geometrytypes         import Path
+from .geometrytypes         import Point
+from .geometrytypes         import Polygon
+# Integer types
 from .intergertypes         import BigInt
 from .intergertypes         import Integer
 from .intergertypes         import MediumInt
 from .intergertypes         import SmallInt
 from .intergertypes         import TinyInt
-# 文字列型
-from .stringstypes          import Binary
-from .stringstypes          import Blob
-from .stringstypes          import Char
-from .stringstypes          import Enum
-from .stringstypes          import LongBlob
-from .stringstypes          import LongText
-from .stringstypes          import MediumBlob 
-from .stringstypes          import Set
-from .stringstypes          import Text
-from .stringstypes          import TinyBlob
-from .stringstypes          import TinyText
-from .stringstypes          import VarBinary
-from .stringstypes          import VarChar
+# logical types
+from .logicaltypes          import Boolean
+# String types
+from .stringtypes           import Binary
+from .stringtypes           import Blob
+from .stringtypes           import Char
+from .stringtypes           import Enum
+from .stringtypes           import LongBlob
+from .stringtypes           import LongText
+from .stringtypes           import MediumBlob
+from .stringtypes           import MediumText
+from .stringtypes           import Set
+from .stringtypes           import Text
+from .stringtypes           import TinyBlob
+from .stringtypes           import TinyText
+from .stringtypes           import VarBinary
+from .stringtypes           import VarChar
 #-------------------------------------------------------------------------------
 __all__ = [
-    "Date", "DateTime", "Time", "TimeStamp", "Year"
+    # Datatypes
+    "DataType",
+    # Date time types
+    "Date", "DateTime", "Time", "TimeStamp", "Year",
+    # Getometry types
+    "Box", "Circle", "Line", "Lseg", "Path", "Point", "Polygon",
+    # Integer types
+    "BigInt", "Integer", "MediumInt", "SmallInt", "TinyInt",
+    # logical types
+    "Boolean",
+    # String types
+    "Binary", "Blob", "Char", "Enum", "LongBlob",
+    "LongText", "MediumBlob", "MediumText", "Set",
+    "Text", "TinyBlob", "TinyText", "VarBinary", "VarChar"
 ]
 #-------------------------------------------------------------------------------

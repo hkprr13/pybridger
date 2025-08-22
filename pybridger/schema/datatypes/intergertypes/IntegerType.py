@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from ..datatype     import DataType             # データ型クラス
+from typing         import Any
+from ..datatype     import DataType
 #-------------------------------------------------------------------------------
 class IntegerType(DataType):
     def __init__(self) -> None:

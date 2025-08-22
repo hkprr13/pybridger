@@ -1,19 +1,25 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .IntegerType   import IntegerType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing             import Any
+from .IntegerType       import IntegerType
+from ....common         import override
+from ....common         import private
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class BigInt(IntegerType):
     """
-    8バイト整数型
-    サポートされているSQL(MySQL, PostgreSQL)
+    Define 8-byte integer type
+    Supported SQL (MySQL, PostgreSQL)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize 8-byte integer type object
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
+    def mysql(self) -> None:
         self.query                : Any = Query("BIGINT")
         self.storage              : Any =                          8
         self.signedMaximum        : Any =  9_223_372_036_854_775_807
@@ -23,7 +29,7 @@ class BigInt(IntegerType):
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query                : Any = self.TEXTNOTSUPPORTED
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
@@ -33,7 +39,7 @@ class BigInt(IntegerType):
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.storage              : Any =                          8
         self.signedMaximum        : Any =  9_223_372_036_854_775_807
         self.signedMinimum        : Any = -9_223_372_036_854_775_808

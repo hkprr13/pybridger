@@ -1,28 +1,40 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .StringsType   import StringsType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .StringType    import StringType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class TinyBlob(StringsType):
+class TinyBlob(StringType):
     """
-    255Bのバイナリ型
-    サポートされているSQL(MySQLのみ)
+    Define 255B binary type class
+    Supported SQL (MySQL)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize 255B binary type object
+        Args:
+        
+        Examples:
+            ```
+            dataType = TinyBlob()
+            ```
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
+    def mysql(self) -> None:
         self.query : Any = Query("TINYBLOB")
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
 #-------------------------------------------------------------------------------

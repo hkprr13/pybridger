@@ -1,19 +1,25 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .IntegerType   import IntegerType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing             import Any
+from .IntegerType       import IntegerType
+from ....common         import override
+from ....common         import private
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class TinyInt(IntegerType):
     """
-    1バイト整数型
-    サポートされているSQL(MySQL)
+    Define 1-byte integer type class
+    Supported SQL (MySQL)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize 1-byte integer type object
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
+    def mysql(self) -> None:
         self.query                : Any = Query("TINYINT")
         self.storage              : Any =    1
         self.signedMaximum        : Any =  127
@@ -23,7 +29,7 @@ class TinyInt(IntegerType):
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query                : Any = self.TEXTNOTSUPPORTED
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
@@ -33,7 +39,7 @@ class TinyInt(IntegerType):
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.query                : Any = self.TEXTNOTSUPPORTED
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED

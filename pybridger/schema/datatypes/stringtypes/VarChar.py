@@ -1,32 +1,41 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .StringsType   import StringsType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .StringType    import StringType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class VarChar(StringsType):
+class VarChar(StringType):
     """
-    可変長の文字列データ型
-    サポートされているSQL(すべて)
+    Define variable-length string data type class
+    Supported SQL (MySQL, Sqlite3, PostgreSQL)
     """
     #---------------------------------------------------------------------------
     def __init__(self, length : int) -> None:
+        """
+        Initialize variable-length string data type object
+        Args:
+            length (int) : length 
+        Examples:
+            ```
+            dataType = VarChar(16)
+            ```
+        """
         super().__init__()
         self.length = length
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
+    def mysql(self) -> None:
         self.query  : Any = Query(f"VARCHAR({self.length})")
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query  : Any = Query(f"VARCHAR({self.length})")
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.query  : Any = Query(f"VARCHAR({self.length})")
 #-------------------------------------------------------------------------------

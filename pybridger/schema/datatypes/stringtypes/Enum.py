@@ -1,32 +1,41 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .StringsType   import StringsType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .StringType    import StringType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class Set(StringsType):
+class Enum(StringType):
     """
-    複数選択型
-    サポートされているSQL(MySQL)
+    Define enumerated types class
+    Supported SQL (MySQL, PostgreSQL)
     """
     #---------------------------------------------------------------------------
     def __init__(self, *args) -> None:
+        """
+        Initialize Enumerated types object
+        Args:
+            args : List values
+        Examples:
+            ```
+            dataType = Enum('a', 'b', 'c', 'd', 'e')
+            ```
+        """
         super().__init__()
         self.__args = args
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
-        self.query : Any = Query(f"SET{self.__args}")
+    def mysql(self) -> None:
+        self.query : Any = Query(f"ENUM{self.__args}")
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
-        self.query : Any = self.TEXTNOTSUPPORTED
+    def postgresql(self) -> None:
+        self.query : Any = Query(f"ENUM{self.__args}")
 #-------------------------------------------------------------------------------

@@ -1,8 +1,7 @@
 #-------------------------------------------------------------------------------
-from .Filed         import Filed        # 基底クラス
-from ..datatypes    import Boolean      # 論理値型
-from ..constraint  import ForeignKey   #
-from ..common       import private
+from .Filed             import Filed 
+from ..datatypes        import Boolean
+from ...common          import private
 #-------------------------------------------------------------------------------
 class BoolFiled(Filed):
     """
@@ -11,32 +10,31 @@ class BoolFiled(Filed):
     #---------------------------------------------------------------------------
     def __init__(
             self,
-            isNotNull  : bool        = False,
             default    : bool | None = None,
             foreignKey : str  | None = None
         ) -> None:
         """
-        真偽値のカラム定義クラスの初期化
+        Initialization of the boolean column definition class
         Args:
-            isNotNull  (bool)        : NotNull制約を有効化するかどうか
-            defalut    (bool | None) : デフォルト値を設定するかどうか 
-                                     : Noneなら未指定,
-                                     : Trueならデフォルト値がTrue,
-                                     : Flaseならデフォルト値がFalse
-            foreignKey (str | None)  : 外部キー制約の指定
+            isNotNull  (bool)        : Whether to enable the NotNull constraint
+            defalut    (bool | None) : Whether to set a default value 
+                                     : None means unspecified,
+                                     : True means the default value is True,
+                                     : Flase means the default value is False
+            foreignKey (str | None)  : Specifies the foreign key constraint
+        Examples:
+            ```
+            isUpdate = BoolFiled(default = True)
+            ```
         """
         super().__init__(
-            dataType        = Boolean(),                  # データ型の指定
-            isPrimaryKey    = False,                      # 設定しない
-            isNotNull       = isNotNull,                  # 初期化時に依存
-            isUnique        = False,                      # 設定しない
-            isAutoincrement = False,                      # 設定しない
-            default         = self.__setDefalut(default), # 文字列に変換
-            foreignKey      = foreignKey                  # 初期化時に依存
+            dataType        = Boolean(),
+            default         = self.__setDefalut(default),
+            foreignKey      = foreignKey
         )
     #---------------------------------------------------------------------------
     @private
-    def __setDefalut(self, defalut):
+    def __setDefalut(self, defalut) -> None | str:
         if defalut is None:
             return None
         else:

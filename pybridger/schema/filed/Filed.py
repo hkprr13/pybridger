@@ -1,83 +1,54 @@
 #-------------------------------------------------------------------------------
-from ..datatypes.DataType import DataType    # データ型　<-インポートエラー回避
-from ..column             import Column      # カラムクラス
-from ..constraint        import Default     # デフォルト値クラス
-from ..constraint        import NotNull     # NotNullクラス
-from ..constraint        import Unique      # ユニーク設定クラス
-from ..constraint        import ForeignKey  # 外部キー制約クラス
-from ..common             import private     # プライベートメソッド
-from ..common             import override    # オーバライドメソッド 
+from ..datatypes        import DataType
+from ..column           import Column
+from ..constraints      import Default
+from ..constraints      import Check
+from ..constraints      import ForeignKey
 #-------------------------------------------------------------------------------
 class Filed(Column):
     """
-    フィールドクラスの基底クラス
-    カラムクラスを継承する。カラムクラスより設定に制限あり
+    Base class for field classes.
+    Inherits column classes.
+    Has more restrictions on settings than column classes
     """
     def __init__(
             self,
             dataType        : DataType,
             isPrimaryKey    : bool       = False,
+            isAutoincrement : bool       = False,
             isNotNull       : bool       = False,
             isUnique        : bool       = False,
-            isAutoincrement : bool       = False,
+            check           : str | None = None,
             default         : str | None = None,
             foreignKey      : str | None = None
         ) -> None:
-        # 制約
-        self.dataType        = dataType
-        self.isPrimaryKey    = isPrimaryKey
-        self.isNotNull       = isNotNull
-        self.isUnique        = isUnique
-        self.isAutoincrement = isAutoincrement
-        self.default         = default
-        self.foreignKey      = foreignKey
-        #
-        self.columnName  : str
-        self.tableName   : str
-        self.dataTypeSql : str    
-    #---------------------------------------------------------------------------
-    @override
-    @private
-    def setDataTypeSql(self) -> None: ...
-    #---------------------------------------------------------------------------
-    @override
-    @private
-    def setPrimaryKeySql(self) -> None:
-        return super().setPrimaryKeySql(self.isPrimaryKey)
-    #---------------------------------------------------------------------------
-    @override
-    @private
-    def setDefaultSql(self) -> None:
-        return super().setDefaultSql(
-            Default(self.default)
+        """
+        Initialize filed object
+        Args:
+            dataType        (DataType)   : Data type 
+            isPrimaryKey    (bool)       : Defining the primary key
+            isAutoincrement (bool)       : Defining autoincrement
+            isNotNull       (bool)       : Defining not null
+            isUnique        (bool)       : Defining unique
+            check           (str | None) : Defining check
+            default         (str | None) : Defining defalut
+            foreignKey      (str | None) : Defining foreignkey
+        """
+        self.__foreignKey = foreignKey
+        super().__init__(
+            dataType        = dataType,
+            isPrimaryKey    = isPrimaryKey,
+            isAutoIncrement = isAutoincrement,
+            isNotNull       = isNotNull,
+            isUnique        = isUnique,
+            default         = Default(default),
+            check           = Check(check),
+            foreignKey      = self.__setForeignKey()
         )
     #---------------------------------------------------------------------------
-    @override
-    @private
-    def setNotNullSql(self) -> None:
-        return super().setNotNullSql(
-            NotNull(self.isNotNull)
-        )
-    #---------------------------------------------------------------------------
-    @override
-    @private
-    def setUniqueSql(self) -> None:
-        return super().setUniqueSql(
-            Unique(self.isUnique)
-        )
-    #---------------------------------------------------------------------------
-    @override
-    @private
-    def setForeignKeySql(self) -> None:
-        if self.foreignKey is None:
-            foreignKey = None
-        else:    
-            foreignKey = ForeignKey(
-                referenceName = self.foreignKey,
-                onUpdate      = None,
-                onDelete      = None
-            )
-        return super().setForeignKeySql(
-            foreignKey = foreignKey
-        ) 
+    def __setForeignKey(self) -> ForeignKey | None:
+        if self.__foreignKey:
+            return ForeignKey(self.__foreignKey)
+        else:
+            return None
 #-------------------------------------------------------------------------------

@@ -1,8 +1,7 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from ..datatype     import DataType             # データ型クラス
+from ..datatype     import DataType
 #-------------------------------------------------------------------------------
-class SpatialType(DataType):
+class GeometryType(DataType):
     def __init__(self) -> None:
         super().__init__()
 #-------------------------------------------------------------------------------

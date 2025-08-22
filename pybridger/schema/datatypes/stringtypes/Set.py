@@ -1,32 +1,41 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .StringsType   import StringsType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing         import Any
+from .StringType    import StringType
+from ....common     import override
+from ....common     import private
+from ....mapper     import Query
 #-------------------------------------------------------------------------------
-class VarBinary(StringsType):
+class Set(StringType):
     """
-    可変長バイナリデータ型
-    サポートされているSQL(MySQL)
+    Define multiple selection type class
+    Supported SQL (MySQL)
     """
     #---------------------------------------------------------------------------
-    def __init__(self, length : int) -> None:
+    def __init__(self, *args) -> None:
+        """
+        Initialize multiple selection type object
+        Args:
+            args : list values
+        Examples:
+            ```
+            dataType = Set()
+            ```
+        """
         super().__init__()
-        self.length = length
+        self.__args = args
     #---------------------------------------------------------------------------
     @override
     @private
-    def mysql(self):
-        self.query : Any = Query(f"VARBINARY({self.length})")
+    def mysql(self) -> None:
+        self.query : Any = Query(f"SET{self.__args}")
     #---------------------------------------------------------------------------
     @override
     @private
-    def sqlite3(self):
+    def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
     @private
-    def postgresql(self):
+    def postgresql(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
 #-------------------------------------------------------------------------------

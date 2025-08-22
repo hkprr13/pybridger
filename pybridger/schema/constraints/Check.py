@@ -7,7 +7,7 @@ class Check(Constraint):
     """
     Defined check constraint class
     """
-    def __init__(self, conditons : str) -> None:
+    def __init__(self, conditons : str | None) -> None:
         """
         Initialize check constraint object
         Args:
@@ -19,15 +19,21 @@ class Check(Constraint):
         """
         self.__conditions = conditons
     #---------------------------------------------------------------------------
+    def __buildCheckQuery(self) -> Query:
+        if self.__conditions:
+            return Query(f"CHECK ({self.__conditions})")
+        else:
+            return Query("")
+    #---------------------------------------------------------------------------
     @override
     def mysql(self) -> None:
-        self.query  = Query(f"CHECK ({self.__conditions})")
+        self.query = self.__buildCheckQuery()
     #---------------------------------------------------------------------------
     @override
     def sqlite3(self) -> None:
-        self.query  = Query(f"CHECK ({self.__conditions})")
+        self.query = self.__buildCheckQuery()
     #---------------------------------------------------------------------------
     @override
     def postgresql(self) -> None:
-        self.query  = Query(f"CHECK ({self.__conditions})")
+        self.query = self.__buildCheckQuery()
 #-------------------------------------------------------------------------------

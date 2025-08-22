@@ -112,6 +112,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildAutoIncrementQuery(self) -> Query:
         """
         private method
@@ -125,6 +126,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildNotNullQuery(self) -> Query:
         """
         private method
@@ -138,6 +140,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildUniqueQuery(self) -> Query:
         """
         private method
@@ -151,6 +154,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildDefaultQuery(self):
         """
         private method
@@ -163,6 +167,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildCheckQuery(self) -> Query:
         """
         private method
@@ -175,6 +180,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildTableLevelCheckQuery(self) -> Query:
         """
         private method
@@ -187,6 +193,7 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
+    @private
     def __buildForeignKeyQuery(self) -> Query:
         """
         private method

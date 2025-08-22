@@ -1,15 +1,21 @@
 #-------------------------------------------------------------------------------
-from typing         import Any                  # Any型
-from .IntegerType   import IntegerType          # 整数型
-from ...common      import override             # オーバライドデコレーター
-from ...common      import private              # パブリックデコレーター
-from ...query       import Query                # クエリクラス
+from typing             import Any
+from .IntegerType       import IntegerType
+from ....common         import override
+from ....common         import private
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class MediumnInt(IntegerType):
     """
-    3バイト整数型
-    サポートされているSQL(MySQL)
+    Define 3-byte integer type
+    Supported SQL (MySQL)
     """
+    #---------------------------------------------------------------------------
+    def __init__(self) -> None:
+        """
+        Initialize 3-byte integer type object
+        """
+        super().__init__()
     #---------------------------------------------------------------------------
     @override
     @private
