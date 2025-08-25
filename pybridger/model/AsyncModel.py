@@ -1,48 +1,45 @@
 #-------------------------------------------------------------------------------
-from .ModelMeta    import ModelMeta
-from ..column      import Column
-from ..common      import private
-from ..common      import public
-from ..constraints import Constraints
-from ..manager     import Base 
-from ..manager     import AsyncAlterTableAddColumn
-from ..manager     import AsyncAlterTableAddConstraint
-from ..manager     import AsyncAlterTableDropColumn
-from ..manager     import AsyncAlterTableDropConstraint
-from ..manager     import AsyncAlterTableRenameColumn
-from ..manager     import AsyncCreateIndex
-from ..manager     import AsyncCreateTable
-from ..manager     import AsyncCreateTableIfNotExists
-from ..manager     import AsyncCreateTrigger
-from ..manager     import AsyncCreateView
-from ..manager     import AsyncInsertRecord
-from ..manager     import AsyncInsertRecords
-from ..manager     import AsyncUpdateRecord
-from ..manager     import AsyncUpdateRecords
-from ..manager     import AsyncDeleteRecord
-from ..manager     import AsyncDropIndex
-from ..manager     import AsyncDropIndexIfExists
-from ..manager     import AsyncDropTable
-from ..manager     import AsyncDropTableIfExists
-from ..manager     import AsyncDropTrigger
-from ..manager     import AsyncDropTriggerIfNotExists
-from ..manager     import AsyncDropView
-from ..manager     import AsyncDropViewIfExists
-from ..manager     import Select
+from .ModelMeta     import ModelMeta
+from ..schema       import Column
+from ..common       import private
+from ..common       import public
+from ..schema       import Constraint
+from ..manager      import Base 
+from ..manager      import AsyncAlterTableAddColumn
+from ..manager      import AsyncAlterTableAddConstraint
+from ..manager      import AsyncAlterTableDropColumn
+from ..manager      import AsyncAlterTableDropConstraint
+from ..manager      import AsyncAlterTableRenameColumn
+from ..manager      import AsyncCreateIndex
+from ..manager      import AsyncCreateTable
+from ..manager      import AsyncCreateTableIfNotExists
+from ..manager      import AsyncCreateTrigger
+from ..manager      import AsyncCreateView
+from ..manager      import AsyncInsertRecord
+from ..manager      import AsyncInsertRecords
+from ..manager      import AsyncUpdateRecord
+from ..manager      import AsyncUpdateRecords
+from ..manager      import AsyncDeleteRecord
+from ..manager      import AsyncDropIndex
+from ..manager      import AsyncDropIndexIfExists
+from ..manager      import AsyncDropTable
+from ..manager      import AsyncDropTableIfExists
+from ..manager      import AsyncDropTrigger
+from ..manager      import AsyncDropTriggerIfNotExists
+from ..manager      import AsyncDropView
+from ..manager      import AsyncDropViewIfExists
+from ..manager      import Select
+#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 class Model(metaclass = ModelMeta):
     """
-    モデルクラスの基底クラス。
-
+    Define Model class
     Attributes:
-        tableName (str)                     : テーブル名（クラス名から自動取得）
-        columns   (list[dict[str, Column]]) : カラム定義のリスト
+        tableName (str)                     : Automatically retrieved from class name
+        columns   (list[dict[str, Column]]) : List of column async definitions
     """
-
-    tableName : str                     # テーブル名
-    columns   : list[dict[str, Column]] # カラム
-    #---------------------------------------------------------------------------
-    # プライベートメソッド
+    tableName : str
+    columns   : list[dict[str, Column]]
     #---------------------------------------------------------------------------
     @classmethod
     @private
@@ -54,111 +51,123 @@ class Model(metaclass = ModelMeta):
     #---------------------------------------------------------------------------
     @classmethod
     @private
-    def __columnsToQuery(cls):
+    def __columnsToCreateQuery(cls) -> str:
         """
-        カラムをSQL文にする
-        テーブル作成時に使用する
+        Convert columns to query statements.
+        Used when creating tables
+        Returns:
+            str : Create query
         """
-        cls.__foreignKeyList = [] # 外部キー定義リスト
-        columnDefineLists    = [] # 各カラム定義
-        # 各カラム定義をリストに追加
+        cls.__foreignKeyList = []
+        columnDefineLists    = []
+        # Add each column async definition to the list
         for cols in cls.columns:
-            columnSql = cls.__columnsToSql(cols)
-            columnDefineLists.append(columnSql)
-        # 外部キーがある場合、末尾に追加
+            columnQuery = cls.__columnsToQuery(cols)
+            columnDefineLists.append(columnQuery)
+        # If there is a foreign key, add it at the end
         for fk in cls.__foreignKeyList:
             columnDefineLists.append(fk)
         return ", ".join(columnDefineLists)
     #---------------------------------------------------------------------------
     @classmethod
     @private
-    def __columnsToSql(
+    async def __columnsToQuery(
             cls,
             columns : dict[str, Column]
         ) -> str:
         """
-        カラムをSQL文にする
-        columnsToQueryでのみ使用するプライベートメソッド
+        Convert columns to a query statement.
+        Private method used only in columnsToQuery
         Args:
-            columns (dict[str, Column]) : カラム 
+            columns (dict[str, Column]) : Columns
         Returns:
-            Create文で使用するSQL文を返す
+            str : the query statement used in the Create statement
         """
         columnName, columnObject = next(iter(columns.items()))
         parts = []
         parts.append(columnName)
-        # データ型
-        if columnObject.dataTypeSql:
-            parts.append(columnObject.dataTypeSql)
-        # 主キー
-        if columnObject.primaryKeySql:
-            parts.append(columnObject.primaryKeySql)
-        # デフォルト値
-        if columnObject.defaultSql:
-            parts.append(columnObject.defaultSql)
-        # ユニーク設定
-        if columnObject.uniqueSql:
-            parts.append(columnObject.uniqueSql)
-        # NotNull制約
-        if columnObject.notNullSql:
-            parts.append(columnObject.notNullSql)
-        # 外部キー制約
-        # 定義ある場合は別途保管 
-        fk = cls.__foreignKeyToSql(columnName, columnObject)
+        if columnObject.dataTypeQuery.sql:
+            parts.append(columnObject.dataTypeQuery.sql)
+        if columnObject.primaryKeyQuery.sql:
+            parts.append(columnObject.primaryKeyQuery.sql)
+        if columnObject.autoIncrementQuery.sql:
+            parts.append((columnObject.autoIncrementQuery.sql))
+        if columnObject.defaultQuery.sql:
+            parts.append(columnObject.defaultQuery.sql)
+        if columnObject.uniqueQuery.sql:
+            parts.append(columnObject.uniqueQuery.sql)
+        if columnObject.notNullQuery.sql:
+            parts.append(columnObject.notNullQuery.sql)
+        # If async defined, store separately
+        fk = cls.__foreignKeyToQuery(columnName, columnObject)
         if fk:
             cls.__foreignKeyList.append(fk)        
         return " ".join(parts)
     #---------------------------------------------------------------------------
     @classmethod
     @private
-    def __foreignKeyToSql(
+    async def __foreignKeyToQuery(
             cls,
             columnName : str,
             columnObject : Column
         ) -> str:
         """
-        外部キー制約の設定をSQL文として出力するプライベートメソッド
+        Private method that outputs foreign key constraints as a query statement
         Args:
-            columnName   (str) : カラム名
-            cokumnObject (str) : カラムオブジェクト
+            columnName   (str) : Column name.
+            cokumnObject (str) : Column object.
         Returns:
-            fk : SQL文
+            fk : Query statement.
         """
-        fk = columnObject.foreignKeySql
-        # リプレイスする
-        if fk: fk = fk.replace("~~~", columnName)
-        else:  fk = ""
+        fk = columnObject.foreignKeyQuery.sql
+        if fk:
+            fk = fk.replace("~~~", columnName)
+        else:
+            fk = ""
         return fk
     #---------------------------------------------------------------------------
-    # パブリックメソッド
+    @classmethod
+    async def checkDatatypes(cls) -> None:
+        print(cls.__dict__)
     #---------------------------------------------------------------------------
-    # CREATE系
     @classmethod
     @public
     async def createTable(cls) -> AsyncCreateTable:
         """
-        テーブルを作成する
+        Create a table
         Returns:
-            CreateTable : テーブル作成クラス
+            CreateTable : Table creation object
+        Exemples:
+            ```
+            user = User.createTable()
+            user.execute()
+            user.commit()
+            ```
         """
-        columns = cls.__columnsToQuery()
+        columns = cls.__columnsToCreateQuery()
         return AsyncCreateTable(
-            tableName = cls.__name__, # テーブル名
-            columns   = columns       # テーブル作成用カラム
+            tableName = cls.tableName,
+            columns   = columns
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
     async def createTableIfNotExists(cls) -> AsyncCreateTableIfNotExists:
         """
-        テーブルが存在しない場合に作成する
+        Create a table if it does not exist
         Returns:
-            CreateTableIfNotExists : テーブル作成クラス
+            CreateTableIfNotExists : Table creation object
+        Exemples:
+            ```
+            user = User.createTableIfNotExists()
+            user.execute()
+            user.commit()
+            ```
         """
-        columns = cls.__columnsToQuery()
+        columns = cls.__columnsToCreateQuery()
         return AsyncCreateTableIfNotExists(
-            tableName = cls.__name__, # テーブル名
-            columns   = columns       # テーブル作成用カラム
+            tableName = cls.tableName,
+            columns   = columns
         )
     #---------------------------------------------------------------------------
     @classmethod
@@ -169,30 +178,29 @@ class Model(metaclass = ModelMeta):
             *columns  : Column
         ) -> AsyncCreateIndex:
         """
-        インデックスを作成する
+        Create an index
         Args:
-            indexName (str)    : 作成するインデックス名
-            *columns  (Column) : 対象とするカラム
+            indexName (str)    : Name of the index to be created
+            *columns  (Column) : Target columns
         Returns:
-            CreateIndex: インデックス作成処理オブジェクト
+            CreateIndex : Index creation processing object
         Examples:
-            ↓ インスタンスの作成
+            ```
             user = User.createIndex("indexName", User.id, User.name)
-            ↓ 実行とコミット
             user.execute()
             user.commit()
+            ```
         """
-        # カラムを文字列に変更する
         cols = cls.__parameterColumnsToStrings(columns)
         return AsyncCreateIndex(
             indexName = indexName,
-            tableName = cls.__name__,
+            tableName = cls.tableName,
             columns   = cols
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def createView(cls): ...
+    async def createView(cls): ...
     #---------------------------------------------------------------------------
     @classmethod
     @public
@@ -202,83 +210,89 @@ class Model(metaclass = ModelMeta):
             timing      : str,
             event       : str,
             body        : Base
-        ):
+        ) -> AsyncCreateTrigger:
         """
-        トリガーの作成
+        Creating a trigger
         Args:
-            triggerName (str) : トリガー名 
-            timing      (str) : タイミング BEFORE AFTER
-            event       (str) : イベント  INSERT UPDATE DELETE
-            body        (str) : 実行するSQL文
+            triggerName (str) : Trigger name 
+            timing      (str) : Timing BEFORE or AFTER
+            event       (str) : Event  INSERT or UPDATE or DELETE
+            body        (str) : Query statement to execute
         Examples:
+            ```
             trigger = User.createTrigger(
-                "tableName",
+                "tableName,
                 "triggerName",
                 "before | after",
-                "inser | update | delete",
-                User.InsertRecord(~~~)      <-実行したいものを入れる
+                "insert | update | delete",
+                User.InsertRecord() <-Enter the query you want to execute
             )
             trigger.execute()
             trigger.commit()
+            ```
         """
         return AsyncCreateTrigger(
-            tableName   = cls.__name__, # テーブル名
-            triggerName = triggerName,  # トリガー名
-            timing      = timing,       # イベントタイミング
-            event       = event,        # イベント
-            body        = body.query    # 実行するSQL
+            tableName   = cls.tableName, 
+            triggerName = triggerName,
+            timing      = timing,
+            event       = event,
+            body        = body.query
         )
-    #---------------------------------------------------------------------------
-    # DROP系
     #---------------------------------------------------------------------------
     @classmethod
     @public
     async def dropTable(cls) -> AsyncDropTable:
         """
-        テーブルを削除する
-        Example:
+        Delete a table
+        Examples:
+            ```
             user = User.dropTable()
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropTable : テーブル削除クラス
+            AsyncDropTable : Table deletion object
         """
         return AsyncDropTable(
-            tableName = cls.__name__
+            tableName = cls.tableName
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
     async def dropTableIfExists(cls) -> AsyncDropTableIfExists:
         """
-        テーブルが存在する場合のみ削除する
+        Delete only if the table exists
         Example:
+            ```
             user = User.dropTableIfExists()
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropTableIfExists : テーブル削除クラス
+            AsyncDropTableIfExists : Table deletion object
         """
         return AsyncDropTableIfExists(
-            tableName = cls.__name__
+            tableName = cls.tableName
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
     async def dropView(cls, viewName : str) -> AsyncDropView:
         """
-        ビューの削除
+        Deleting a view
         Args:
-            viewName (str) : 削除するビュー名
+            viewName (str) : Name of the view to be deleted
         Example:
+            ```
             user = User.dropView("view")
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropView : ビュー削除クラス
+            AsyncDropView : View deletion object
         """
         return AsyncDropView(
-            tableName = cls.__name__,
+            tableName = cls.tableName,
             viewName  = viewName
         )
     #---------------------------------------------------------------------------
@@ -286,18 +300,20 @@ class Model(metaclass = ModelMeta):
     @public
     async def dropViewIfExist(cls, viewName : str) -> AsyncDropViewIfExists:
         """
-        ビューが存在する場合削除する
+        Delete a view if it exists
         Args:
-            viewName (str) : 削除するビュー名
+            viewName (str) : Name of the view to delete
         Example:
+            ```
             user = User.dropView("view")
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropViewIfExists : ビュー削除クラス
+            AsyncDropViewIfExists : View deletion object
         """
         return AsyncDropViewIfExists(
-            tableName = cls.__name__,
+            tableName = cls.tableName,
             viewName  = viewName
         )
     #---------------------------------------------------------------------------
@@ -305,40 +321,41 @@ class Model(metaclass = ModelMeta):
     @public
     async def dropIndex(cls, indexName : str) -> AsyncDropIndex:
         """
-        インデックス削除
+        Index deletion
         Args:
-            indexName (str) : インデックス名
+            indexName (str) : Index name
         Example:
+            ```
             user = User.dropIndex("index")
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropIndex : インデックス削除クラス
+            AsyncDropIndex : Index deletion object
         """
         return AsyncDropIndex(
-            tableName = cls.__name__,
+            tableName = cls.tableName,
             indexName = indexName
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    async def dropIndexIfNotExists(
-            cls,
-            indexName : str
-        ) -> AsyncDropIndexIfExists:
+    async def dropIndexIfNotExists(cls, indexName : str) -> AsyncDropIndexIfExists:
         """
-        インデックス削除
+        Index deletion
         Args:
-            indexName (str) : インデックス名
+            indexName (str) : Index name
         Example:
+            ```
             user = User.dropIndexIfExists("index")
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropIndexIfExists : インデックス削除クラス
+            AsyncDropIndexIfExists : Index deletion object
         """
         return AsyncDropIndexIfExists(
-            tableName = cls.__name__,
+            tableName = cls.tableName,
             indexName = indexName
         )
     #---------------------------------------------------------------------------
@@ -346,18 +363,20 @@ class Model(metaclass = ModelMeta):
     @public
     async def dropTrigger(cls, triggerName : str) -> AsyncDropTrigger:
         """
-        トリガーの削除
+        Deleting a trigger
         Args:
-            triggerName (str) : トリガー名
+            triggerName (str) : Trigger name
         Examples:
+            ```
             user = User.dropTrigger("trigger")
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropTrigger : トリガー削除オブジェクト
+            AsyncDropTrigger : Trigger deletion object
         """
         return AsyncDropTrigger(
-            tableName   = cls.__name__,
+            tableName   = cls.tableName,
             triggerName = triggerName
         )
     #---------------------------------------------------------------------------
@@ -368,144 +387,148 @@ class Model(metaclass = ModelMeta):
             triggerName : str
         ) -> AsyncDropTriggerIfNotExists:
         """
-        トリガーの削除
+        Deleting a trigger
         Args:
-            triggerName (str) : トリガー名
+            triggerName (str) : Trigger name
         Examples:
+            ```
             user = User.dropTriggerIfNotExists("trigger")
             user.execute()
             user.commit()
+            ```
         Returns:
-            DropTriggerIfNotExists : トリガー削除オブジェクト
+            AsyncDropTriggerIfNotExists : Trigger deletion object
         """
         return AsyncDropTriggerIfNotExists(
-            tableName   = cls.__name__,
+            tableName   = cls.tableName,
             triggerName = triggerName
         )
-    #---------------------------------------------------------------------------
-    # INSERT/UPDATE/DELETE
     #---------------------------------------------------------------------------
     @classmethod
     @public
     async def insertRecord(cls, **columns) -> AsyncInsertRecord:
         """
-        レコードを挿入
+        Insert record
         Args:
-            **columns : 例: id = 1, name = "name", age = 19...
+            columns : Example: id = 1, name = "name", age = 19...
         Examples:
+            ```
             user = User.insertRecord(id = 1, name = "name", age = 19)
             user.execute()
             user.commit()
-
-            Userテーブルにidが1, nameが"name", ageが19が挿入される
+            # A record with id = 1, name = "name", and age = 19
+            # is inserted into the User table
+            ```
         Returns:
-            InsertRecord : レコード挿入クラスを返す
+            AsyncInsertRecord : Returns the record insertion object
         """
-        cols         = "" # カラム
-        placeHolders = "" # プレイスホルダー
-        values       = [] # 値
-        # id = 1, name = "name", age = 19...の形に成形
-        # 値をストックに格納
-        # カラム数に応じて, プレイスホルダー数を決定
+        cols         = ""
+        placeHolders = ""
+        values       = []
         for key, value in columns.items():
+            Model()
             cols         += f"{key}, "
             placeHolders += "?, "
             values.append(value)
         return AsyncInsertRecord(
-            tableName    = cls.__name__,     # テーブル名
-            columns      = cols[:-2],        # id,name, ...の形で渡す, 末尾を削除
-            values       = tuple(values),    # 値はタプルで渡す
-            placeHolders = placeHolders[:-2] # プレイスホルダー, 末尾を削除
+            tableName    = cls.tableName,
+            columns      = cols[:-2],
+            values       = tuple(values),
+            placeHolders = placeHolders[:-2]
         )
-        
     #---------------------------------------------------------------------------
     @classmethod    
     @public
-    async def insertRecords(cls, **columns) -> AsyncInsertRecords:
+    async def insertRecords(cls, **columns) ->AsyncInsertRecords:
         """
-        レコードを複数挿入
-        Args:
-            **columns : 例: id   = [1,   2,   3  ],
-                            name = ["a", "b", "c"],
-                            age  = [19,  22,  17 ]
-        Examples:
+        Insert multiple records
+        Arguments:
+            **columns : Ex(id = [1, 2, 3], name = ["a", "b", "c"], age  = [19, 22, 17])
+        Example:
+            ```
             user = User.insertRecord(
-                id = [1, 2, 3], name = ["a", "b", "c"], age = [19, 22, 17]
+                id   = [  1,   2,   3],
+                name = ["a", "b", "c"],
+                age  = [ 19,  22,  17]
             )
             user.execute()
             user.commit()
-
-            ↓Userテーブルに
-            |id|name|user|
-            |1 |a   |19  |
-            |2 |b   |22  |
-            |3 |c   |17  | と複数レコードが挿入される
-        Returns:
-            InsertRecord : レコード複数挿入クラスを返す
+            # Multiple records are inserted into the User table:
+            # |id|name|user|
+            # |1 |a   |19  |
+            # |2 |b   |22  |
+            # |3 |c   |17  |
+            ```
+        Return value:
+            InsertRecord: Returns a object for inserting multiple records
         """
-        cols         = "" # カラム
-        placeHolders = "" # プレイスホルダー
-        for key, values in columns.items(): # valuesは使わない
+        cols         = ""
+        placeHolders = ""
+        for key, values in columns.items():
             cols         += f"{key}, "
             placeHolders += "?, "
         return AsyncInsertRecords(
-            tableName    = cls.__name__,     # テーブル名
-            columns      = cols[:-2],        # id,name, ...の形で渡す, 末尾を削除
-            data         = list(        
-                zip(*columns.values())       # 値はリストで渡す
+            tableName    = cls.tableName,
+            columns      = cols[:-2],        # Pass in the form of id, name,
+            data         = list(             # ... and delete the suffix
+                zip(*columns.values())       
             ), 
-            placeHolders = placeHolders[:-2] # プレイスホルダー, 末尾を削除          
+            placeHolders = placeHolders[:-2] # Placeholder, delete the end         
         )
     #---------------------------------------------------------------------------
     @classmethod    
     @public
     async def updateRecord(cls, **updateColumns) -> AsyncUpdateRecord:
         """
-        レコードを更新
+        Update record
         Args:
-            **updateColumns : 更新したいカラムを指定する
+            **updateColumns : Specify the columns to be updated.
         Examples:
+            ```
             user = User.updateRecord(name = "a", age = 20)
             user.where(id = 1)
             user.execute()
             user.commit()
+            ```
         Returns:
-            UpdateRecord : レコード更新クラスを返す 
+            UpdateRecord : Returns the record update object
         """
-        cols   = "" # カラム
-        values = [] # 値(リスト型)
-        # id = ?, name = ?, age = ? の形に成型
+        cols   = ""
+        values = []
+        # Formatted as id = ?, name = ?, age = ?
         for key, value in updateColumns.items():
             cols += f"{key} = ?, "
             values.append(value)
         return AsyncUpdateRecord(
-            tableName    = cls.__name__,    # テーブル名
-            columns      = cols[:-2] + " ", # ←WHEREの前に空白を入れる用
-            values       = tuple(values),   # タプルで渡す
+            tableName    = cls.tableName,
+            columns      = cols[:-2] + " ", # Insert a space before WHERE
+            values       = tuple(values),
         )
     #---------------------------------------------------------------------------
     @classmethod    
     @public
     async def updateRecords(cls, **updateColumns) -> AsyncUpdateRecords:
         """
-        レコードを更新
+        Update records
         Args:
-            **updateColumns : 更新したいカラムを指定する
+            **updateColumns : Specify the columns to be updated
         Examples:
+            ```
             user = User.updateRecords(
                 name = ["a","b","c"], age = [20,22,24]
-            ).where(id = [1,2,3]) ※whereも忘れずに
+            ).where(id = [1,2,3]) # Don't forget to include where
             user.execute()
             user.commit()
+            ```
         Returns:
-            UpdateRecords : 複数レコード更新クラスを返す 
+            UpdateRecords : Returns a multiple record update object
         """
-        cols = "" # カラム
-        for key, value in updateColumns.items(): # valueは使わない
+        cols = ""
+        for key, value in updateColumns.items():
             cols += f"{key} = ?, "
         return AsyncUpdateRecords(
-            tableName = cls.__name__,    # テーブル名
-            columns   = cols[:-2] + " ", # ←WHEREの前に空白を入れる用
+            tableName = cls.tableName,
+            columns   = cols[:-2] + " ", # Insert a space before WHERE
             data      = list(zip(*updateColumns.values()))
         )
     #---------------------------------------------------------------------------
@@ -513,134 +536,135 @@ class Model(metaclass = ModelMeta):
     @public
     async def deleteRecord(cls, **deleteColumns) -> AsyncDeleteRecord:
         """
-        レコードを削除
+        Delete a record
         Args:
-            **deleteColumns : 削除したいカラムを指定する
+            **deleteColumns : Specify the columns to be deleted
         Examples:
-            user = User.deleteRecord(id = 1) ※複数指定不可
+            ```
+            user = User.deleteRecord(id = 1) # Multiple specifications are not allowed
             user.execute()
             user.commit()
+            ```
         Returns:
-            DeleteRecord : レコード削除クラスを返す
+            DeleteRecord : Returns a record deletion object
         """
-        cols    = "" # カラム
-        values = [] # 値(リスト型)
-        # id = ? の形に成型
+        cols    = ""
+        values = []
+        # Formed into the shape of id = ?
         for key, value in deleteColumns.items():
             cols += f"{key} = ?, "
             values.append(value)
         return AsyncDeleteRecord(
-            tableName = cls.__name__,    # テーブル名
-            columns   = cols[:-2] + " ", # <-WHEREの前に空白を入れる用
-            values    = tuple(values)    # タプルで渡す
+            tableName = cls.tableName,
+            columns   = cols[:-2] + " ", # Insert a space before WHERE
+            values    = tuple(values)
         )
-    #---------------------------------------------------------------------------
-    # ALTER系
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def alterTableAddColumn(
-            cls,
-            **column : Column
-        ) -> AsyncAlterTableAddColumn:
+    async def alterTableAddColumn(cls, **column : Column) -> AsyncAlterTableAddColumn:
         """
-        テーブルにカラムを追加する
+        Add a column to a table
         Args:
-            column (Column) : カラム
+            column (Column) : Column
         Examples:
+            ```
             user = User.alterTableAddColumn(age = Column(Integer()))
             user.execute()
             user.commit()
+            ```
         Returns:
-            AlterTableAddColumn : カラム追加クラス
+            AsyncAlterTableAddColumn : Column addition object
         """
-        columnName   : str    # カラム名
-        columnObject : Column # カラムオブジェクト
+        columnName   : str 
+        columnObject : Column 
         # カラム
         for key, value in column.items():
             columnName   = key
             columnObject = value
         # 条件
-        constraints = f"{columnObject.notNullSql} "\
-                    + f"{columnObject.notNullSql} "\
-                    + f"{columnObject.uniqueSql}"
+        constraints = f"{columnObject.notNullQuery.sql} "\
+                    + f"{columnObject.notNullQuery.sql} "\
+                    + f"{columnObject.uniqueQuery.sql}"
         return AsyncAlterTableAddColumn(
-            tableName   = cls.__name__,             # テーブル名
-            column      = columnName,               # カラム名
-            dataType    = columnObject.dataTypeSql, # データ型
-            constraints = constraints               # 制約
+            tableName   = cls.tableName,
+            column      = columnName,
+            dataType    = columnObject.dataTypeQuery.sql,
+            constraints = constraints
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def alterTableDropColumn(
+    async def alterTableDropColumn(
             cls,
             column : Column
         ) -> AsyncAlterTableDropColumn:
         """
-        テーブルからカラムを削除する
+        Delete a column from a table
         Args:
-            column (Column) : カラム
+            column (Column) : Column
         Examples:
+            ```
             user = User.alterTableDropColumn(User.age)
             user.execute()
             user.commit()
+            ```
         Returns:
-            AlterTableDropColumn : カラム削除クラス
+            AsyncAlterTableDropColumn : Column deletion object
         """
         return AsyncAlterTableDropColumn(
-            tableName  = cls.__name__,     # テーブル名
-            columnName = column.columnName # カラム名
+            tableName  = cls.tableName,
+            columnName = column.columnName
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def alterTableRenameColumn(
+    async def alterTableRenameColumn(
             cls,
             oldName : str,
             newName : str
         ) -> AsyncAlterTableRenameColumn:
         """
-        テーブルのカラム名を変更
+        Change table column name
         Args:
-            oldName (str) : 既存の名前 
-            newName (str) : 新しい名前
+            oldName (str) : Existing name 
+            newName (str) : New name
         Examples:
+            ```
             user = User.alterTableRenameColumn("email", "address")
             user.execute()
             user.commit()
+            ```
         Returns:
-            AlterTableRenameColumn : カラム名変更クラス
+            AsyncAlterTableRenameColumn : Column name change object
         """
         return AsyncAlterTableRenameColumn(
-            tableName = cls.__name__,
+            tableName = cls.tableName,
             oldName   = oldName,
             newName   = newName
         )
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def alterTableAddConstraint(cls,**constraints : Constraints): ...
+    async def alterTableAddConstraint(cls,**constraints : Constraint): ...
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def alterTableDropConstraint(cls): ...
+    async def alterTableDropConstraint(cls): ...
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def alterView(cls): ...
-    #---------------------------------------------------------------------------
+    async def alterView(cls): ...
     #---------------------------------------------------------------------------
     @classmethod
     @public
-    def fromDict(cls, data : dict):
+    async def fromDict(cls, data : dict):
         instance = cls()
         for key, value in data.items():
             if hasattr(isinstance, key):
                 setattr(instance, key, value)
         return instance
     #---------------------------------------------------------------------------
-    #---------------------------------------------------------------------------
-    def __and__(self, other):
+    async def __and__(self, other) -> str:
         return f"{self} {other}"
 #-------------------------------------------------------------------------------

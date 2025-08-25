@@ -1,6 +1,5 @@
 #-------------------------------------------------------------------------------
 from ...Base    import Base
-from ....common import public
 #-------------------------------------------------------------------------------
 class FullOuterJoin(Base):
     #--------------------------------------------------------------------------
@@ -9,7 +8,7 @@ class FullOuterJoin(Base):
             tableName : str,
             joinTable : str,
             joinSql   : str            
-        ):
+        ) -> None:
         super().__init__(tableName)
         self.query = f"SELECT * FROM {tableName} "\
                    + f"FULL OUTER JOIN {joinTable} ON {joinSql};"

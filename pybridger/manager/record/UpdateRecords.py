@@ -1,11 +1,36 @@
 
 #-------------------------------------------------------------------------------
-from ..Base    import Base          # 基底クラス
-from ...common import public        # パブリックメソッド
+from ..Base    import Base
+from ...common import public
+#-------------------------------------------------------------------------------
+class Where(Base):
+    """
+    Condition class (for UpdateRecord)
+    """
+    def __init__(
+            self,
+            tableName  : str,
+            columns    : str,
+            data       : list[tuple[str]],
+            conditions : str,
+        ) -> None:
+        """
+        Initalize condition object
+        Args:
+            tableName  (str)   : table name
+            columns    (str)   : columns for updates
+            values     (tuple) : values
+            conditions (str)   : conditons for updates
+        """
+        super().__init__(tableName)
+        query = f"UPDATE {tableName} SET {columns}" \
+              + f"WHERE {conditions};"
+        self.query = query.replace("?", self.sqlEngine.PLACEHOLDER)
+        self.data = data
 #-------------------------------------------------------------------------------
 class UpdateRecords(Base):
     """
-    複数レコード更新クラス
+    Define a record update class
     """
     def __init__(
             self,
@@ -21,65 +46,36 @@ class UpdateRecords(Base):
         self.__data      = data
     #---------------------------------------------------------------------------
     @ public
-    def where(self, **conditionsColumn):
+    def where(self, **conditionsColumn) -> Where:
         """
-        指定したレコードを更新するメソッド
+        Method to update specified records
         Args:
-            **conditionsColumns : 更新したい条件カラムを指定する
+            **conditionsColumn (str) : Specify the condition column you want to update
         Examples:
-            user = User.updateRecords(
-                name = ["a","b","c"], age = [20,22,24]
-            ).where(id = [1,2,3]) ※whereも忘れずに
+            ```
+            user = User.updateRecord(name = "a", age = 20)
+            user.where(id = 1) 
             user.execute()
             user.commit()
+            ```
         Returns:
-            Where : 条件指定クラスを返す
+            Where : Returns where object
         """
-        conditions = "" # 条件文
-        datas      = [] # 値のリスト(最終的にタプルにする)
-        # 成型
+        conditions = "" 
+        datas      = []
         for key, values in conditionsColumn.items():
             conditions += f"{key} = ?"
-            # プレイスホルダーで使用できるようにする
+            # Make it available for use as a placeholder
             for i in range(len(values)):
-                data = list(self.__data[i]) # appendできるようにリスト型に変更
-                data.append(values[i])      # プレイスホルダーで使用できるように
-                                            # 末尾にデータを足す
-                datas.append(tuple(data))   # タプル型に変更し、リストに加える
-        print(datas)
+                data = list(self.__data[i]) # Change to a list type 
+                                            # so that it can be appended
+                data.append(values[i])      # Add data to the end 
+                                            # so that it can be used as a placeholder
+                datas.append(tuple(data))   # Change to tuple type and add to list
         return Where(
-            tableName  = self.tableName, # テーブル名
-            columns    = self.__columns, # カラム
-            data       = datas,          # 値
-            conditions = conditions,     # 条件
+            tableName  = self.tableName,
+            columns    = self.__columns,
+            data       = datas,
+            conditions = conditions,
         )
-#-------------------------------------------------------------------------------
-class Where(Base):
-    """
-    条件クラス(UpdateRecords用)
-    """
-    def __init__(
-            self,
-            tableName  : str,
-            columns    : str,
-            data       : list[tuple[str]],
-            conditions : str,
-
-        ) -> None:
-        """
-        条件クラスの初期化
-        Args:
-            tableName  (str)              : テーブル名
-            columns    (str)              : 更新するカラム
-            values     (list[tuple[str]]) : 値
-            conditions (str)              : 条件のカラム
-        """
-        super().__init__(tableName)
-        # クエリ
-        query = f"UPDATE {tableName} SET {columns}" \
-              + f"WHERE {conditions};"
-        # プレイスホルダーをSQLによって置き換える
-        self.query = query.replace("?", self.sqlEngine.PLACEHOLDER)
-        # 値
-        self.data = data
 #-------------------------------------------------------------------------------

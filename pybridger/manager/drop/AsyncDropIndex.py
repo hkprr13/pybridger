@@ -1,19 +1,20 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase   # 基底クラス
-from ...common   import public      # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncDropIndex(AsyncBase):
-    """インデックス削除クラス"""
+    """
+    Define the index deletion class
+    """
     def __init__(
             self,
             tableName : str,
             indexName : str
-        ):
+        ) -> None:
         """
-        インデックス削除クラスの初期化
+        Initialize the index deletion object
         Args:
-            tableName (str) : テーブル名
-            indexName (str) : インデックス名
+            tableName (str) : table name
+            indexName (str) : index name
         """
         super().__init__(tableName)
         self.query = f"DROP INDEX {indexName};"

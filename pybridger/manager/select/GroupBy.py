@@ -1,19 +1,10 @@
 #-------------------------------------------------------------------------------
+from test.test_dataclasses import Any
 from ..Base import Base
 #-------------------------------------------------------------------------------
 class GroupBy(Base):
     """
-        SQLのGROUP BY構文を構築・実行するクラス
-        Parameters:
-            tableName (str) : 対象のテーブル名
-            columns   (str) : 取得するカラム（例: "name, COUNT(*)"）
-            condition (str) : WHERE句で使用する条件（空文字で無条件）
-            byColumn  (str) : GROUP BYでグループ化する列名
-        Attributes:
-            tableName (str) : テーブル名
-            columns   (str) : SELECT対象のカラム
-            condition (str) : 条件式（※綴りミスがあるため注意）
-            byColumn  (str) : GROUP BYの対象列
+    Define a class that constructs and executes SQL GROUP BY syntax
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -22,53 +13,53 @@ class GroupBy(Base):
             columns   : str,
             condition : str,
             byColumn  : str
-        ):
+        ) -> None:
+        """
+        Initalize a object that constructs and executes SQL GROUP BY syntax
+        Args:
+            tableName (str) : table name
+            columns   (str) : columns 
+            condition (str) : condition
+            byColumn  (str) : by column
+        """
         super().__init__(tableName)
         self.tableName = tableName
         self.columns   = columns
         self.condition = condition  
         self.byColumn  = byColumn
     #---------------------------------------------------------------------------
-    def getRecord(self):
+    def getRecord(self) -> list[Any] | Any:
         """
-            GROUP BY構文を用いてレコードを取得する
-            Returns:
-                List[Tuple] : グループ化されたクエリの結果一覧
-            Raises:
-                DatabaseConnectionError : 実行時にDB接続エラーが発生した場合
+        Retrieve records using GROUP BY syntax
+        Returns:
+            List[Tuple] : List of grouped query results.
         """
-        # 基本となるクエリ
         query = f"SELECT {self.columns} FROM {self.tableName} "
-        # 条件が存在するなら
         if self.condition == "":
             query += f"GROUP BY {self.byColumn};"
-        # 条件が存在しないなら
         else:
             query += f"WHERE {self.condition} GROUP BY {self.byColumn};"
         cur = self.sqlEngine.cursor()
         cur.execute(query)
         return cur.fetchall()
     #---------------------------------------------------------------------------
-    def having(self, aggregate):
+    def having(self, aggregate) -> list[Any] | Any:
         """
-            GROUP BY + HAVING構文を用いて集計条件付きレコードを取得する
-            Args:
-                aggregate (Column) : HAVING句で使用する集計関数付きカラム
-                                     例: Column("COUNT(*) > 1")
-            Returns:
-                List[Tuple] : HAVING句適用後のクエリ結果一覧
-            Raises:
-                DatabaseConnectionError : 実行時にDB接続エラーが発生した場合
+        Use the GROUP BY + HAVING syntax
+        to retrieve records with aggregation conditions
+        Args:
+            aggregate (Column) : Column with aggregation function
+                                 used in the HAVING clause
+        Examples
+            Column("COUNT(*) > 1")
+        Returns:
+            List[Tuple] : List of query results after applying the HAVING clause
         """
-        # 基本となるクエリ
         query = f"SELECT {self.columns} FROM {self.tableName} "
-        # 条件が存在するなら
         if self.condition == "":
             query += f"GROUP BY {self.byColumn} "
-        # 条件が存在しないなら
         else:
             query += f"WHERE {self.condition} GROUP BY {self.byColumn} "
-        # HAVING句を足す
         query += f"HAVING {aggregate.columnName};"
         cur = self.sqlEngine.cursor()
         cur.execute(query)

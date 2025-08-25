@@ -1,14 +1,15 @@
 #-------------------------------------------------------------------------------
-from ..Base    import Base   # 基底クラス
-from ...common import public # パブリックメソッド
+from ..Base    import Base
 #-------------------------------------------------------------------------------
 class DropTable(Base):
-    """テーブル削除クラス"""
-    def __init__(self, tableName: str):
+    """
+    Define the table deletion object
+    """
+    def __init__(self, tableName: str) -> None:
         """
-        テーブル削除クラスの初期化
+        Initialize the table deletion class
         Args:
-            tableName (str) : テーブル名
+            tableName (str) : table name
         """
         super().__init__(tableName)
         self.query = f"DROP TABLE {self.tableName}"

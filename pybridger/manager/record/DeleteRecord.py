@@ -4,7 +4,7 @@ from ...common import public # パブリックメソッド
 #-------------------------------------------------------------------------------
 class DeleteRecord(Base):
     """
-    レコード削除クラス
+    Define a record deletion class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -12,17 +12,14 @@ class DeleteRecord(Base):
             tableName : str,
             columns   : str,
             values    : tuple
-        ):
+        ) -> None:
         """
-        レコード削除のクラスの初期化
+        Initalize a record deletion object
         """
         super().__init__(tableName)
-        # クエリ
         query = f"DELETE FROM {self.tableName} WHERE {columns}"
-        # プレイスホルダーをSQLによって置き換える
         self.query = query.replace(
             "?", self.sqlEngine.PLACEHOLDER
         )
-        # 値
         self.value = values
 #-------------------------------------------------------------------------------

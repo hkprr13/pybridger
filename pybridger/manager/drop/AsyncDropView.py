@@ -1,19 +1,20 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase   # 基底クラス
-from ...common   import public      # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncDropView(AsyncBase):
-    """ビュー削除クラス"""
+    """
+    Define view deletion class
+    """
     def __init__(
             self,
             tableName : str,
             viewName  : str
-        ):
+        ) -> None:
         """
-        ビュー削除クラスの初期化
+        Initalize view deletion object
         Args:
-            tableName (str) : テーブル名
-            vieName   (str) : 削除するビュー名
+            tableName (str) : table name
+            viewName   (str) : view name
         """
         super().__init__(tableName)
         self.query = f"DROP VIEW {viewName};"

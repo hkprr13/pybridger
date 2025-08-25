@@ -1,6 +1,5 @@
 #-------------------------------------------------------------------------------
 from ...Base    import Base
-from ....common import public
 #-------------------------------------------------------------------------------
 class RightJoin(Base):
     #--------------------------------------------------------------------------
@@ -9,9 +8,8 @@ class RightJoin(Base):
             tableName : str,
             columns   : str,
             joinTable : str,
-            joinSql   : str,
-            
-        ):
+            joinSql   : str,         
+        ) -> None:
         super().__init__(tableName)
         self.query = f"SELECT {columns} FROM {tableName} "\
                    + f"RIGHT JOIN {joinTable} ON {joinSql};"

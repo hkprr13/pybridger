@@ -1,10 +1,9 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase # 基底クラス
-from ...common   import public    # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncDeleteRecord(AsyncBase):
     """
-    レコード削除クラス
+    Define a record deletion class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -12,17 +11,14 @@ class AsyncDeleteRecord(AsyncBase):
             tableName : str,
             columns   : str,
             values    : tuple
-        ):
+        ) -> None:
         """
-        レコード削除のクラスの初期化
+        Initalize a record deletion object
         """
         super().__init__(tableName)
-        # クエリ
         query = f"DELETE FROM {self.tableName} WHERE {columns}"
-        # プレイスホルダーをSQLによって置き換える
         self.query = query.replace(
             "?", self.sqlEngine.PLACEHOLDER
         )
-        # 値
-        self.values = values 
+        self.value = values
 #-------------------------------------------------------------------------------

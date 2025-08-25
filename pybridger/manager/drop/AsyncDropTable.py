@@ -1,14 +1,15 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase   # 基底クラス
-from ...common   import public      # パブリックメソッド
+from ..AsyncBase import AsyncBase 
 #-------------------------------------------------------------------------------
 class AsyncDropTable(AsyncBase):
-    """テーブル削除クラス"""
+    """
+    Define the table deletion object
+    """
     def __init__(self, tableName: str):
         """
-        テーブル削除クラスの初期化
+        Initialize the table deletion class
         Args:
-            tableName (str) : テーブル名
+            tableName (str) : table name
         """
         super().__init__(tableName)
         self.query = f"DROP TABLE {self.tableName}"

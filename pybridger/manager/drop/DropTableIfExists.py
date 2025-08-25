@@ -1,15 +1,18 @@
 #-------------------------------------------------------------------------------
-from ..Base     import Base   # 基底クラス
-from ...common  import private # プライベートメソッド
+from ..Base     import Base
+from ...common  import private
 from ...config  import Config
+from ...errors  import DatabaseUndefinedError
 #-------------------------------------------------------------------------------
 class DropTableIfExists(Base):
-    """テーブル削除クラス"""
+    """
+    Define the table deletion object. If the table exists
+    """
     def __init__(self, tableName: str):
         """
-        テーブル削除クラスの初期化
+        Initialize the table deletion object. If the table exists
         Args:
-            tableName (str) : テーブル名
+            tableName (str) : table name
         """
         super().__init__(tableName)
         self.query = self.__buildQuery()
@@ -17,16 +20,16 @@ class DropTableIfExists(Base):
     @private
     def __buildQuery(self) -> str:
         """
-        クエリの構築
+        build query
         Returns:
-            クエリ文字列
+            str : query
         Raises:
-            Exceptin : エンジン未設定の場合
+            DatabaseUndefinedError : Engine is un defined
         """
         if self.sqlEngine == Config.sqlite3Engine:
             return f"DROP TABLE IF NOT EXISTS {self.tableName}"
-        elif self.sqlEngine == Config.MySqlEngine:
+        elif self.sqlEngine == Config.mySqlEngine:
             return f"DROP TABLE IF NOT EXISTS {self.tableName}"
         else:
-            raise Exception("エンジン未設定です")
+            raise DatabaseUndefinedError()
 #-------------------------------------------------------------------------------

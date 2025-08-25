@@ -1,19 +1,20 @@
 #-------------------------------------------------------------------------------
-from ..Base    import Base   # 基底クラス
-from ...common import public # パブリックメソッド
+from ..Base    import Base 
 #-------------------------------------------------------------------------------
 class DropTrigger(Base):
-    """トリガー削除クラス"""
+    """
+    Define trigger deletion class
+    """
     def __init__(
             self,
             tableName   : str,
             triggerName : str
-        ):
+        ) -> None:
         """
-        トリガー削除クラスの初期化
+        Initalize trigger deletion object
         Args:
-            tableName   (str) : テーブル名
-            triggerName (str) : トリガー名
+            tableName   (str) : table name
+            triggerName (str) : trigger name
         """
         super().__init__(tableName)
         self.query = f"DROP TRIGGER {triggerName};"

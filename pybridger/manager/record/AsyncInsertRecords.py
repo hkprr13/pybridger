@@ -4,7 +4,7 @@ from ...common   import public    # パブリックメソッド
 #-------------------------------------------------------------------------------
 class AsyncInsertRecords(AsyncBase):
     """
-    レコードを複数挿入するクラス
+    Define a class that inserts multiple records
     """
     def __init__(
             self,
@@ -12,27 +12,23 @@ class AsyncInsertRecords(AsyncBase):
             columns      : str,
             data         : list[tuple[str]],
             placeHolders : str
-        ):
+        ) -> None:
         """
-        レコード挿入の初期化
+        Initalize a class that inserts multiple records object
         Args:
-            tableName    (str)              : テーブル名
-            columns      (str)              : カラム(str) id, name, age
-            data         (list[tuple[str]]) : 値
+            tableName    (str)              : table name
+            columns      (str)              : columns (id, name, age)
+            data         (list[tuple[str]]) : values
                                               [(1,  2,  3 ),
                                                (a,  b,  c ),
                                                (19, 22, 17)]
-            placeHolders (str)              : プレイスホルダー
+            placeHolders (str)              : place holder
         """
-        # オーバーロード
-        super().__init__(tableName)        
-        # プレイスホルダーをSQLによって変える       
+        super().__init__(tableName)              
         placeHolders = placeHolders.replace(
             "?", self.sqlEngine.PLACEHOLDER
         )
-        # クエリ
         self.query = f"INSERT INTO {self.tableName} "\
                    + f"({columns}) VALUES ({placeHolders});"
-        # 値
         self.data = data
 #-------------------------------------------------------------------------------

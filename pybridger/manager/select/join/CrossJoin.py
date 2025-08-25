@@ -1,6 +1,5 @@
 #-------------------------------------------------------------------------------
 from ...Base    import Base
-from ....common import public
 #-------------------------------------------------------------------------------
 class CrossJoin(Base):
     #--------------------------------------------------------------------------
@@ -8,7 +7,7 @@ class CrossJoin(Base):
             self,
             tableName : str,
             joinTable : str,            
-        ):
+        ) -> None:
         super().__init__(tableName)
         self.query = f"SELECT * FROM {tableName} "\
                    + f"CROSS JOIN {joinTable};"

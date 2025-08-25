@@ -1,7 +1,14 @@
 #-------------------------------------------------------------------------------
 class Query:
-    """クエリクラス"""
-    def __init__(self,  value : object) -> None:
+    """
+    Define Query class
+    """
+    def __init__(self, value : object) -> None:
+        """
+        Initalize query object
+        Args:
+            value (object): query
+        """
         self.__value = value
     #---------------------------------------------------------------------------
     @property

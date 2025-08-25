@@ -1,37 +1,39 @@
 #-------------------------------------------------------------------------------
-from ..Base     import Base    # 基底クラス
-from ...common  import private # パブリックメソッド
-from ...config  import Config  # コンフィグクラス
+from ..Base     import Base
+from ...config  import Config
+from ...errors  import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class DropIndex(Base):
-    """インデックス削除クラス"""
+    """
+    Define the index deletion class    
+    """
     def __init__(
             self,
             tableName : str,
             indexName : str
-        ):
+        ) -> None:
         """
-        インデックス削除クラスの初期化
+        Initialize the index deletion object
         Args:
-            tableName (str) : テーブル名
-            indexName (str) : インデックス名
+            tableName (str) : table name
+            indexName (str) : index name
         """
         super().__init__(tableName)
         self.__indexName = indexName
         self.query = self.__buildQuery()
     #--------------------------------------------------------------------------
-    def __buildQuery(self):
+    def __buildQuery(self) -> str:
         """
-        クエリの構築
+        Build query
         Returns:
-            クエリ文字列
+            str : query
         Raises:
-            Exceptin : エンジン未設定の場合
+            Exceptin : engine is un defined
         """
         if self.sqlEngine == Config.sqlite3Engine:
             return f"DROP INDEX {self.__indexName};"
-        elif self.sqlEngine == Config.MySqlEngine:
+        elif self.sqlEngine == Config.mySqlEngine:
             return f"DROP INDEX {self.__indexName} ON {self.tableName};"
         else:
-            raise Exception("エンジン未設定です")
+            raise EngineUndefinedError()
 #-------------------------------------------------------------------------------

@@ -1,23 +1,27 @@
 #-------------------------------------------------------------------------------
-from ..Base        import Base           # ベース
-from .GroupBy      import GroupBy        # GROUP BY
-from .Where        import Where          # WHERE
-from .join         import CrossJoin      # CROSS JOIN句
-from .join         import FullOuterJoin  # FULL OUTER JOIN句
-from .join         import InnerJoin      # INNER JOIN句
-from .join         import LeftJoin       # LEFT JOIN句
-from .join         import NaturalJoin    # NATURAL JOIN句
-from .join         import RightJoin      # RIGHT JOIN句
-from .join         import SelfJoin       # SELF JOIN句
-from ...column     import Column         # カラムクラス
-from ...conditions import Condition      # 条件クラス
-from ...conditions import ConditionGroup # 複数条件クラス
-from ...common     import public         # パブリックメソッド
-from ...common     import private        # プライベートメソッド 
-from ...model      import Model          # モデルクラス
+from typing         import Any, Literal
+from typing         import LiteralString
+from ..Base         import Base
+from .GroupBy       import GroupBy
+from .Where         import Where
+from .join          import CrossJoin
+from .join          import FullOuterJoin
+from .join          import InnerJoin
+from .join          import LeftJoin
+from .join          import NaturalJoin
+from .join          import RightJoin
+from .join          import SelfJoin
+from ...schema      import Column
+from ...schema      import Condition
+from ...schema      import ConditionGroup 
+from ...common      import public
+from ...common      import private 
+from ...model       import Model
 #-------------------------------------------------------------------------------
 class Select(Base):
-    """SELECTクラス"""
+    """
+    Define select object
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
@@ -25,10 +29,10 @@ class Select(Base):
             columns,
         ) -> None:
         """"
-        SELECTクラスの初期化
+        Initalize select object
         Args:
-            tableName (str) : テーブル名
-            columns   (str) : カラム
+            tableName (str) : table name
+            columns   (str) : column
         """
         super().__init__(tableName)
         self.__columns     = self.__setColumns(columns)
@@ -36,8 +40,8 @@ class Select(Base):
         self.__query   = ""
     #---------------------------------------------------------------------------
     @private
-    def __setColumns(self, columns):
-        # columnsが引数として指定されていない場合は*として認識する
+    def __setColumns(self, columns) -> LiteralString | Literal['*']:
+        # If columns is not specified as an argument, it is recognized as *.
         if len(columns) == 0:
             cols = "*"
         else:
@@ -45,7 +49,7 @@ class Select(Base):
         return cols
     #---------------------------------------------------------------------------
     @private
-    def __setColumnsList(self, columns : tuple[Column]):
+    def __setColumnsList(self, columns : tuple[Column]):# -> list[Any]:
         columnsList = []
         for col in columns:
             columnsList.append(f"{col.tableName}.{col.columnName}")
@@ -54,13 +58,11 @@ class Select(Base):
     @public
     def getRecord(self) -> list:
         """
-        指定したカラムの全てのレコードを取得する
+        Retrieves all records from the specified column.
         Returns:
-            List : クエリ結果のレコードリスト
+            List : List of query result records.
         """
-        # クエリ
         self.__query = f"SELECT {self.__columns} FROM {self.tableName};"
-        # クエリから結果を取得する
         cur = self.sqlEngine.cursor()
         cur.execute(self.__query)
         return cur.fetchall()
@@ -72,7 +74,6 @@ class Select(Base):
         Returns:
             List : クエリ結果のレコードリスト
         """
-        # クエリ
         self.__query = f"SELECT * FROM {self.tableName};"
         cur = self.sqlEngine.cursor()
         cur.execute(self.__query)
@@ -84,9 +85,9 @@ class Select(Base):
             *condition : Condition | ConditionGroup
         )-> Where:
         """
-        WHERE句
+        WHERE
         Args:
-            *condition (Condition | ConditionGroup) : 条件
+            *condition (Condition | ConditionGroup) : conditon
         Examples:
             engine = Engine(...)
             engine.launch()
@@ -97,7 +98,7 @@ class Select(Base):
         parts  = []
         values = []
         for cond in condition:
-            sql, vals = cond.toSql(placeHolder)
+            sql, vals = cond.toQuery(placeHolder)
             parts.append(sql)
             values.extend(vals)
         whereClause = " AND ".join(parts)
@@ -112,28 +113,24 @@ class Select(Base):
     @public
     def orderBy(
             self,
-            asc  : Column | None = None, # 昇順
-            desc : Column | None = None, # 降順
+            asc  : Column | None = None, # ascending order
+            desc : Column | None = None, # descending order
         ) -> list:
         """
-        データを昇順・降順で並び替える
+        Sort data in ascending or descending order
         Args:
-            asc  (Column) : 昇順にソートするカラム
-            desc (Column) : 降順にソートするカラム
+            asc  (Column) : Column to sort in ascending order
+            desc (Column) : Column to sort in descending order
         Returns:
-            list : 並び替え後のレコードリスト
+            list : List of records after sorting.
         """
         query = f"SELECT {self.__columns} FROM {self.tableName} "
-        # ASCが未指定かつ, DESCが未指定
         if asc is None and desc is None:
             raise Exception("ascまたはdescのいずれかを指定してください")
-        # ASCが未指定かつ, DESCが指定されている
         if asc is None and not desc is None:
             query += f"ORDER BY {desc.columnName} DESC;"
-         # ASCが指定されている, かつDESCが未指定
         if not asc is None and desc is None:  
             query += f"ORDER BY {asc.columnName} ASC;"
-         # ASCが指定されている, かつDESCがされている
         if not desc is None and not asc is None:
             query += f"ORDER BY {asc.columnName} ASC, {desc.columnName} DESC;"
         cur = self.cursor()
@@ -148,12 +145,12 @@ class Select(Base):
             offset : int
         ) -> list:
         """
-        LIMITとOFFSETを使ってページネーションされたレコードを取得する
+        Retrieve paginated records using LIMIT and OFFSET.
         Args:
-            limit  (int) : 最大取得件数
-            offset (int) : 取得開始位置
+            limit  (int) : Maximum number of records to retrieve.
+            offset (int) : Starting position for retrieval.
         Returns:
-            list : クエリ結果の一部
+            list : Part of the query results.
         """
         #クエリ
         query = f"SELECT {self.__columns} " \
@@ -165,11 +162,11 @@ class Select(Base):
         return cur.fetchall()
     #---------------------------------------------------------------------------  
     @public
-    def count(self):
+    def count(self) -> list[Any] | Any:
         """
-        レコード件数を取得する
+        Get the number of records
         Returns:
-            int : 件数のタプル
+        int: Tuple of number of records
         """
         # クエリ
         self.__query = f"SELECT COUNT(*) " \
@@ -182,11 +179,11 @@ class Select(Base):
     def getAvg(
             self,
             column : Column
-        ):
+        ) -> list[Any] | Any:
         """
-        指定列の平均値を取得する
+        Get the average value of the specified column
         Returns:
-            List[Tuple] : 平均値のタプル (例: [(34.5,)])
+            List[Tuple]: Tuple of average values (e.g., [(34.5,]))
         """
         self.__query = f"SELECT AVG({column.columnName}) " \
                      + f"FROM {self.tableName} "    
@@ -198,13 +195,13 @@ class Select(Base):
     def getSum(
             self,
             column : Column
-        ):
+        ) -> list[Any] | Any:
         """
-        指定列の合計値を取得する
+        Get the sum of the specified column
         Args:
-            column (Column) : 対象カラム
+            column (Column) : Target column
         Returns:
-            List[Tuple] : 合計値のタプル
+            List[Tuple] : Tuple of sum values
         """
         self.__query = f"SELECT SUM({column.columnName}) " \
                      + f"FROM {self.tableName} "    
@@ -216,13 +213,13 @@ class Select(Base):
     def getMax(
             self,
             column : Column
-        ):
+        ) -> list[Any] | Any:
         """
-        指定列の最大値を取得する
+        Get the maximum value of the specified column.
         Args:
-            column (Column) : 対象カラム
+            column (Column) : Target column
         Returns:
-            List[Tuple] : 最大値のタプル
+            List[Tuple] : Tuple of maximum values
         """
         self.__query = f"SELECT Max({column.columnName}) " \
                      + f"FROM {self.tableName} "    
@@ -234,13 +231,13 @@ class Select(Base):
     def getMin(
             self,
             column : Column
-        ):
+        ) -> list[Any] | Any:
         """
-        指定列の最小値を取得する
+        Get the minimum value of the specified column
         Args:
-            column (Column) : 対象カラム
+            column (Column) : Target column
         Returns:
-            List[Tuple] : 最小値のタプル
+            List[Tuple] : Tuple of minimum values
         """
         self.__query = f"SELECT Min({column.columnName}) " \
                      + f"FROM {self.tableName} "    
@@ -251,14 +248,14 @@ class Select(Base):
     @public
     def groupBy(
             self,
-            column : Column  # グループ化する列
-        ):
+            column : Column  
+        ) -> GroupBy:
         """
-        指定列でGROUP BYを実行する
+        Execute GROUP BY on the specified column.
         Args:
-            column (Column) : グループ化対象のカラム
+            column (Column) : Column to be grouped.
         Returns:
-            GroupBy : グループ化クエリオブジェクト
+            GroupBy : Grouping query object.
         """
         return GroupBy(
             tableName = self.tableName,
@@ -270,16 +267,16 @@ class Select(Base):
     @public
     def whereGroupBy(
             self,
-            condition, # 条件
-            column : Column  # グループ化する列
-        ):
+            condition, 
+            column : Column  
+        ) -> GroupBy:
         """
-        WHERE + GROUP BY句による条件付きグループ化
+        Conditional grouping using WHERE + GROUP BY clause
         Args:
-            condition (str) : WHERE条件式
-            column    (Column) : グループ化対象のカラム
+            condition (str) : WHERE condition
+            column    (Column) : Column to be grouped
         Returns:
-            GroupBy : グループ化クエリオブジェクト
+            GroupBy : Grouping query object
         """
         return GroupBy(
             tableName = self.tableName,
@@ -292,8 +289,14 @@ class Select(Base):
     def crossJoin(
             self,
             joinTable : type[Model],
-        ):
+        ) -> CrossJoin:
         """
+        CROSS JOIN method
+        Args:
+            joinTable (type[Model]) : table model object
+            conditon  (Conditon)    : conditon
+        Returns:
+            CrossJoin : Cross join object 
         """
         return CrossJoin(
             tableName = self.tableName,
@@ -305,13 +308,19 @@ class Select(Base):
             self,
             joinTable : type[Model],
             *condition   : Condition
-        ):
+        ) -> FullOuterJoin:
         """
+        FULL OUTER JOIN method
+        Args:
+            joinTable (type[Model]) : table model object
+            c
+        Returns:
+            FullOuterJoin : Full outer join object 
         """
         placeHolder = self.sqlEngine.PLACEHOLDER
         parts  = []
         for cond in condition:
-            sql, vals = cond.toSql(placeHolder)
+            sql, vals = cond.toQuery(placeHolder)
             parts.append(sql)
         joinSql = " AND ".join(parts)
         return FullOuterJoin(
@@ -325,13 +334,19 @@ class Select(Base):
             self,
             joinTable  : type[Model],
             *condition : Condition
-        ):
+        ) -> InnerJoin:
         """
+        INNER JOIN method
+        Args:
+            joinTable (type[Model]) : table model object
+            conditon  (Conditon)    : conditon
+        Returns:
+            InnerJoin : Inner join object 
         """
         placeHolder = self.sqlEngine.PLACEHOLDER
         parts  = []
         for cond in condition:
-            sql, vals = cond.toSql(placeHolder)
+            sql, vals = cond.toQuery(placeHolder)
             parts.append(sql)
         joinSql = " AND ".join(parts)
         return InnerJoin(
@@ -346,9 +361,14 @@ class Select(Base):
             self,
             joinTable  : type[Model],
             *condition : Condition
-        ):
+        ) -> LeftJoin:
         """
-        
+        LEFT JOIN method
+        Args:
+            joinTable (type[Model]) : table model object
+            conditon  (Conditon)    : conditon
+        Returns:
+            LeftJoin : Left join object 
         """
         columns = ""
         for col in self.__columnsList:
@@ -357,7 +377,7 @@ class Select(Base):
         placeHolder = self.sqlEngine.PLACEHOLDER
         parts  = []
         for cond in condition:
-            sql, vals = cond.toSql(placeHolder)
+            sql, vals = cond.toQuery(placeHolder)
             parts.append(sql)
         joinSql = " AND ".join(parts)
         return LeftJoin(
@@ -371,9 +391,14 @@ class Select(Base):
     def naturalJoin(
             self,
             joinTable  : type[Model],
-        ):
+        ) -> NaturalJoin:
         """
-        
+        NATURAL JOIN method
+        Args:
+            joinTable (type[Model]) : table model object
+            conditon  (Conditon)    : conditon
+        Returns:
+            NaturalJoin : Natural join object 
         """
         return NaturalJoin(
             tableName = self.tableName,
@@ -386,9 +411,14 @@ class Select(Base):
             self,
             joinTable  : type[Model],
             *condition : Condition
-        ):
+        ) -> RightJoin:
         """
-        
+        RIGHT JOIN method
+        Args:
+            joinTable (type[Model]) : table model object
+            conditon  (Conditon)    : conditon
+        Returns:
+            RightJoin : Right join object 
         """
         columns = ""
         for col in self.__columnsList:
@@ -397,7 +427,7 @@ class Select(Base):
         placeHolder = self.sqlEngine.PLACEHOLDER
         parts  = []
         for cond in condition:
-            sql, vals = cond.toSql(placeHolder)
+            sql, vals = cond.toQuery(placeHolder)
             parts.append(sql)
         joinSql = " AND ".join(parts)
         return RightJoin(
@@ -411,5 +441,4 @@ class Select(Base):
     def selfJoin(
             self
         ): ...
-
 #-------------------------------------------------------------------------------

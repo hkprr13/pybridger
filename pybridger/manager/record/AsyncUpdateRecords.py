@@ -1,61 +1,10 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase # 基底クラス
-from ...common   import public    # パブリックメソッド
-#-------------------------------------------------------------------------------
-class AsyncUpdateRecords(AsyncBase):
-    """
-    複数レコード更新クラス
-    """
-    def __init__(
-            self,
-            tableName : str,
-            columns   : str,
-            data      : list[tuple[str]]  
-        ):
-        """
-        複数レコード更新の初期化
-        """
-        super().__init__(tableName)
-        self.__columns   = columns
-        self.__data      = data
-    #---------------------------------------------------------------------------
-    @ public
-    async def where(self, **conditionsColumn):
-        """
-        指定したレコードを更新するメソッド
-        Args:
-            **conditionsColumns : 更新したい条件カラムを指定する
-        Examples:
-            user = User.updateRecords(
-                name = ["a","b","c"], age = [20,22,24]
-            ).where(id = [1,2,3]) ※whereも忘れずに
-            user.execute()
-            user.commit()
-        Returns:
-            Where : 条件指定クラスを返す
-        """
-        conditions = "" # 条件文
-        datas      = [] # 値のリスト(最終的にタプルにする)
-        # 成型
-        for key, values in conditionsColumn.items():
-            conditions += f"{key} = ?"
-            # プレイスホルダーで使用できるようにする
-            for i in range(len(values)):
-                data = list(self.__data[i]) # appendできるようにリスト型に変更
-                data.append(values[i])      # プレイスホルダーで使用できるように
-                                            # 末尾にデータを足す
-                datas.append(tuple(data))   # タプル型に変更し、リストに加える
-        print(datas)
-        return Where(
-            tableName  = self.tableName, # テーブル名
-            columns    = self.__columns, # カラム
-            data       = datas,          # 値
-            conditions = conditions,     # 条件
-        )
+from ..AsyncBase import AsyncBase
+from ...common   import public
 #-------------------------------------------------------------------------------
 class Where(AsyncBase):
     """
-    条件クラス(UpdateRecords用)
+    Condition class (for UpdateRecord)
     """
     def __init__(
             self,
@@ -63,22 +12,69 @@ class Where(AsyncBase):
             columns    : str,
             data       : list[tuple[str]],
             conditions : str,
-
         ) -> None:
         """
-        条件クラスの初期化
+        Initalize condition object
         Args:
-            tableName  (str)              : テーブル名
-            columns    (str)              : 更新するカラム
-            values     (list[tuple[str]]) : 値
-            conditions (str)              : 条件のカラム
+            tableName  (str)   : table name
+            columns    (str)   : columns for updates
+            values     (tuple) : values
+            conditions (str)   : conditons for updates
         """
         super().__init__(tableName)
-        # クエリ
         query = f"UPDATE {tableName} SET {columns}" \
               + f"WHERE {conditions};"
-        # プレイスホルダーをSQLによって置き換える
         self.query = query.replace("?", self.sqlEngine.PLACEHOLDER)
-        # 値
-        self.__data = data
+        self.data = data
+#-------------------------------------------------------------------------------
+class AsyncUpdateRecords(AsyncBase):
+    """
+    Define a record update class
+    """
+    def __init__(
+            self,
+            tableName : str,
+            columns   : str,
+            data      : list[tuple[str]]  
+        ) -> None:
+        """
+        Define a record update class
+        """
+        super().__init__(tableName)
+        self.__columns   = columns
+        self.__data      = data
+    #---------------------------------------------------------------------------
+    @ public
+    async def where(self, **conditionsColumn) -> Where:
+        """
+        Method to update specified records
+        Args:
+            **conditionsColumn (str) : Specify the condition column you want to update
+        Examples:
+            ```
+            user = User.updateRecord(name = "a", age = 20)
+            user.where(id = 1) 
+            user.execute()
+            user.commit()
+            ```
+        Returns:
+            Where : Returns where object
+        """
+        conditions = "" 
+        datas      = []
+        for key, values in conditionsColumn.items():
+            conditions += f"{key} = ?"
+            # Make it available for use as a placeholder
+            for i in range(len(values)):
+                data = list(self.__data[i]) # Change to a list type 
+                                            # so that it can be appended
+                data.append(values[i])      # Add data to the end 
+                                            # so that it can be used as a placeholder
+                datas.append(tuple(data))   # Change to tuple type and add to list
+        return Where(
+            tableName  = self.tableName,
+            columns    = self.__columns,
+            data       = datas,
+            conditions = conditions,
+        )
 #-------------------------------------------------------------------------------

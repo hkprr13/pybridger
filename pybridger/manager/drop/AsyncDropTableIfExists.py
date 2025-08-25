@@ -1,14 +1,15 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase   # 基底クラス
-from ...common   import public      # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncDropTableIfExists(AsyncBase):
-    """テーブル削除クラス"""
+    """
+    Define the table deletion object. If the table exists
+    """
     def __init__(self, tableName: str):
         """
-        テーブル削除クラスの初期化
+        Initialize the table deletion object. If the table exists
         Args:
-            tableName (str) : テーブル名
+            tableName (str) : table name
         """
         super().__init__(tableName)
         self.query = f"DROP TABLE IF NOT EXISTS {self.tableName}"
