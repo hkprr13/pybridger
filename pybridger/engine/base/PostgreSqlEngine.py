@@ -23,7 +23,7 @@ class PostgreSqlEngine(SqlEngine):
             logFile      : str | None = None
         ) -> None:
         """
-        Initalize PostgreSQL engine class
+        Initialize PostgreSQL engine class
         Args:
             logFile      (str | None) : ログファイル名
             hostName     (str)        : host
@@ -63,7 +63,7 @@ class PostgreSqlEngine(SqlEngine):
         """
         Connect to database
         Returns:
-            sqlite3.Connection : Returns connect objct
+            sqlite3.Connection : Returns connect object
         Raises:
             Exception : If the database connection fails
         Raises:

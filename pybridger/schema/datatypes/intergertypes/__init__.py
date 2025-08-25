@@ -1,14 +1,14 @@
 #-------------------------------------------------------------------------------
 from .BigInt        import BigInt
 from .Integer       import Integer
-from .MediumInt     import MediumnInt
+from .MediumInt     import MediumInt
 from .SmallInt      import SmallInt
 from .Tinyint       import TinyInt
 #-------------------------------------------------------------------------------
 __all__ = [
     "BigInt",
     "Integer",
-    "MediumnInt",
+    "MediumInt",
     "SmallInt",
     "TinyInt"
 ]

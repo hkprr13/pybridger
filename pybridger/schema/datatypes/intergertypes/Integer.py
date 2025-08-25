@@ -12,7 +12,7 @@ class Integer(IntegerType):
 
     MySQL query      : "INT"
     Sqlite3 query    : "INTEGER"
-    PostgreSQL query : "INT
+    PostgreSQL query : "INT"
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:

@@ -64,7 +64,7 @@ class AsyncCreateTrigger(AsyncBase):
             event       (str) : Event  "INSERT | UPDATE | DELETE"
             body        (str) : Query to execute
         """
-        query = f"CREATE {triggerName} "
+        query = f"CREATE TRIGGER {triggerName} "
         if timing.lower() == "before":
             query += "BEFORE " # Space at the end
         elif timing.lower()  == "after":
@@ -79,6 +79,6 @@ class AsyncCreateTrigger(AsyncBase):
             query += "DELETE " # Space at the end
         else:
             raise Exception(f"Specifying an invalid argument: {event}")
-        query += f"ON {tableName} EACH ROW BIGIN {body} END;"
+        query += f"ON {tableName} EACH ROW BEGIN {body} END;"
         return query
 #-------------------------------------------------------------------------------

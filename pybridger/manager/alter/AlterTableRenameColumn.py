@@ -13,7 +13,7 @@ class AlterTableRenameColumn(Base):
             newName   : str,
         ) -> None:
         """
-        Initalize a class for changing table column names
+        Initialize a class for changing table column names
         Args:
             tableName (str) : table name
             oldName   (str) : old name

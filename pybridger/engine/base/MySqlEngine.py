@@ -21,7 +21,7 @@ class MySqlEngine(SqlEngine):
             logFile      : str | None = None
         ) -> None:
         """
-        Initalize MySQL engine class
+        Initialize MySQL engine class
         Args:
             hostName     (str)        : host
             userName     (str)        : user name
@@ -171,7 +171,7 @@ class MySqlEngine(SqlEngine):
         try:
             qmsg = f"query:{query.sql}, value:{data}"
             self.logDebug(qmsg)
-            self.cursor().executeany(query.sql, data)
+            self.cursor().executemany(query.sql, data)
         except Exception as e:
             msg  = "The query failed"       
             self.logError(msg)

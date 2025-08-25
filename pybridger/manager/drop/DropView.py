@@ -11,7 +11,7 @@ class DropView(Base):
             viewName  : str
         ) -> None:
         """
-        Initalize view deletion object
+        Initialize view deletion object
         Args:
             tableName (str) : table name
             viewName   (str) : view name

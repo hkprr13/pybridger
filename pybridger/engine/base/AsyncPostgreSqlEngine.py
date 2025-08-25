@@ -9,7 +9,7 @@ from ...mapper      import Query
 #-------------------------------------------------------------------------------
 class AsyncPostgreSqlEngine(SqlEngine):
     """
-    Asynchronous Sqlite3 engine class
+    Asynchronous PostgreSQL engine class
     """
     PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
@@ -21,19 +21,18 @@ class AsyncPostgreSqlEngine(SqlEngine):
             databaseName : str,
             port         : int,
             logFile      : str | None = None
-        ):
+        ) -> None:
         """
-        PostgreSQLエンジンの初期化
+        Initialize Asynchronous PostgreSQL engine class
         Args:
-            hostName     (str)        : ホスト名
-            userName     (str)        : ユーザー名
-            password     (str)        : パスワード
-            databaseName (str)        : データベース名
-            port         (str)        : ポート番号
-            logFile      (str | None) : ログファイル名
+            hostName     (str)        : host
+            userName     (str)        : user
+            password     (str)        : password
+            databaseName (str)        : database
+            port         (str)        : port
+            logFile      (str | None) : log file
         """
         super().__init__()
-        # インスタンス変数
         self.hostName     = hostName
         self.userName     = userName
         self.password     = password
@@ -69,7 +68,7 @@ class AsyncPostgreSqlEngine(SqlEngine):
         """
         Connect to database
         Returns:
-            Any : Returns connect objct
+            Any : Returns connect object
         Raises:
             Exception : If the database connection fails
         """

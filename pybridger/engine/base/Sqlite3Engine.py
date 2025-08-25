@@ -18,7 +18,7 @@ class Sqlite3Engine(SqlEngine):
             logFile      : str | None = None
         ) -> None:
         """
-        SInitalize Sqlite3 engine class
+        Initialize Sqlite3 engine class
         Args:
             databasePath (str)        : database path
             logFile      (str | None) : lof file
@@ -36,7 +36,7 @@ class Sqlite3Engine(SqlEngine):
         """
         Connect to database
         Returns:
-            sqlite3.Connection : Returns connect objct
+            sqlite3.Connection : Returns connect object
         Raises:
             Exception : If the database connection fails
         """

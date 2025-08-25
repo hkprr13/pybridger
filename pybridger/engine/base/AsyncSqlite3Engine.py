@@ -11,7 +11,7 @@ class AsyncSqlite3Engine(SqlEngine):
     """
     Asynchronous Sqlite3 engine class
     """
-    PLACEHOLDER : str = "%s"
+    PLACEHOLDER : str = "?"
     #---------------------------------------------------------------------------
     def __init__(
             self,
@@ -19,10 +19,10 @@ class AsyncSqlite3Engine(SqlEngine):
             logFile      : str | None = None
         ):
         """
-        非同期SQLite3データベース接続エンジンの初期化
+        Initialize Asynchronous Sqlite3 engine class
         Args:
-            databasePath (str)        : データベースパス
-            logFile      (str | None) : ログファイル名
+            databasePath (str)        : database path
+            logFile      (str | None) : log file
         """
         super().__init__()
         self.database  = databasePath
@@ -46,7 +46,7 @@ class AsyncSqlite3Engine(SqlEngine):
         """
         Connect to database
         Returns:
-            Any : Returns connect objct
+            Any : Returns connect object
         Raises:
             Exception : If the database connection fails
         """

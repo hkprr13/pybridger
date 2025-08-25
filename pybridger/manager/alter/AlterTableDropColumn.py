@@ -12,7 +12,7 @@ class AlterTableDropColumn(Base):
             columnName : str
         ) -> None:
         """
-        Initalize a class to delete columns from the table
+        Initialize a class to delete columns from the table
         Args:
             tableName  (str) : table name
             columnName (str) : column name

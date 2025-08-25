@@ -15,7 +15,7 @@ class DDL:
     #---------------------------------------------------------------------------
     def __init__(self, query : str) -> None:
         """
-        Initalize Data Definition Language class
+        Initialize Data Definition Language class
         Args:
             query (str) : query text
         """

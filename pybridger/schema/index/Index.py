@@ -1,33 +1,35 @@
 #-------------------------------------------------------------------------------
-from ..common       import private # プライベートメソッド
-from ..common       import public  # パブリックメソッド
-from ..config       import Config  # コンフィグクラス
-from ..column       import Column  # カラムクラス
-from ..query        import Query   # クエリクラス
+from ...common      import private
+from ...common      import public
+from ...config      import Config
+from ...schema      import Column
+from ...mapper      import Query
+from ...errors      import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class Index:
+    """
+    Define Index class
+    """
     def __init__(
             self,
             indexName : str,
             *columns  : Column
         ) -> None:
         """
-        インデックスの操作クラス
+        Initialize index object
         Args:
-            indexName (str)    : インデックス名
-            *columns  (Column) : カラムオブジェクト
+            indexName (str)    : Index name
+            *columns  (Column) : Column object
         Examples:
-            ↓ インデックスインスタンスの作成
-            index = Index("indexName", User.id, User.name)
-            ↓ インデックスを作成
+            index = Index(“indexName”, User.id, User.name)
+            # Create index
             index.create()
-            ↓ インデックスを削除
-            index.drop()
-            ※ 各操作は自動でコミットされる
+            # Drop index
+            index.drop() # Each operation is automatically committed.
         """
-        self.__indexName = indexName        # インデックス名
-        self.__columns   = columns          # カラムオブジェクト群
-        self.__sqlEngine = Config.sqlEngine # エンジンオブジェクト
+        self.__indexName = indexName
+        self.__columns   = columns
+        self.__sqlEngine = Config.sqlEngine
     #---------------------------------------------------------------------------
     @ private
     def __columnsToSql(self) -> str:
@@ -40,36 +42,32 @@ class Index:
         else:
             query = query[:-2]
             query += ")"
-        # User (id, name, ...)の形に成形して返す
+        # User (id, name, ...)
         return query
     #---------------------------------------------------------------------------
     @ public
     def create(self) -> None:
         """
-        インデックスの作成
+        Create index
         """
-        # User (id, name, ...)の形を取得する
+        # User (id, name, ...)
         colToSql = self.__columnsToSql()
-        # クエリ
         query = f"CREATE INDEX {self.__indexName} ON {colToSql};"
-        # エンジンが設定されていたら
         if not self.__sqlEngine is None:
             self.__sqlEngine.execute(Query(query))
             self.__sqlEngine.commit()
         else:
-            raise Exception("エンジンが未設定です")
+            raise EngineUndefinedError()
     #---------------------------------------------------------------------------
     @ public
     def drop(self) -> None:
         """
-        インデックスの削除
+        Delete Index
         """
-        # クエリ
         query = f"DROP INDEX IF NOT EXISTS {self.__indexName};"
-        # エンジンが設定されていたら
         if not self.__sqlEngine is None:
             self.__sqlEngine.execute(Query(query))
             self.__sqlEngine.commit()
         else:
-            raise Exception("エンジンが未設定です")  
+            raise EngineUndefinedError()
 #-------------------------------------------------------------------------------

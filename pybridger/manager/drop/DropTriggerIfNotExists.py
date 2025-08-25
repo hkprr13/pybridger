@@ -11,7 +11,7 @@ class DropTriggerIfNotExists(Base):
             triggerName : str
         ):
         """
-        Initalize trigger deletion object. If the table exists
+        Initialize trigger deletion object. If the table exists
         Args:
             tableName   (str) : table name
             triggerName (str) : trigger name

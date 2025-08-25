@@ -1,14 +1,12 @@
 #-------------------------------------------------------------------------------
-from ..datatype     import DataType
+from typing import Literal
+from .PybridgerError import PyBridgerError
 #-------------------------------------------------------------------------------
-class LogicalType(DataType):
-    """
-    Base logical type class
-    """
-    #---------------------------------------------------------------------------
+class EngineUnsupportedError(PyBridgerError):
     def __init__(self) -> None:
-        """
-        Initialize logical type object
-        """
         super().__init__()
+    #---------------------------------------------------------------------------
+    @property
+    def msg(self) -> Literal['Unsupported Engine']:
+        return "Unsupported Engine" 
 #-------------------------------------------------------------------------------

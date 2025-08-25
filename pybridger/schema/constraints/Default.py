@@ -10,7 +10,7 @@ class Default(Constraint):
     """
     def __init__(self, value: str | int | float | bool | None) -> None:
         """
-        Initalize default constraint object
+        Initialize default constraint object
         Args:
             value (str | int | float | bool) : defalut value
         Examples:

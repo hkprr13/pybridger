@@ -5,7 +5,7 @@ class Query:
     """
     def __init__(self, value : object) -> None:
         """
-        Initalize query object
+        Initialize query object
         Args:
             value (object): query
         """

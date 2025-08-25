@@ -14,7 +14,7 @@ class Where(AsyncBase):
             conditions   : str,
         ) -> None:
         """
-        Initalize condition object
+        Initialize condition object
         Args:
             tableName  (str)   : table name
             columns    (str)   : columns for updates
@@ -40,7 +40,7 @@ class AsyncUpdateRecord(AsyncBase):
             values       : tuple,
         ) -> None:
         """
-        Initalize a record update object
+        Initialize a record update object
         """
         super().__init__(tableName)
         self.__columns = columns

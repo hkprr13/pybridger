@@ -7,7 +7,7 @@ class Unique(Constraint):
     """
     Defined unique constraint
     """
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize unique constraint object
         """

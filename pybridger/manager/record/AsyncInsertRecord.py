@@ -13,7 +13,7 @@ class AsyncInsertRecord(AsyncBase):
             placeHolders : str
         ) -> None:
         """
-        Initalize a class for inserting records object
+        Initialize a class for inserting records object
         Args:
             tableName    (str)   : table name
             columns      (str)   : columns (id, name, age)

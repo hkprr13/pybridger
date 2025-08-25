@@ -14,7 +14,7 @@ class AsyncInsertRecords(AsyncBase):
             placeHolders : str
         ) -> None:
         """
-        Initalize a class that inserts multiple records object
+        Initialize a class that inserts multiple records object
         Args:
             tableName    (str)              : table name
             columns      (str)              : columns (id, name, age)

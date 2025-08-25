@@ -1,36 +1,46 @@
 #-------------------------------------------------------------------------------
-from ..common       import private   # プライベートメソッド
-from ..common       import public    # パブリックメソッド
-from ..config       import Config    # コンフィグクラス
-from ..query        import Query     # クエリクラス
+from typing import Any
+from ...engine      import MySqlEngine
+from ...engine      import Sqlite3Engine
+from ...engine      import PostgreSqlEngine
+from ...common      import private
+from ...common      import public
+from ...config      import Config
+from ...mapper      import Query
+from ...errors      import EngineUndefinedError
+from ...errors      import EngineUnsupportedError
 #-------------------------------------------------------------------------------
 class Trigger:
+    """
+    Define trigger class
+    """
     def  __init__(
             self,
             triggerName : str,
             tableName   : str
         ) -> None:
         """
-        テーブルにトリガーを作成する
-        ※出力はしない
+        Create a trigger on the table. No output
         Args:
-            triggerName (str) : トリガー名
-            tableName   (str) : テーブル名
+            triggerName (str) : Trigger name
+            tableName   (str) : Table name
         Examples:
+            ‘’'
             trigger = Trigger(
-                triggerName = "triggerName",
-                tableName   = "tableName"
+                triggerName = “triggerName”,
+                tableName   = “tableName”
             )
+            ```
         """
         self.__triggerName = triggerName
         self.__tableName   = tableName
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self):
+    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
         engine = Config.sqlEngine
         if engine is None:
-            raise Exception("エンジンが未設定です")
+            raise EngineUndefinedError()
         return engine
     #---------------------------------------------------------------------------
     @private
@@ -40,23 +50,22 @@ class Trigger:
             event  : str,
             body   : str
         ) -> Query:
-        
         """
         Args:
-            timing (str) : タイミング
-            event  (str) : イベント  
-            body   (str) : 実行するSQL文
+            timing (str) : Timing
+            event  (str) : Event  
+            body   (str) : SQL statement to execute
         Raises:
-            ValueError : 使用できない引数を指定している場合
+            ValueError : When specifying an invalid argument
         Returns:
-            Query : クエリクラス
+            Query : Query class
         """
         timingUpper : str = timing.upper()
         eventUpper  : str = timing.upper()
         if not timingUpper in ("BEFORE", "AFTER"):
-            raise ValueError(f"使用できない引数({timing})を指定しています")
+            raise ValueError(f"Specified an invalid argument ({timing})")
         if not eventUpper in ("INSERT", "UPDATE", "DELETE"):
-            raise ValueError(f"使用できない引数({event})を指定しています")
+            raise ValueError(f"Specified an invalid argument ({event})")
         query = Query(
             f"CREATE TRIGGER {self.__triggerName} "
             f"{timingUpper} {eventUpper} ON {self.__tableName}"
@@ -66,26 +75,26 @@ class Trigger:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __buildShowQuery(self):
+    def __buildShowQuery(self) -> Query:
         """
-        Show用のクエリ
+        Show query
         Raises:
-            Exception : 未対応のエンジン時
+            EngineUnsupportedError : Unsupported error
         """
-        if self.__sqlEngine == Config.MySqlEngine:
+        if self.__sqlEngine == Config.mySqlEngine:
             query = "SHOW TRIGGERS;"
         elif self.__sqlEngine == Config.sqlite3Engine:
             query = "SELECT name, tbl_name, sql "\
                   + "FROM sqlite_master WHERE type='trigger';"
         else:
-            raise Exception("未対応のエンジンです")
+            raise EngineUnsupportedError()
         return Query(query)
     #---------------------------------------------------------------------------
     @property
     @private
-    def __buildDropQuery(self):
+    def __buildDropQuery(self) -> Query:
         """
-        Delete用のクエリ
+        Delete query
         """
         return Query(f"DROP TRIGGER IF EXISTS {self.__triggerName}")
     #---------------------------------------------------------------------------
@@ -95,32 +104,36 @@ class Trigger:
             timing : str,
             event  : str,
             body   : str
-        ):
+        ) -> None:
         """
-        トリガーの作成
+        Create trigger
         Args:
-            timing (str) : タイミング BEFORE AFTER
-            event  (str) : イベント  INSERT UPDATE DELETE
-            body   (str) : 実行するSQL文
+            timing (str) : Timing BEFORE AFTER
+            event  (str) : Event  INSERT UPDATE DELETE
+            body   (str) : SQL statement to execute
         Examples:
+            ```
             trigger = Trigger("triggerName", "tableName")
-            trigger.create("before | after", "inser | update | delete", "SQL文")
+            trigger.create(
+                "before | after", "insert | update | delete", "SQL statement"
+            )
+            ```
         """
         self.__sqlEngine.execute(
             self.__buildCreateQuery(timing, event, body)
         )
     #---------------------------------------------------------------------------
     @public
-    def show(self): 
+    def show(self) -> list[Any] | None: 
         """
-        トリガーの確認
+        Show trigger
         """
         self.__sqlEngine.execute(self.__buildShowQuery)
         return self.__sqlEngine.fetchall()
     #---------------------------------------------------------------------------
-    def drop(self): 
+    def drop(self) -> None: 
         """
-        トリガーの削除
+        Delete trigger
         """
         self.__sqlEngine.execute(self.__buildDropQuery)
 #-------------------------------------------------------------------------------

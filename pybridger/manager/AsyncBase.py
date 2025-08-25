@@ -74,7 +74,7 @@ class AsyncBase:
     @public
     async def transaction(self) -> None:
         """
-        Transaztion
+        Transaction
         """
         await self.sqlEngine.transaction()
     #---------------------------------------------------------------------------

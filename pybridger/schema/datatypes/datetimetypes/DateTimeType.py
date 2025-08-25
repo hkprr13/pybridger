@@ -10,7 +10,7 @@ class DateTimeType(DataType):
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
         """
-        Initalize date time object
+        Initialize date time object
         Attributes:
             format (Any) : Date and time format
             range  (Any) : Date and time range

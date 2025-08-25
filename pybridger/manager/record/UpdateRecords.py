@@ -15,7 +15,7 @@ class Where(Base):
             conditions : str,
         ) -> None:
         """
-        Initalize condition object
+        Initialize condition object
         Args:
             tableName  (str)   : table name
             columns    (str)   : columns for updates

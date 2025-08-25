@@ -58,22 +58,22 @@ class CreateTrigger(Base):
         Args:
             tableName   (str) : table name
             triggerName (str) : trigger name 
-            timing      (str) : timing "BEFORE | AFTER"
-            event       (str) : event  "INSERT | UPDATE | DELETE"
+            timing      (str) : timing "before | after"
+            event       (str) : event  "insert | update | delete"
             body        (str) : query
         """
         query = f"CREATE {triggerName} "
-        if timing == "before":
+        if timing.lower() == "before":
             query += "BEFORE " # Space at the end
-        elif timing == "after":
+        elif timing.lower() == "after":
             query += "AFTER "  # Space at the end
         else:
             raise Exception(f"Specifying an invalid argument: {timing}")
-        if event == "insert":
+        if event.lower() == "insert":
             query += "INSERT " # Space at the end
-        elif event == "update":
+        elif event.lower() == "update":
             query += "UPDATE " # Space at the end
-        elif event == "delete":
+        elif event.lower() == "delete":
             query += "DELETE " # Space at the end
         else:
             raise Exception(f"Specifying an invalid argument: {event}")

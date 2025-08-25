@@ -14,7 +14,7 @@ class DeleteRecord(Base):
             values    : tuple
         ) -> None:
         """
-        Initalize a record deletion object
+        Initialize a record deletion object
         """
         super().__init__(tableName)
         query = f"DELETE FROM {self.tableName} WHERE {columns}"

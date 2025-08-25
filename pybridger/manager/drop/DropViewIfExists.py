@@ -11,7 +11,7 @@ class DropViewIfExists(Base):
             viewName  : str
         ) -> None:
         """
-        Initalize view deletion object. If the table exists
+        Initialize view deletion object. If the table exists
         Args:
             tableName (str) : table name
             viewName   (str) : view name

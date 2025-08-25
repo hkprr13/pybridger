@@ -15,7 +15,7 @@ class ForeignKey(Constraint):
             onDelete      : bool | None = None
         ):
         """
-        Intialize foreign key constraint object
+        Initialize foreign key constraint object
         Args:
             referenceName (str)         : It is the reference format of "table.column"
             onUpdate      (bool | None) : Whether or not to apply ON UPDATE CASCADE. If None, it is not specified. 

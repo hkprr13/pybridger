@@ -29,7 +29,7 @@ class Select(Base):
             columns,
         ) -> None:
         """"
-        Initalize select object
+        Initialize select object
         Args:
             tableName (str) : table name
             columns   (str) : column

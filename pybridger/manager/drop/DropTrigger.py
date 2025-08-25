@@ -11,7 +11,7 @@ class DropTrigger(Base):
             triggerName : str
         ) -> None:
         """
-        Initalize trigger deletion object
+        Initialize trigger deletion object
         Args:
             tableName   (str) : table name
             triggerName (str) : trigger name

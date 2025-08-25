@@ -72,7 +72,7 @@ class Base:
     @public
     def transaction(self) -> None:
         """
-        Transaztion
+        Transaction
         """
         self.sqlEngine.transaction()
     #---------------------------------------------------------------------------

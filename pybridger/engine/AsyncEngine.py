@@ -54,7 +54,8 @@ class AsyncEngine:
                 self.sqlEngine = AsyncSqlite3Engine(
                     databasePath = self.database
                 )
-            raise Exception("データベースを指定してください")
+            else:
+                raise Exception("データベースを指定してください")
         elif self.sqlEngineName == "mysql":
             if  self.hostName and self.userName \
             and self.password and self.database:

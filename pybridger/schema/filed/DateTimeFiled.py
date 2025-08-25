@@ -4,7 +4,7 @@ from ..datatypes import DateTime
 #-------------------------------------------------------------------------------
 class DateTimeFiled(Filed):
     """
-    時間型のカラム定義クラス
+    Define date time filed class
     """
     def __init__(
             self,
@@ -15,8 +15,8 @@ class DateTimeFiled(Filed):
         """
         Initialization of time-type column definition classes
         Args:
-            isNotNull  (bool)       : Whether to enable the NotNull constraint
-            defalut    (str | None) : Whether to set a default value   
+            defalut    (str | None) : Whether to set a default value 
+            check      (str | None) : Whether to set a check value 
             foreignKey (str | None) : Specifies the foreign key constraint
         """
         super().__init__(

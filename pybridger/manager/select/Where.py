@@ -15,7 +15,7 @@ class Where(Base):
             value     : tuple
         ) -> None:
         """
-        Initalize where for SELECT object
+        Initialize where for SELECT object
             tableName (str)   : table name
             columns   (str)   : column
             condition (str)   : condition

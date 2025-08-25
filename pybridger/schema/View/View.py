@@ -1,20 +1,19 @@
 #-------------------------------------------------------------------------------
-import csv                         # csvライブラリのインポート
-from ..common     import private   # プライベートメソッド
-from ..common     import public    # パブリックメソッド
-from ..config     import Config    # コンフィグクラス
-from ..column     import Column    # カラムクラス
-from ..conditions import Condition # 条件クラス
-from ..query      import Query     # クエリクラス
+import csv
+from ...engine      import MySqlEngine
+from ...engine      import Sqlite3Engine
+from ...engine      import PostgreSqlEngine
+from ...common      import private 
+from ...common      import public
+from ...config      import Config
+from ..column       import Column
+from ..conditions   import Condition 
+from ...mapper      import Query
+from ...errors      import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class View:
     """
-    ビュー操作クラス
-    Attributes:
-        __viewName   (str)                         : ビュー名
-        __conditions (Condition)                   : 条件式オブジェクト
-        __columns    (Column)                      : カラムオブジェクト
-        __sqlEngine  (Sqlite3Engine | MySqlEngine) : エンジンオブジェクト
+    Define view class
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -24,13 +23,13 @@ class View:
             *columns   : Column
         ) -> None:
         """
-        ビューの操作をする
-        Args:
-            viewName   (str)       : ビュー名
-            conditions (Condition) : 条件式 例: User.age >= 20
-            *columns   (Column)    : カラム
+        Initialize view object
+        Arguments:
+            viewName   (str)       : View name
+            conditions (Condition) : Condition User.age >= 20
+            *columns   (Column)    : Column
         Examples:
-            view = View("viewName", User.age >= 20, User.id, User.name)
+            view = View(“viewName”, User.age >= 20, User.id, User.name)
         """
         self.__viewName   = viewName
         self.__conditions = conditions
@@ -38,31 +37,27 @@ class View:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self):
+    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
         """
-        sqlエンジンの設定
+        Setting SQL engine
         """
         engine = Config.sqlEngine
         if engine is None:
-            raise Exception("エンジンが未設定です")
+            raise EngineUndefinedError()
         return engine
     #---------------------------------------------------------------------------
     @ private
     def __bulidSelectQuery(self) -> str:
-        # クエリ
-        query = "SELECT " # 末尾にスペース
-        # テーブル名
+        query     = "SELECT " 
         tableName = ""
-        # カラム名を取得する
         for col in self.__columns:
             tableName = col.tableName
-            query += f"{col.columnName}, " # 末尾にスペース
+            query += f"{col.columnName}, "
         else:
-            # 末尾とカンマを消す
+
             query = query[:-2]
-            # 成形する
             query += f" FROM {tableName} WHERE {self.__conditions}"
-        # SELECT id, name FROM User WHERE age >= 10 の形式で返す
+        # SELECT id, name FROM User WHERE age >= 10
         return query
     #---------------------------------------------------------------------------
     @public
@@ -74,76 +69,63 @@ class View:
             cascadedCheckOption : bool = False,
             securityDefiner     : bool = False,
             readOnly            : bool = False
-        ):
+        ) -> None:
         """
-            データベースにビューを作成する
-            ※出力はしない
-            Args:
-                replace             (bool) : 既存のビューを置き換える
-                checkOption         (bool) : ビューを通した更新を制限
-                localCheckOption    (bool) : ネストビューで自分自身の条件のみを強制
-                cascadedCheckOption (bool) : ネストビューすべての条件を強制
-                securityDefiner     (bool) : ビューを作成したユーザ権限で実行
-                readOnly            (bool) : ビューから書き込み操作を禁止
-            Examples:
-                view = View("viewName", User.age >= 10, User.id, User.name)
-                view.create(replece = True, checkOption = True)
+        Create a view in the database. No output
+        Args:
+            replace             (bool) : Replace existing view.
+            checkOption         (bool) : Restrict updates through view.
+            localCheckOption    (bool) : Enforce only own conditions in nested views.
+            cascadedCheckOption (bool) : Enforce all conditions in nested views.
+            securityDefiner     (bool) : Execute with the permissions of the user who created the view
+            readOnly            (bool) : Prohibit write operations from the view
+        Examples:
+            view = View(“viewName”, User.age >= 10, User.id, User.name)
+            view.create(replece = True, checkOption = True)
         """
-        # クエリ
-        query     = f"CREATE " # 末尾にスペース
-        # セレクト句
+        query     = f"CREATE "
         selectSql = self.__bulidSelectQuery()
-        # リプレイスビューが有効なら
         if replace == True:
-            query += "OR REPLACE " # 末尾にスペース
+            query += "OR REPLACE "
         # CREATE VIEW viewName AS SELECT id, name FROM User WHWRE age >= 10
-        query += f"VIEW {self.__viewName} AS {selectSql} " # 末尾にスペース
+        query += f"VIEW {self.__viewName} AS {selectSql} " 
         # オプション句の構築
         withClaises = []
-        # チェックオプションが有効なら
         if checkOption:
             withClaises.append("CHECK OPTION")
-        # ローカルチェックオプションが有効なら
         if localCheckOption:
             withClaises.append("LOCAL CHECK OPTION")
-        # カスケードチェックオプションが有効なら
         if cascadedCheckOption:
             withClaises.append("CASCADED CHECK OPTION")
-        # セキュリティーデフェンダーが有効なら
         if securityDefiner:
             withClaises.append("SECURITY DEFINER")
-        # 読み取り専用が有効なら
         if readOnly:
             withClaises.append("READ ONLY")
-        # オプション句リストが空ではなければ
         if withClaises:
             query += f"WITH {' '.join(withClaises)}"
             query += ";"
         else:
-            query = query[:-1] + ";" # 末尾にスペースを削除する
+            query = query[:-1] + ";" 
         self.__sqlEngine.execute(query = Query(query))
         self.__sqlEngine.commit()
     #---------------------------------------------------------------------------
     @public
     def show(self) -> list:
         """
-        ビューの表示
+        Display view
         Returns:
-            ビューのイテレーターを返す
+            Returns a view iterator.
         """
-        # クエリ
         query = f"SELECT * FROM {self.__viewName};"
         cur = self.__sqlEngine.cursor()
         cur.execute(query)
-        # リストで返す
         return cur.fetchall()
     #---------------------------------------------------------------------------
     @public
-    def drop(self):
+    def drop(self) -> None:
         """
-        ビューの削除
+        Delete view
         """
-        # クエリ
         query = f"DROP VIEW IF EXISTS {self.__viewName};"
         self.__sqlEngine.execute(query = Query(query))
         self.__sqlEngine.commit()
@@ -154,39 +136,33 @@ class View:
             filePath      : str,
             includeHeader : bool = True,
             encoding      : str = "utf-8"
-        ):
+        ) -> None:
         """
-        ビュー内容をCSVファイルとして出力する
+        Output view contents as a CSV file.
         Args:
-            filePath      (str)  : 出力先のCSVファイルパス(.csv不要)
-            includeHeader (bool) : ヘッダー行(カラム名)を含んで出力するか
-            ncoding       (str)  : 出力ファイルの文字コード
+            filePath      (str)  : Output CSV file path (.csv not required)
+            includeHeader (bool) : Whether to include header row (column names) in output
+            encoding       (str)  : Output file character encoding
         Raises:
-            Exception : エンジンが未設定またはクエリ失敗時
+            Exception : When engine is not set or query fails
         """
-        # カーソルの設定
         cur = self.__sqlEngine.cursor()
         cur.execute(f"SELECT * FROM {self.__viewName};") # ビュー名で指定
-        # 出力に失敗時に戻り値を返す
         if cur.description is None:
-            print("出力に失敗しました")
+            print("Output failed")
             return
-        # カラム名の取得
         columnNames = [description[0] for description in cur.description]
-        # データ行の取得
         rows = cur.fetchall()
-        # ファイルに書き込み
         try:
             with open(
                 file    = f"{filePath}.csv", mode     = "w",
                 newline = "",                encoding = encoding
             ) as f:
                 writer = csv.writer(f)
-                # ヘッダー行フラグが真なら
                 if includeHeader:
-                    writer.writerow(columnNames) # ヘッダー行あり
-                writer.writerows(rows)           # データ行
-            print("出力に成功しました")
+                    writer.writerow(columnNames)
+                writer.writerows(rows) 
+            print("Output successful")
         except Exception as e:
             print(e)            
 #-------------------------------------------------------------------------------

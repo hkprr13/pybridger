@@ -15,7 +15,7 @@ class GroupBy(Base):
             byColumn  : str
         ) -> None:
         """
-        Initalize a object that constructs and executes SQL GROUP BY syntax
+        Initialize a object that constructs and executes SQL GROUP BY syntax
         Args:
             tableName (str) : table name
             columns   (str) : columns 

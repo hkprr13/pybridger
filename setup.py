@@ -1,8 +1,8 @@
 from setuptools import setup, find_packages
 
 setup(
-    name                          = "pybridger",                                 # パッケージ名（PyPI上の名前）
-    version                       = "0.1.2",                                    # バージョン
+    name                          = "pybridger",                                # パッケージ名（PyPI上の名前）
+    version                       = "0.1.3",                                    # バージョン
     author                        = "KazuhiroKondo",                            # 名前
     author_email                  = "hkprr13@gmail.com",                        # メールアドレス
     description                   = "自作のORMです",                             # 説明

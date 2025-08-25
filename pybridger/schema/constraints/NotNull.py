@@ -10,7 +10,7 @@ class NotNull(Constraint):
     #---------------------------------------------------------------------------
     def __init__(self):
         """
-        Intialize not null constraint object
+        Initialize not null constraint object
         """
         super().__init__()
     #---------------------------------------------------------------------------

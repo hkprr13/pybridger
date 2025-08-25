@@ -22,7 +22,7 @@ class AsyncMySqlEngine(SqlEngine):
         logFile      : str | None = None
     ) -> None:
         """
-        Initalize asynchronous engine class
+        Initialize asynchronous engine class
         Args:
             hostName     (str)        : host
             userName     (str)        : user name
@@ -55,7 +55,7 @@ class AsyncMySqlEngine(SqlEngine):
         """
         Connect to MySQL asynchronously and create a pool
         Returns:
-            Any : Returns connect objct
+            Any : Returns connect object
         Raises:
             Exception : If the database connection fails
         """

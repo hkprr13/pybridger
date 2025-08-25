@@ -1,28 +1,28 @@
 #-------------------------------------------------------------------------------
-from .Filed      import Filed # 基底クラス
-from ..datatypes import Time  # 時刻型
+from .Filed      import Filed
+from ..datatypes import Time 
 #-------------------------------------------------------------------------------
 class TimeFiled(Filed):
+    """
+    Define time filed
+    """
     def __init__(
             self,
-            isNotNull       = False,
-            default         = None,
-            foreignKey      = None
+            check      : str | None = None,
+            default    : str | None = None,
+            foreignKey : str | None = None
         ) -> None:
         """
-        時間型のカラム定義クラスの初期化
+        Initialization of time-type column definition classes
         Args:
-            isNotNull  (bool)       : NotNull制約を有効化するかどうか
-            defalut    (str | None) : デフォルト値を設定するかどうか   
-            foreignKey (str | None) : 外部キー制約の指定  
+            check      (str | None) : Whether to set a check value 
+            defalut    (str | None) : Whether to set a default value 
+            foreignKey (str | None) : Specifies the foreign key constraint
         """
         super().__init__(
-            dataType        = Time(),    # データ型の指定
-            isPrimaryKey    = False,     # 設定しない
-            isNotNull       = isNotNull, # 初期化時に依存
-            isUnique        = False,     # 設定しない
-            isAutoincrement = False,     # 設定しない
-            default         = default,   # 初期化時に依存
-            foreignKey      = foreignKey # 初期化時に依存
+            dataType        = Time(),
+            check           = check,
+            default         = default,  
+            foreignKey      = foreignKey 
         )
 #-------------------------------------------------------------------------------

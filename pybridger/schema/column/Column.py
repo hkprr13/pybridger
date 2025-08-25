@@ -1,4 +1,5 @@
 #-------------------------------------------------------------------------------
+from typing import Any
 from ..datatypes    import DataType
 from ..constraints  import AutoIncrement
 from ..constraints  import PrimaryKey
@@ -31,9 +32,9 @@ class Column:
         check           : Check           | None = None,
         tableLevelCheck : TableLevelCheck | None = None,
         foreignKey      : ForeignKey      | None = None
-    ):
+    ) -> None:
         """
-        Intialize column object 
+        Initialize column object 
         Args:
             dataType        (DataType)               : Define data type
             isPrimaryKey    (bool)                   : Enable primary key or not
@@ -155,7 +156,7 @@ class Column:
             return Query("")
     #---------------------------------------------------------------------------
     @private
-    def __buildDefaultQuery(self):
+    def __buildDefaultQuery(self) -> Any | Query:
         """
         private method
         build query for default constraints

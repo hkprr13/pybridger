@@ -12,7 +12,7 @@ class Date(DateTimeType):
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
         """
-        Initalize date type object
+        Initialize date type object
         """
         super().__init__()
     #---------------------------------------------------------------------------

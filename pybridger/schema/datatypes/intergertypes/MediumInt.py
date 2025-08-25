@@ -5,7 +5,7 @@ from ....common         import override
 from ....common         import private
 from ....mapper         import Query
 #-------------------------------------------------------------------------------
-class MediumnInt(IntegerType):
+class MediumInt(IntegerType):
     """
     Define 3-byte integer type
     Supported SQL (MySQL)
