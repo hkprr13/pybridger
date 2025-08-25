@@ -1,14 +1,21 @@
 #-------------------------------------------------------------------------------
-from ..common   import public  # パブリックメソッド
-from ..config   import Config  # コンフィグクラス
-from ..query    import Query   # クエリクラス
+from typing     import Any
+from ..engine   import AsyncSqlite3Engine
+from ..engine   import AsyncMySqlEngine
+from ..engine   import AsyncPostgreSqlEngine
+from ..common   import public
+from ..config   import Config
+from ..mapper   import Query
+from ..errors   import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class AsyncBase:
     """
-    データベース操作マネージャークラスにおける基底クラス
+    Define a base class for the database operation manager class    
     """
-    def __init__(self, tableName : str):
-        """初期化"""
+    def __init__(self, tableName : str) -> None:
+        """
+        Initialize a base class for the database operation manager object
+        """
         self.tableName = tableName
         self.query : str
         self.value : tuple
@@ -16,45 +23,65 @@ class AsyncBase:
     #---------------------------------------------------------------------------
     @property
     @public
-    def sqlEngine(self):
-        """sqlエンジンの設定"""
+    def sqlEngine(
+            self
+        ) -> AsyncSqlite3Engine | AsyncMySqlEngine | AsyncPostgreSqlEngine:
+        """
+        Setting SQL engine
+        Returns:
+             Sqlite3Engine | MySqlEngine | PostgreSqlEngine : engine object
+        """
         engine = Config.asyncSqlEngine
         if engine is None:
-            raise Exception("エンジンが未設定です")
+            raise EngineUndefinedError()
         return engine
     #---------------------------------------------------------------------------
     @public
-    async def connect(self):
-        """コネクト"""
+    async def connect(self) -> None:
+        """
+        Connect 
+        """    
         await self.sqlEngine.connect()
     #---------------------------------------------------------------------------        
     @public
-    async def cursor(self):
-        """カーソル"""
+    async def cursor(self) -> Any:
+        """
+        Cursor
+        """
         return await self.sqlEngine.cursor()
     # #---------------------------------------------------------------------------
     @public
-    async def execute(self):
-        """クエリの実行"""
+    async def execute(self) -> None:
+        """
+        Execute
+        """
         await self.sqlEngine.execute(Query(self.query), self.value)
     #---------------------------------------------------------------------------
     @public
-    async def executeAny(self):
-        """複数クエリの実行"""
+    async def executeAny(self) -> None:
+        """
+        Execute any
+        """
         await self.sqlEngine.executeAny(Query(self.query), self.data)
     #---------------------------------------------------------------------------
     @public
-    async def commit(self):
-        """データベースにコミットする"""
+    async def commit(self) -> None:
+        """
+        Commit transaction
+        """
         await self.sqlEngine.commit()
     #---------------------------------------------------------------------------
     @public
-    async def transaction(self):
-        """トランザクション"""
+    async def transaction(self) -> None:
+        """
+        Transaztion
+        """
         await self.sqlEngine.transaction()
     #---------------------------------------------------------------------------
     @public
-    async def rollback(self):
-        """ロールバック"""
+    async def rollback(self) -> None:
+        """
+        Rollback
+        """
         await self.sqlEngine.rollback()
 #-------------------------------------------------------------------------------

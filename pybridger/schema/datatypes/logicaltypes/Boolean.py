@@ -9,6 +9,10 @@ class Boolean(LogicalType):
     """
     Define boolen type class
     Supported SQL (MySQL, Sqlite3, PostgreSQL)
+
+    MySQL query      : "BOOLEAN"
+    Sqlite3 query    : "BOOLEAN"
+    PostgreSQL query : "BOOLEAN"
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:

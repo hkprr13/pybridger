@@ -9,7 +9,7 @@ class DateTimeFiled(Filed):
     def __init__(
             self,
             default    : str  | None = None,
-            check      : str | None = None,
+            check      : str  | None = None,
             foreignKey : str  | None = None
         ) -> None:
         """

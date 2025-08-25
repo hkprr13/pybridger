@@ -1,19 +1,20 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase # 基底クラス
-from ...common   import public    # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncCreateTableIfNotExists(AsyncBase):
-    """非同期テーブル作成クラス"""
+    """
+    Define an asynchronous table creation class
+    """
     def __init__(
             self,
             tableName : str,
             columns   : str
-        ):
+        ) -> None:
         """
-        非同期テーブル作成クラスの初期化
+        Initialize an asynchronous table creation class
         Args:
-            tableName (str) : テーブル名
-            columns   (str) : CREATE TABLE (...);の...部分
+            tableName (str) : table name
+            columns   (str) : The ... part of "CREATE TABLE (...);"
         """
         super().__init__(tableName)
         self.query = f"CREATE TABLE IF NOT EXISTS {tableName} ({columns});"

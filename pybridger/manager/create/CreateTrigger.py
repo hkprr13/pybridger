@@ -1,10 +1,11 @@
 #-------------------------------------------------------------------------------
-from ..Base         import Base    # 基底クラス
-from ...common      import private # プライベートメソッド
-from ...common      import public  # パブリックメソッド
-from ...query       import Query   # クエリクラス
+from ..Base         import Base  
+from ...common      import private
 #-------------------------------------------------------------------------------
 class CreateTrigger(Base):
+    """
+    Define the trigger creation class
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
@@ -13,22 +14,22 @@ class CreateTrigger(Base):
             timing      : str,
             event       : str,
             body        : str
-        ):
+        ) -> None:
         """
-        トリガーの作成
+        Initialize the trigger creation object
         Args:
-            tableName   (str) : テーブル名
-            triggerName (str) : トリガー名 
-            timing      (str) : タイミング BEFORE AFTER
-            event       (str) : イベント  INSERT UPDATE DELETE
-            body        (str) : 実行するSQL文
+            tableName   (str) : table name
+            triggerName (str) : trigger name 
+            timing      (str) : timing "BEFORE | AFTER"
+            event       (str) : event  "INSERT | UPDATE | DELETE"
+            body        (str) : query
         Examples:
             trigger = User.createTrigger(
                 "tableName",
                 "triggerName",
                 "before | after",
                 "inser | update | delete",
-                "SQL文"
+                query
             )
             trigger.execute()
             trigger.commit()
@@ -52,29 +53,30 @@ class CreateTrigger(Base):
             body        : str
         ) -> str:
         """
-        トリガー作成クエリの作成用のプライベートメソッド
+        Private method for creating trigger creation queries
+        Initialize the trigger creation object
         Args:
-            tableName   (str) : テーブル名
-            triggerName (str) : トリガー名 
-            timing      (str) : タイミング BEFORE AFTER
-            event       (str) : イベント  INSERT UPDATE DELETE
-            body        (str) : 実行するSQL文
+            tableName   (str) : table name
+            triggerName (str) : trigger name 
+            timing      (str) : timing "BEFORE | AFTER"
+            event       (str) : event  "INSERT | UPDATE | DELETE"
+            body        (str) : query
         """
         query = f"CREATE {triggerName} "
         if timing == "before":
-            query += "BEFORE " # 末尾にスペース
+            query += "BEFORE " # Space at the end
         elif timing == "after":
-            query += "AFTER "  # 末尾にスペース
+            query += "AFTER "  # Space at the end
         else:
-            raise Exception(f"使えない引数:{timing} を指定しています。")
+            raise Exception(f"Specifying an invalid argument: {timing}")
         if event == "insert":
-            query += "INSERT " # 末尾にスペース
+            query += "INSERT " # Space at the end
         elif event == "update":
-            query += "UPDATE " # 末尾にスペース
+            query += "UPDATE " # Space at the end
         elif event == "delete":
-            query += "DELETE " # 末尾にスペース
+            query += "DELETE " # Space at the end
         else:
-            raise Exception(f"使えない引数:{event} を指定しています。")
+            raise Exception(f"Specifying an invalid argument: {event}")
         query += f"ON {tableName} EACH ROW BEGIN {body} END;"
         return query
 #-------------------------------------------------------------------------------

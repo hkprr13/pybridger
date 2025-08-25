@@ -2,11 +2,11 @@
 from typing             import Literal
 from .PybridgerError    import PyBridgerError
 #-------------------------------------------------------------------------------
-class DataTypeUndefinedError(PyBridgerError):
+class DatabaseUndefinedError(PyBridgerError):
     def __init__(self) -> None:
         super().__init__()
     #---------------------------------------------------------------------------
     @property
-    def msg(self) -> Literal["Data type un defined"]:
-        return "Data type un defined" 
+    def msg(self) -> Literal["Database un degined"]:
+        return "Database un degined" 
 #-------------------------------------------------------------------------------

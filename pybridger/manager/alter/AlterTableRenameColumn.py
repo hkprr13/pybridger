@@ -1,34 +1,25 @@
 #-------------------------------------------------------------------------------
-from ..Base    import Base   # 基底クラス
-from ...common import public # パブリックメソッド
+from ..Base    import Base  
 #-------------------------------------------------------------------------------
 class AlterTableRenameColumn(Base):
-    """テーブルのカラム名変更クラス"""
+    """
+    Define a class for changing table column names
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
             tableName : str,
             oldName   : str,
             newName   : str,
-        ):
+        ) -> None:
         """
-        テーブルのカラム名変更クラス
+        Initalize a class for changing table column names
         Args:
-            tableName (str) : テーブル名
-            oldName   (str) : 既存の名前
-            newName   (str) : 新しい名前
+            tableName (str) : table name
+            oldName   (str) : old name
+            newName   (str) : new name
         """
         super().__init__(tableName)
-        self.__query = f"ALTER TABLE {tableName} " \
-                     + f"RENAME COLUMN {oldName} TO {newName};"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    def execute(self):
-        return super().execute(self.__query)
+        self.query = f"ALTER TABLE {tableName} " \
+                   + f"RENAME COLUMN {oldName} TO {newName};"
 #-------------------------------------------------------------------------------

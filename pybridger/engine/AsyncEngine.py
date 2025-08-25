@@ -92,17 +92,3 @@ class AsyncEngine:
         """
         await self.sqlEngine.commit()
     #---------------------------------------------------------------------------
-    @public
-    async def connectOpen(self) -> None:
-        """
-        データベース接続を開始する
-        """
-        await self.sqlEngine.connectOpen()
-    #---------------------------------------------------------------------------
-    @public
-    async def connectClose(self) -> None:
-        """
-        データベース接続を閉じる
-        """
-        await self.sqlEngine.connectClose()
-    #---------------------------------------------------------------------------

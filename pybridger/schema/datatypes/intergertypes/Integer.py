@@ -9,6 +9,10 @@ class Integer(IntegerType):
     """
     Define 3-byte integer type
     Supported SQL (MySQL, Sqlite3, PostgreSQL)
+
+    MySQL query      : "INT"
+    Sqlite3 query    : "INTEGER"
+    PostgreSQL query : "INT
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:

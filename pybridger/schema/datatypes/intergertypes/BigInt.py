@@ -9,6 +9,10 @@ class BigInt(IntegerType):
     """
     Define 8-byte integer type
     Supported SQL (MySQL, PostgreSQL)
+
+    MySQL query      : "BIGINT"
+    Sqlite3 query    : "INTEGER"
+    PostgreSQL query : "INTEGER"
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
@@ -30,7 +34,7 @@ class BigInt(IntegerType):
     @override
     @private
     def sqlite3(self) -> None:
-        self.query                : Any = self.TEXTNOTSUPPORTED
+        self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
         self.signedMinimum        : Any = self.TEXTNOTSUPPORTED
@@ -40,6 +44,7 @@ class BigInt(IntegerType):
     @override
     @private
     def postgresql(self) -> None:
+        self.query                : Any = Query("BIGINT")
         self.storage              : Any =                          8
         self.signedMaximum        : Any =  9_223_372_036_854_775_807
         self.signedMinimum        : Any = -9_223_372_036_854_775_808

@@ -9,6 +9,10 @@ class SmallInt(IntegerType):
     """
     Define 2-byte integer type class
     Supported SQL (MySQL, PostgreSQL)
+
+    MySQL query      : "SMALLINT"
+    Sqlite3 query    : "INTEGER"
+    PostgreSQL query : "SMALLINT"
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
@@ -30,7 +34,7 @@ class SmallInt(IntegerType):
     @override
     @private
     def sqlite3(self):
-        self.query                : Any = self.TEXTNOTSUPPORTED
+        self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
         self.signedMinimum        : Any = self.TEXTNOTSUPPORTED

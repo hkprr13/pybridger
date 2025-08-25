@@ -1,7 +1,7 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase 
+from ..datatype     import DataType
 #-------------------------------------------------------------------------------
-class AsyncAlterTableDropConstraint(AsyncBase):
-    def __init__(self, tableName: str) -> None:
-        super().__init__(tableName)
+class FloatingPointDataType(DataType):
+    def __init__(self) -> None:
+        super().__init__()
 #-------------------------------------------------------------------------------

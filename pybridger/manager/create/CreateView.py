@@ -1,7 +1,6 @@
 #-------------------------------------------------------------------------------
-from ..Base     import Base   # 基底クラス
-from ...common  import public # パブリックメソッド
-from ...query   import Query  # クエリクラス
+from ..Base     import Base   
+from ...common  import public 
 #-------------------------------------------------------------------------------
 class CreateView(Base):
     def __init__(
@@ -22,3 +21,4 @@ class CreateView(Base):
 class Where(Base):
     def __init__(self, tableName: str):
         super().__init__(tableName)
+#-------------------------------------------------------------------------------

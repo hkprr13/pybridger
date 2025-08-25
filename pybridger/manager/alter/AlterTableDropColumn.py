@@ -1,31 +1,22 @@
 #-------------------------------------------------------------------------------
-from ..Base    import Base   # 基底クラス
-from ...common import public # パブリックメソッド
+from ..Base    import Base
 #-------------------------------------------------------------------------------
 class AlterTableDropColumn(Base):
-    """テーブルからカラムを削除するクラス"""
+    """
+    Define a class to delete columns from the table
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
             tableName  : str,
             columnName : str
-        ):
+        ) -> None:
         """
-        テーブルからカラムを削除するクラスの初期化
+        Initalize a class to delete columns from the table
         Args:
-            tableName (str)  : テーブル名
-            columnNmae (str) : カラム名
+            tableName  (str) : table name
+            columnName (str) : column name
         """
         super().__init__(tableName)
-        self.__query = f"ALTER TABLE {tableName} DROP COLUMN {columnName};"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    def execute(self):
-        return super().execute(self.__query)
+        self.query = f"ALTER TABLE {tableName} DROP COLUMN {columnName};"
 #-------------------------------------------------------------------------------

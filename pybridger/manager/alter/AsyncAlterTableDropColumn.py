@@ -1,31 +1,22 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase # 基底クラス
-from ...common   import public    # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncAlterTableDropColumn(AsyncBase):
-    """テーブルからカラムを削除するクラス"""
+    """
+    Define a class to delete columns from the table
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
             tableName  : str,
             columnName : str
-        ):
+        ) -> None:
         """
-        テーブルからカラムを削除するクラスの初期化
+        Initialize a class to delete columns from the table.
         Args:
-            tableName (str)  : テーブル名
-            columnNmae (str) : カラム名
+            tableName (str)  : table name
+            columnNmae (str) : column name
         """
         super().__init__(tableName)
-        self.__query = f"ALTER TABLE {tableName} DROP COLUMN {columnName};"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    async def execute(self):
-        return await super().execute(self.__query)
+        self.query = f"ALTER TABLE {tableName} DROP COLUMN {columnName};"
 #-------------------------------------------------------------------------------

@@ -1,6 +1,11 @@
 #-------------------------------------------------------------------------------
+from typing     import Any
 from ..config   import Config
 from ..common   import private
+from ..engine   import Sqlite3Engine
+from ..engine   import MySqlEngine
+from ..engine   import PostgreSqlEngine
+from ..errors   import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class Session:
     def __init__(self) -> None:
@@ -8,13 +13,13 @@ class Session:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self):
+    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
         engine = Config.sqlEngine
         if engine is None:
-            raise Exception("エンジンが未設定です")
+            raise  EngineUndefinedError()
         return engine
     #---------------------------------------------------------------------------
-    def __enter__(self):
+    def __enter__(self) -> Any:
         self.__conn = self.__sqlEngine.connect()
         return self.__conn
     #---------------------------------------------------------------------------

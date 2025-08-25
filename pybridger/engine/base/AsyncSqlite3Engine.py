@@ -11,6 +11,7 @@ class AsyncSqlite3Engine(SqlEngine):
     """
     Asynchronous Sqlite3 engine class
     """
+    PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
     def __init__(
             self,

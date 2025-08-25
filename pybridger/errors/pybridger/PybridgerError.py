@@ -1,5 +1,6 @@
 #-------------------------------------------------------------------------------
 import sys
+from typing             import Literal
 #-------------------------------------------------------------------------------
 def custom_excepthook(exc_type, exc_value, traceback):
     print(f"{exc_type.__name__}: {exc_value}")
@@ -10,6 +11,6 @@ class PyBridgerError(Exception):
         
         super().__init__(self.msg)
     @property
-    def msg(self):
+    def msg(self) -> Literal["pybridger error"]:
         return "pybridger error"
 #-------------------------------------------------------------------------------

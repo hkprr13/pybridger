@@ -1,22 +1,22 @@
 #-------------------------------------------------------------------------------
-from ..Base         import Base   # 基底クラス
-from ...common      import public # パブリックメソッド
-from ...query       import Query  # クエリクラス
+from ..Base     import Base
 #-------------------------------------------------------------------------------
 class CreateIndex(Base):
-    """インデックス作成クラス"""
+    """
+    Define index creation class
+    """
     def __init__(
             self,
             indexName : str,
             tableName : str,
             columns   : str
-        ):
+        ) -> None:
         """
-            インデックス作成クラス
+            Initialize index creation class
             Args:
-                indexName (str) : インデックス名
-                tableName (str) : テーブル名
-                columns   (str) : カラム(文字列形式)
+                indexName (str) : index name
+                tableName (str) : table name
+                columns   (str) : column
         """
         super().__init__(tableName)
         self.query = f"CREATE {indexName} ON {tableName} ({columns});"

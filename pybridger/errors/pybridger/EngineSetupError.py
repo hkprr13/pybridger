@@ -1,4 +1,5 @@
 #-------------------------------------------------------------------------------
+from typing import Literal
 from .PybridgerError import PyBridgerError
 #-------------------------------------------------------------------------------
 class EngineSetupError(PyBridgerError):
@@ -6,6 +7,6 @@ class EngineSetupError(PyBridgerError):
         super().__init__()
     #---------------------------------------------------------------------------
     @property
-    def msg(self):
+    def msg(self) -> Literal["An error occurred during engine of SQL setup"]:
         return "An error occurred during engine of SQL setup" 
 #-------------------------------------------------------------------------------

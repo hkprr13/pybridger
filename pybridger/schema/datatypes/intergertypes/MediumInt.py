@@ -9,6 +9,9 @@ class MediumnInt(IntegerType):
     """
     Define 3-byte integer type
     Supported SQL (MySQL)
+    MySQL query      : "MEDIUMINT"
+    Sqlite3 query    : "INTEGER"
+    PostgreSQL query : "INTEGER"
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
@@ -30,7 +33,7 @@ class MediumnInt(IntegerType):
     @override
     @private
     def sqlite3(self):
-        self.query                : Any = self.TEXTNOTSUPPORTED
+        self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
         self.signedMinimum        : Any = self.TEXTNOTSUPPORTED
@@ -40,7 +43,7 @@ class MediumnInt(IntegerType):
     @override
     @private
     def postgresql(self):
-        self.query                : Any = self.TEXTNOTSUPPORTED
+        self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
         self.signedMinimum        : Any = self.TEXTNOTSUPPORTED

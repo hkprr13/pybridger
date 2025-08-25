@@ -1,9 +1,10 @@
 #-------------------------------------------------------------------------------
-from ..Base    import Base   # 基底クラス
-from ...common import public # パブリックメソッド
+from ..Base    import Base
 #-------------------------------------------------------------------------------
 class AlterTableAddColumn(Base):
-    """テーブルにカラムを追加するクラス"""
+    """
+    Define a class to add columns to the table
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
@@ -11,26 +12,16 @@ class AlterTableAddColumn(Base):
             column      : str,
             dataType    : str,
             constraints : str,
-        ):
+        ) -> None:
         """
-        テーブルにカラムを追加するクラスの初期化
+        Initialize the class that adds columns to the table
         Args:
-            tableName   (str) : テーブル名
-            column      (str) : カラム名
-            dataType    (str) : データ型
-            constraints (str) : 制約
+            tableName   (str) : table name
+            column      (str) : column name
+            dataType    (str) : data type
+            constraints (str) : constraints
         """
         super().__init__(tableName)
-        self.__query = f"ALTER TABLE {tableName} ADD " \
-                     + f"{column} {dataType} {constraints};"
-    #---------------------------------------------------------------------------
-    @public
-    @property
-    def query(self):
-        """クエリ"""
-        return self.__query
-    #---------------------------------------------------------------------------
-    @public
-    def execute(self):
-        return super().execute(self.__query)
+        self.query = f"ALTER TABLE {tableName} ADD " \
+                   + f"{column} {dataType} {constraints};"
 #-------------------------------------------------------------------------------

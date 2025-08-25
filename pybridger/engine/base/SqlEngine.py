@@ -3,7 +3,9 @@ from ...common  import public
 from ...utils   import Log
 #-------------------------------------------------------------------------------
 class SqlEngine:
-    """基底SQLエンジンクラス"""
+    """
+    Define SQL engine
+    """
     def __init__(self) -> None:
         super().__init__()
         self.isLog : bool       = False

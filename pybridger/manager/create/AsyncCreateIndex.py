@@ -1,21 +1,22 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase # 基底クラス
-from ...common   import public    # パブリックメソッド
+from ..AsyncBase import AsyncBase
 #-------------------------------------------------------------------------------
 class AsyncCreateIndex(AsyncBase):
-    """非同期インデックス作成クラス"""
+    """
+    Define an asynchronous index creation class
+    """
     def __init__(
             self,
             indexName : str,
             tableName : str,
             columns   : str
-        ):
+        ) -> None:
         """
-        非同期インデックス作成クラスの初期化
+        Initialize an asynchronous index creation class
         Args:
-            indexName (str) : インデックス名
-            tableName (str) : テーブル名
-            columns   (str) : カラム
+            indexName (str) : index name
+            tableName (str) : table name
+            columns   (str) : column
         """
         super().__init__(tableName)
         self.query = f"CREATE {indexName} ON {tableName} ({columns});"

@@ -10,6 +10,7 @@ class Sqlite3Engine(SqlEngine):
     """
     Defined Sqlite3 engine class
     """
+    PLACEHOLDER : str = "?"
     #---------------------------------------------------------------------------
     def __init__(
             self,

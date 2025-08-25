@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-from ..Base    import Base   # 基底クラス
-from ...common import public # パブリックメソッド
+from ..Base    import Base  
+from ...common import public 
 #-------------------------------------------------------------------------------
 class AsyncCreateView(Base):
     def __init__(
@@ -8,7 +8,7 @@ class AsyncCreateView(Base):
             viewName  : str,
             tableName : str,
             columns   : str
-        ):
+        ) -> None:
         super().__init__(tableName)
         self.__viewName  = viewName
         self.__columns   = columns

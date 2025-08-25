@@ -1,14 +1,21 @@
 #-------------------------------------------------------------------------------
-from ..common   import public  # パブリックメソッド
-from ..config   import Config  # コンフィグクラス
-from ..query    import Query   # クエリクラス
+from typing     import Any
+from ..engine   import Sqlite3Engine
+from ..engine   import MySqlEngine
+from ..engine   import PostgreSqlEngine
+from ..common   import public
+from ..config   import Config
+from ..mapper   import Query
+from ..errors   import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class Base:
     """
-    データベース操作マネージャークラスにおける基底クラス
+    Define a base class for the database operation manager class    
     """
-    def __init__(self, tableName : str):
-        """初期化"""
+    def __init__(self, tableName : str) -> None:
+        """
+        Initialize a base class for the database operation manager object
+        """
         self.tableName = tableName
         self.query : str
         self.value : tuple
@@ -16,46 +23,63 @@ class Base:
     #---------------------------------------------------------------------------
     @property
     @public
-    def sqlEngine(self):
-        """sqlエンジンの設定"""
+    def sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+        """
+        Setting SQL engine
+        Returns:
+             Sqlite3Engine | MySqlEngine | PostgreSqlEngine : engine object
+        """
         engine = Config.sqlEngine
         if engine is None:
-            raise Exception("エンジンが未設定です")
+            raise EngineUndefinedError()
         return engine
     #---------------------------------------------------------------------------
     @public
-    def connect(self):
-        """コネクト"""
+    def connect(self) -> None:
+        """
+        Connect 
+        """
         self.sqlEngine.connect()
     #---------------------------------------------------------------------------        
     @public
-    def cursor(self):
-        """カーソル"""
+    def cursor(self) -> Any:
+        """
+        Cursor
+        """
         return self.sqlEngine.cursor()
-
-    # #---------------------------------------------------------------------------
+    #---------------------------------------------------------------------------
     @public
-    def execute(self):
-        """クエリの実行"""
+    def execute(self) -> None:
+        """
+        Execute
+        """
         self.sqlEngine.execute(Query(self.query), self.value)
     #---------------------------------------------------------------------------
     @public
-    def executeAny(self):
-        """複数クエリの実行"""
+    def executeAny(self) -> None:
+        """
+        Execute any
+        """
         self.sqlEngine.executeAny(Query(self.query), self.data)
     #---------------------------------------------------------------------------
     @public
-    def commit(self):
-        """データベースにコミットする"""
+    def commit(self) -> None:
+        """
+        Commit transaction
+        """
         self.sqlEngine.commit()
     #---------------------------------------------------------------------------
     @public
-    def transaction(self):
-        """トランザクション"""
+    def transaction(self) -> None:
+        """
+        Transaztion
+        """
         self.sqlEngine.transaction()
     #---------------------------------------------------------------------------
     @public
-    def rollback(self):
-        """ロールバック"""
+    def rollback(self) -> None:
+        """
+        Rollback
+        """
         self.sqlEngine.rollback()
 #-------------------------------------------------------------------------------

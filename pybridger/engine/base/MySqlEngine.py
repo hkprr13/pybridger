@@ -10,6 +10,7 @@ class MySqlEngine(SqlEngine):
     """
     Defined MySQL engine class
     """
+    PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
     def __init__(
             self,

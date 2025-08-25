@@ -1,6 +1,7 @@
-from ..Base import Base    #マネージャーのベースクラス
-
+#-------------------------------------------------------------------------------
+from ..Base import Base
+#-------------------------------------------------------------------------------
 class AlterTableAddConstraint(Base):
-    def __init__(self, tableName: str):
+    def __init__(self, tableName: str) -> None:
         super().__init__(tableName)
-        
+#-------------------------------------------------------------------------------

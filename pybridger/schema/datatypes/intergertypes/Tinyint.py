@@ -9,6 +9,10 @@ class TinyInt(IntegerType):
     """
     Define 1-byte integer type class
     Supported SQL (MySQL)
+
+    MySQL query      : "TINYINT"
+    Sqlite3 query    : "INTEGER"
+    PostgreSQL query : "INTEGER"
     """
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
@@ -30,7 +34,7 @@ class TinyInt(IntegerType):
     @override
     @private
     def sqlite3(self) -> None:
-        self.query                : Any = self.TEXTNOTSUPPORTED
+        self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
         self.signedMinimum        : Any = self.TEXTNOTSUPPORTED
@@ -40,7 +44,7 @@ class TinyInt(IntegerType):
     @override
     @private
     def postgresql(self) -> None:
-        self.query                : Any = self.TEXTNOTSUPPORTED
+        self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
         self.signedMaximum        : Any = self.TEXTNOTSUPPORTED
         self.signedMinimum        : Any = self.TEXTNOTSUPPORTED

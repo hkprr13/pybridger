@@ -4,7 +4,9 @@ from ...common   import private   # プライベートメソッド
 from ...common   import public    # パブリックメソッド
 #-------------------------------------------------------------------------------
 class AsyncCreateTrigger(AsyncBase):
-    """非同期トリガーの作成"""
+    """
+    Definition of the class for creating asynchronous triggers
+    """
     #---------------------------------------------------------------------------
     def __init__(
             self,
@@ -13,25 +15,27 @@ class AsyncCreateTrigger(AsyncBase):
             timing      : str,
             event       : str,
             body        : str
-        ):
+        ) -> None:
         """
-        非同期トリガーの作成
+        Initializing the asynchronous trigger creation class
         Args:
-            tableName   (str) : テーブル名
-            triggerName (str) : トリガー名 
-            timing      (str) : タイミング BEFORE AFTER
-            event       (str) : イベント  INSERT UPDATE DELETE
-            body        (str) : 実行するSQL文
+            tableName   (str) : Table name
+            triggerName (str) : Trigger name 
+            timing      (str) : Timing "BEFORE | AFTER"
+            event       (str) : Event  "INSERT | UPDATE | DELETE"
+            body        (str) : Query to execute
         Examples:
+            ```
             trigger = User.createTrigger(
                 "tableName",
                 "triggerName",
                 "before | after",
                 "inser | update | delete",
-                "SQL文"
+                "query"
             )
             trigger.execute()
             trigger.commit()
+            ```
         """
         super().__init__(tableName)
         self.query = self.__buildQuery(
@@ -52,29 +56,29 @@ class AsyncCreateTrigger(AsyncBase):
             body        : str
         ) -> str:
         """
-        トリガー作成クエリの作成用のプライベートメソッド
+        Private method for creating trigger creation queries
         Args:
-            tableName   (str) : テーブル名
-            triggerName (str) : トリガー名 
-            timing      (str) : タイミング BEFORE AFTER
-            event       (str) : イベント  INSERT UPDATE DELETE
-            body        (str) : 実行するSQL文
+            tableName   (str) : Table name
+            triggerName (str) : Trigger name 
+            timing      (str) : Timing "BEFORE | AFTER"
+            event       (str) : Event  "INSERT | UPDATE | DELETE"
+            body        (str) : Query to execute
         """
         query = f"CREATE {triggerName} "
-        if timing == "before":
-            query += "BEFORE " # 末尾にスペース
-        elif timing == "after":
-            query += "AFTER "  # 末尾にスペース
+        if timing.lower() == "before":
+            query += "BEFORE " # Space at the end
+        elif timing.lower()  == "after":
+            query += "AFTER "  # Space at the end
         else:
-            raise Exception(f"使えない引数:{timing} を指定しています。")
-        if event == "insert":
-            query += "INSERT " # 末尾にスペース
-        elif event == "update":
-            query += "UPDATE " # 末尾にスペース
-        elif event == "delete":
-            query += "DELETE " # 末尾にスペース
+            raise Exception(f"Specifying an invalid argument: {timing}")
+        if event.lower()  == "insert":
+            query += "INSERT " # Space at the end
+        elif event.lower()  == "update":
+            query += "UPDATE " # Space at the end
+        elif event.lower()  == "delete":
+            query += "DELETE " # Space at the end
         else:
-            raise Exception(f"使えない引数:{event} を指定しています。")
+            raise Exception(f"Specifying an invalid argument: {event}")
         query += f"ON {tableName} EACH ROW BIGIN {body} END;"
         return query
 #-------------------------------------------------------------------------------

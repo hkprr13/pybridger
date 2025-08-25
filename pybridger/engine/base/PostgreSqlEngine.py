@@ -11,6 +11,7 @@ class PostgreSqlEngine(SqlEngine):
     """
     Defined PostgreSQL engine class
     """
+    PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
     def __init__(
             self,

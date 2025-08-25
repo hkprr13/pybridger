@@ -1,7 +1,11 @@
 #-------------------------------------------------------------------------------
-from ..AsyncBase import AsyncBase 
+from .Double        import Double
+from .Float         import Float
+from .Real          import Real
 #-------------------------------------------------------------------------------
-class AsyncAlterTableDropConstraint(AsyncBase):
-    def __init__(self, tableName: str) -> None:
-        super().__init__(tableName)
+__all__ = [
+    "Double",
+    "Float",
+    "Real"
+]
 #-------------------------------------------------------------------------------
