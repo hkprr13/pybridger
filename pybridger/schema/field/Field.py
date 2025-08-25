@@ -5,7 +5,7 @@ from ..constraints      import Default
 from ..constraints      import Check
 from ..constraints      import ForeignKey
 #-------------------------------------------------------------------------------
-class Filed(Column):
+class Field(Column):
     """
     Base class for field classes.
     Inherits column classes.
@@ -23,7 +23,7 @@ class Filed(Column):
             foreignKey      : str | None = None
         ) -> None:
         """
-        Initialize filed object
+        Initialize field object
         Args:
             dataType        (DataType)   : Data type 
             isPrimaryKey    (bool)       : Defining the primary key
@@ -31,7 +31,7 @@ class Filed(Column):
             isNotNull       (bool)       : Defining not null
             isUnique        (bool)       : Defining unique
             check           (str | None) : Defining check
-            default         (str | None) : Defining defalut
+            default         (str | None) : Defining default
             foreignKey      (str | None) : Defining foreignkey
         """
         self.__foreignKey = foreignKey

@@ -6,19 +6,10 @@ import hashlib
 import importlib.util
 from datetime       import datetime
 from pathlib        import Path
-from ..engine       import MySqlEngine
-from ..engine       import Sqlite3Engine
-from ..engine       import Engine
-from ..model        import Model
-from ..common       import public
-from ..common       import private
-from ..column       import Column
-from ..constraints  import Unique
-from ..datatypes    import Integer
-from ..datatypes    import Text
-from ..config       import Config
-from ..query        import Query
-from .migrations    import migrations
+from ...engine      import Engine
+from ...common      import private
+from ...config      import Config
+from ...mapper      import Query
 #-------------------------------------------------------------------------------
 class Migration:
     def __init__(
@@ -35,11 +26,11 @@ class Migration:
         self.__migrationsDir = Path(migrationsDir)
         self.__migrationsDir.mkdir(exist_ok = True)
         # テーブルの作成
-        engine.launch()
-        m = migrations.createTableIfNotExists()
-        m.execute()
-        m.commit()
-        self.tableName = m.tableName
+        self.tableName = ""
+        #
+        # 未実装
+        #
+        #
         print("初期化完了")
     #---------------------------------------------------------------------------
     @property
@@ -134,15 +125,11 @@ class Migration:
             mod      = self.__loadModule(f)
             checksum = self.__checksum(f)
             try:
-                mig = migrations.insertRecord(
-                    name       = f.stem,
-                    applied_at = datetime.now().isoformat(),
-                    checksum   = checksum,
-                    batch      = batch,
-                    success    = 1
-                )
-                mig.execute()
-                mig.commit()
+                ...
+                #
+                #
+                #
+                #
             except Exception as e:
                 self.__sqlEngine.rollback()
                 raise

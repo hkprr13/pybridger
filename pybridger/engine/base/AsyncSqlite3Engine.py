@@ -3,8 +3,6 @@ from typing         import Any
 from .SqlEngine     import SqlEngine
 from ...common      import override
 from ...common      import public
-from ...common      import private
-from ...utils       import Log
 from ...mapper      import Query 
 #-------------------------------------------------------------------------------
 class AsyncSqlite3Engine(SqlEngine):

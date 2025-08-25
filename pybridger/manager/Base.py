@@ -1,8 +1,5 @@
 #-------------------------------------------------------------------------------
 from typing     import Any
-from ..engine   import Sqlite3Engine
-from ..engine   import MySqlEngine
-from ..engine   import PostgreSqlEngine
 from ..common   import public
 from ..config   import Config
 from ..mapper   import Query
@@ -23,7 +20,7 @@ class Base:
     #---------------------------------------------------------------------------
     @property
     @public
-    def sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+    def sqlEngine(self) -> Any:
         """
         Setting SQL engine
         Returns:

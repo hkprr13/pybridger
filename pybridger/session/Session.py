@@ -2,9 +2,6 @@
 from typing     import Any
 from ..config   import Config
 from ..common   import private
-from ..engine   import Sqlite3Engine
-from ..engine   import MySqlEngine
-from ..engine   import PostgreSqlEngine
 from ..errors   import EngineUndefinedError
 #-------------------------------------------------------------------------------
 class Session:
@@ -13,7 +10,7 @@ class Session:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+    def __sqlEngine(self) -> Any:
         engine = Config.sqlEngine
         if engine is None:
             raise  EngineUndefinedError()

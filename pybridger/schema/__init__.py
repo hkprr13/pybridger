@@ -25,11 +25,11 @@ from .datatypes             import Year
 # Fixed point types
 from .datatypes             import Decimal
 from .datatypes             import Numeric
-# Flotting point types
+# Floating point types
 from .datatypes             import Double
 from .datatypes             import Float
 from .datatypes             import Real
-# Getometry types
+# Geometry types
 from .datatypes             import Box
 from .datatypes             import Circle
 from .datatypes             import Line
@@ -60,13 +60,14 @@ from .datatypes             import TinyBlob
 from .datatypes             import TinyText
 from .datatypes             import VarBinary
 from .datatypes             import VarChar
-# Fileds
-from .filed                 import BoolFiled
-from .filed                 import DateTimeFiled
-from .filed                 import FloatFiled
-from .filed                 import IntFiled
-from .filed                 import StrFiled
-from .filed                 import TimeFiled
+# Fields
+from .field                 import BoolField
+from .field                 import DateTimeField
+from .field                 import Field
+from .field                 import FloatField
+from .field                 import IntField
+from .field                 import StrField
+from .field                 import TimeField
 # Index
 from .index                 import Index
 # Trigger
@@ -88,9 +89,9 @@ __all__ = [
     "Date", "DateTime", "Time", "TimeStamp", "Year",
     # Fixed point types
     "Decimal", "Numeric",
-    # Flotting point types
+    # Floating point types
     "Double", "Float", "Real",
-    # Getometry types
+    # Geometry types
     "Box", "Circle", "Line", "Lseg", "Path", "Point", "Polygon",
     # Integer types
     "BigInt", "Integer", "MediumInt", "SmallInt", "TinyInt",
@@ -100,9 +101,9 @@ __all__ = [
     "Binary", "Blob", "Char", "Enum", "LongBlob",
     "LongText", "MediumBlob", "MediumText", "Set",
     "Text", "TinyBlob", "TinyText", "VarBinary", "VarChar",
-    # Fileds
-    "BoolFiled", "DateTimeFiled", "FloatFiled",
-    "IntFiled", "StrFiled", "TimeFiled",
+    # Fields
+    "BoolField", "DateTimeField", "Field", "FloatField",
+    "IntField", "StrField", "TimeField",
     # Index
     "Index",
     # Trigger

@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-from .Filed      import Filed
+from .Field      import Field
 from ..datatypes import Text 
 #-------------------------------------------------------------------------------
-class StrFiled(Filed):
+class StrField(Field):
     """
-    Define String Filed
+    Define String Field
     """
     def __init__(
             self,

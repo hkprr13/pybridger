@@ -1,5 +1,5 @@
 #-------------------------------------------------------------------------------
-from sysntaxelement     import SysntaxElement
+from ..sysntaxelement     import SysntaxElement
 #-------------------------------------------------------------------------------
 class Constraint(SysntaxElement):
     """

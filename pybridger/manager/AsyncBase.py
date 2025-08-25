@@ -1,8 +1,5 @@
 #-------------------------------------------------------------------------------
 from typing     import Any
-from ..engine   import AsyncSqlite3Engine
-from ..engine   import AsyncMySqlEngine
-from ..engine   import AsyncPostgreSqlEngine
 from ..common   import public
 from ..config   import Config
 from ..mapper   import Query
@@ -25,7 +22,7 @@ class AsyncBase:
     @public
     def sqlEngine(
             self
-        ) -> AsyncSqlite3Engine | AsyncMySqlEngine | AsyncPostgreSqlEngine:
+        ) -> Any:
         """
         Setting SQL engine
         Returns:

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-from test.test_dataclasses import Any
-from ..Base import Base
+from typing     import Any
+from ..Base     import Base
 #-------------------------------------------------------------------------------
 class GroupBy(Base):
     """

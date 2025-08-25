@@ -1,7 +1,5 @@
 #-------------------------------------------------------------------------------
-from ..engine       import MySqlEngine
-from ..engine       import PostgreSqlEngine
-from ..engine       import Sqlite3Engine
+from typing         import Any
 from ..common       import private
 from ..common       import public
 from ..config       import Config
@@ -23,7 +21,7 @@ class DDL:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+    def __sqlEngine(self) -> Any:
         """
         Setting SQL engine
         """

@@ -2,17 +2,11 @@
 import csv
 from typing         import cast
 from typing         import Any
-
-from pybridger.pybridger.mapper import Query
-
-
-from ...engine      import Sqlite3Engine
-from ...engine      import MySqlEngine
-from ...engine      import PostgreSqlEngine
 from ...common      import public
 from ...common      import private
 from ...config      import Config
 from ...model       import Model
+from ...mapper      import Query
 from ...errors      import EngineUndefinedError
 from ...errors      import DatabaseUndefinedError
 #-------------------------------------------------------------------------------
@@ -26,11 +20,11 @@ class CSV:
     #---------------------------------------------------------------------------
     @property
     @public
-    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+    def __sqlEngine(self) -> Any:
         """
         Setting SQL engine
         Returns:
-             Sqlite3Engine | MySqlEngine | PostgreSqlEngine : engine object
+             Any : engine object
         """
         engine = Config.sqlEngine
         if engine is None:
@@ -175,7 +169,7 @@ class CSV:
                 l += "isAutoIncrement = False, "
             default = col[4]
             if default:
-                l += f"Defalut('{default}'), "
+                l += f"Default('{default}'), "
             notNull = col[5]
             if notNull.lower() == "true":
                 l += "notNull = NotNull(True), "
@@ -305,7 +299,7 @@ class CSV:
     #---------------------------------------------------------------------------
     @private
     def __getTableColumns(self) -> list[Any]:
-        if isinstance(self.__sqlEngine, MySqlEngine):
+        if self.__sqlEngine == Config.mySqlEngine:
             query = f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS " \
                   + f"WHERE TABLE_SCHEMA = {self.__sqlEngine.PLACEHOLDER}" \
                   + f"AND TABLE_NAME = {self.__sqlEngine.PLACEHOLDER};"
@@ -313,7 +307,7 @@ class CSV:
             cur.execute(query, (self.database, self.__tableName))
             rows = cast(list[dict[str, Any]], cur.fetchall())
             return [row["COLUMN_NAME"] for row in rows]
-        elif isinstance(self.__sqlEngine, Sqlite3Engine):
+        elif self.__sqlEngine == Config.sqlite3Engine:
             query = f"PRAGMA table_info({self.__tableName});"
             cur = self.__sqlEngine.cursor()
             cur.execute(query)

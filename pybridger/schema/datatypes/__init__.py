@@ -10,11 +10,11 @@ from .datetimetypes         import Year
 # Fixed point types
 from .fixedpointtypes       import Decimal
 from .fixedpointtypes       import Numeric
-# Flotting point types
+# Floating point types
 from .floattingpointtypes   import Double
 from .floattingpointtypes   import Float
 from .floattingpointtypes   import Real
-# Getometry types
+# Geometry types
 from .geometrytypes         import Box
 from .geometrytypes         import Circle
 from .geometrytypes         import Line
@@ -53,9 +53,9 @@ __all__ = [
     "Date", "DateTime", "Time", "TimeStamp", "Year",
     # Fixed point types
     "Decimal", "Numeric",
-    # Flotting point types
+    # Floating point types
     "Double", "Float", "Real",
-    # Getometry types
+    # Geometry types
     "Box", "Circle", "Line", "Lseg", "Path", "Point", "Polygon",
     # Integer types
     "BigInt", "Integer", "MediumInt", "SmallInt", "TinyInt",

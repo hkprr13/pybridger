@@ -1,12 +1,12 @@
 #-------------------------------------------------------------------------------
-from .base      import MySqlEngine      # MySQL
-from .base      import Sqlite3Engine    # Sqlite3
-from .base      import PostgreSqlEngine # PostgreSQL
-from ..common   import public           # パブリックメソッド
-from ..column   import Column           # カラムクラス
-from ..model    import Model            # モデルクラス
-from ..manager  import Select           # SELECT句クラス
-from ..config   import Config           # コンフィグクラス
+from .base      import MySqlEngine     
+from .base      import Sqlite3Engine  
+from .base      import PostgreSqlEngine 
+from ..common   import public 
+from ..schema   import Column
+from ..model    import Model
+from ..manager  import Select 
+from ..config   import Config
 #-------------------------------------------------------------------------------
 class Engine:
     """
@@ -94,20 +94,6 @@ class Engine:
         トランザクションをコミットする
         """
         self.sqlEngine.commit()
-    #---------------------------------------------------------------------------
-    @public
-    def connectOpen(self) -> None:
-        """
-        データベース接続を開始する
-        """
-        self.sqlEngine.connectOpen()
-    #---------------------------------------------------------------------------
-    @public
-    def connectClose(self) -> None:
-        """
-        データベース接続を閉じる
-        """
-        self.sqlEngine.connectClose()
     #---------------------------------------------------------------------------
     @public
     def select(

@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-from .Filed      import Filed   # 基底クラス
+from .Field      import Field   # 基底クラス
 from ..datatypes import Integer # 整数型
 #-------------------------------------------------------------------------------
-class IntFiled(Filed):
+class IntField(Field):
     """
-    Define integer filed
+    Define integer field
     """
     def __init__(
             self,

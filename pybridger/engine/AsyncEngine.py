@@ -1,12 +1,9 @@
 #-------------------------------------------------------------------------------
-from .base      import AsyncMySqlEngine         # 非同期MySQL
-from .base      import AsyncSqlite3Engine       # 非同期Sqlite3
-from .base      import AsyncPostgreSqlEngine    # 非同期PostgreSQL
-from ..common   import public                   # パブリックメソッド
-from ..schema   import Column                   # カラムクラス
-from ..model    import Model                    # モデルクラス
-from ..manager  import Select                   # SELECT句クラス
-from ..config   import Config                   # コンフィグクラス
+from .base      import AsyncMySqlEngine
+from .base      import AsyncSqlite3Engine
+from .base      import AsyncPostgreSqlEngine
+from ..common   import public
+from ..config   import Config
 #-------------------------------------------------------------------------------
 class AsyncEngine:
     """

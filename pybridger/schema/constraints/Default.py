@@ -12,10 +12,10 @@ class Default(Constraint):
         """
         Initialize default constraint object
         Args:
-            value (str | int | float | bool) : defalut value
+            value (str | int | float | bool) : default value
         Examples:
             ```
-            Defalut(1)
+            Default(1)
             ```
         """
         self.__value = value

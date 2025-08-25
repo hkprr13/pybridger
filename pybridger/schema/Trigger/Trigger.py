@@ -1,8 +1,5 @@
 #-------------------------------------------------------------------------------
-from typing import Any
-from ...engine      import MySqlEngine
-from ...engine      import Sqlite3Engine
-from ...engine      import PostgreSqlEngine
+from typing         import Any
 from ...common      import private
 from ...common      import public
 from ...config      import Config
@@ -37,7 +34,7 @@ class Trigger:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+    def __sqlEngine(self) -> Any:
         engine = Config.sqlEngine
         if engine is None:
             raise EngineUndefinedError()

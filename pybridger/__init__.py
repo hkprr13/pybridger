@@ -34,11 +34,11 @@ from .schema             import Year
 # Fixed point types
 from .schema             import Decimal
 from .schema             import Numeric
-# Flotting point types
+# Floating point types
 from .schema             import Double
 from .schema             import Float
 from .schema             import Real
-# Getometry types
+# Geometry types
 from .schema             import Box
 from .schema             import Circle
 from .schema             import Line
@@ -69,13 +69,13 @@ from .schema             import TinyBlob
 from .schema             import TinyText
 from .schema             import VarBinary
 from .schema             import VarChar
-# Fileds
-from .schema             import BoolFiled
-from .schema             import DateTimeFiled
-from .schema             import FloatFiled
-from .schema             import IntFiled
-from .schema             import StrFiled
-from .schema             import TimeFiled
+# Fields
+from .schema             import BoolField
+from .schema             import DateTimeField
+from .schema             import FloatField
+from .schema             import IntField
+from .schema             import StrField
+from .schema             import TimeField
 # Index
 from .schema            import Index
 # Trigger
@@ -114,9 +114,9 @@ __all__ = [
     "Date", "DateTime", "Time", "TimeStamp", "Year",
     # Fixed point types
     "Decimal", "Numeric",
-    # Flotting point types
+    # Floating point types
     "Double", "Float", "Real",
-    # Getometry types
+    # Geometry types
     "Box", "Circle", "Line", "Lseg", "Path", "Point", "Polygon",
     # Integer types
     "BigInt", "Integer", "MediumInt", "SmallInt", "TinyInt",
@@ -126,9 +126,9 @@ __all__ = [
     "Binary", "Blob", "Char", "Enum", "LongBlob",
     "LongText", "MediumBlob", "MediumText", "Set",
     "Text", "TinyBlob", "TinyText", "VarBinary", "VarChar",
-    # Fileds
-    "BoolFiled", "DateTimeFiled", "FloatFiled",
-    "IntFiled", "StrFiled", "TimeFiled",
+    # Fields
+    "BoolField", "DateTimeField", "FloatField",
+    "IntField", "StrField", "TimeField",
     # Index
     "Index",
     # Trigger

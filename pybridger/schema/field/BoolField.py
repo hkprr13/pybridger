@@ -1,11 +1,11 @@
 #-------------------------------------------------------------------------------
-from .Filed             import Filed 
+from .Field             import Field 
 from ..datatypes        import Boolean
 from ...common          import private
 #-------------------------------------------------------------------------------
-class BoolFiled(Filed):
+class BoolField(Field):
     """
-    Defile bool filed ckass
+    Defile bool field ckass
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -17,7 +17,7 @@ class BoolFiled(Filed):
         Initialization of the boolean column definition class
         Args:
             isNotNull  (bool)        : Whether to enable the NotNull constraint
-            defalut    (bool | None) : Whether to set a default value 
+            default    (bool | None) : Whether to set a default value 
                                      : None means unspecified,
                                      : True means the default value is True,
                                      : Flase means the default value is False
@@ -34,9 +34,9 @@ class BoolFiled(Filed):
         )
     #---------------------------------------------------------------------------
     @private
-    def __setDefalut(self, defalut) -> None | str:
-        if defalut is None:
+    def __setDefalut(self, default) -> None | str:
+        if default is None:
             return None
         else:
-            return str(defalut)
+            return str(default)
 #-------------------------------------------------------------------------------

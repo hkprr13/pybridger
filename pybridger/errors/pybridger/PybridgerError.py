@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
 import sys
-from typing             import Literal
+from typing import Literal
 #-------------------------------------------------------------------------------
-def custom_excepthook(exc_type, exc_value, traceback):
-    print(f"{exc_type.__name__}: {exc_value}")
-sys.excepthook = custom_excepthook
+# def custom_excepthook(exc_type, exc_value, traceback):
+#     print(f"{exc_type.__name__}: {exc_value}")
+# sys.excepthook = custom_excepthook
 #-------------------------------------------------------------------------------
 class PyBridgerError(Exception):
     def __init__(self) -> None:

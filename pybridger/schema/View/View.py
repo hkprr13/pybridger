@@ -1,8 +1,6 @@
 #-------------------------------------------------------------------------------
 import csv
-from ...engine      import MySqlEngine
-from ...engine      import Sqlite3Engine
-from ...engine      import PostgreSqlEngine
+from typing import Any
 from ...common      import private 
 from ...common      import public
 from ...config      import Config
@@ -37,7 +35,7 @@ class View:
     #---------------------------------------------------------------------------
     @property
     @private
-    def __sqlEngine(self) -> Sqlite3Engine | MySqlEngine | PostgreSqlEngine:
+    def __sqlEngine(self) -> Any:
         """
         Setting SQL engine
         """
@@ -87,22 +85,22 @@ class View:
         selectSql = self.__bulidSelectQuery()
         if replace == True:
             query += "OR REPLACE "
-        # CREATE VIEW viewName AS SELECT id, name FROM User WHWRE age >= 10
+        # CREATE VIEW viewName AS SELECT id, name FROM User WHERE age >= 10
         query += f"VIEW {self.__viewName} AS {selectSql} " 
         # オプション句の構築
-        withClaises = []
+        withClauses = []
         if checkOption:
-            withClaises.append("CHECK OPTION")
+            withClauses.append("CHECK OPTION")
         if localCheckOption:
-            withClaises.append("LOCAL CHECK OPTION")
+            withClauses.append("LOCAL CHECK OPTION")
         if cascadedCheckOption:
-            withClaises.append("CASCADED CHECK OPTION")
+            withClauses.append("CASCADED CHECK OPTION")
         if securityDefiner:
-            withClaises.append("SECURITY DEFINER")
+            withClauses.append("SECURITY DEFINER")
         if readOnly:
-            withClaises.append("READ ONLY")
-        if withClaises:
-            query += f"WITH {' '.join(withClaises)}"
+            withClauses.append("READ ONLY")
+        if withClauses:
+            query += f"WITH {' '.join(withClauses)}"
             query += ";"
         else:
             query = query[:-1] + ";" 

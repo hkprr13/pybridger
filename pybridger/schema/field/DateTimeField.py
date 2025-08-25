@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-from .Filed      import Filed
+from .Field      import Field
 from ..datatypes import DateTime
 #-------------------------------------------------------------------------------
-class DateTimeFiled(Filed):
+class DateTimeField(Field):
     """
-    Define date time filed class
+    Define date time field class
     """
     def __init__(
             self,
@@ -15,7 +15,7 @@ class DateTimeFiled(Filed):
         """
         Initialization of time-type column definition classes
         Args:
-            defalut    (str | None) : Whether to set a default value 
+            default    (str | None) : Whether to set a default value 
             check      (str | None) : Whether to set a check value 
             foreignKey (str | None) : Specifies the foreign key constraint
         """

@@ -1,10 +1,10 @@
 #-------------------------------------------------------------------------------
-from .Filed      import Filed
+from .Field      import Field
 from ..datatypes import Float
 #-------------------------------------------------------------------------------
-class FloatFiled(Filed):
+class FloatField(Field):
     """
-    Define floating point filed class
+    Define floating point field class
     """
     def __init__(
             self,
@@ -20,7 +20,7 @@ class FloatFiled(Filed):
             M          (int)        : decimal digits
             D          (int | None) : scale
             check      (str | None) : Whether to set a check value
-            defalut    (str | None) : Whether to set a default value 
+            default    (str | None) : Whether to set a default value 
             foreignKey (str | None) : Specifies the foreign key constraint
         """
         super().__init__(

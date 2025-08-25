@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-from ..schema import Column # カラムクラス
-from ..schema import Filed  # カラムクラス(フィールド)
+from ..schema import Column
+from ..schema import Field
 #-------------------------------------------------------------------------------
 class ModelMeta(type):
     """
@@ -13,7 +13,7 @@ class ModelMeta(type):
         columns = []
         for key, value in namespace.items():
             # Column class or field class
-            if isinstance(value, Column) or isinstance(value, Filed):
+            if isinstance(value, Column) or isinstance(value, Field):
                 value.columnName = key       # Set attribute names for column names
                 value.tableName  = name      # Set the class name for the table name
                 columns.append({key: value}) # Save in dictionary format
