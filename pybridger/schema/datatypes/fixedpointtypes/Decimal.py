@@ -3,6 +3,7 @@ from typing                     import Any
 from .FixedPointType            import FixedPointType
 from ....common                 import override
 from ....common                 import private
+from ....common                 import public
 from ....mapper                 import Query
 #-------------------------------------------------------------------------------
 class Decimal(FixedPointType):
@@ -55,7 +56,7 @@ class Decimal(FixedPointType):
         """
         return Query(f"DECIMAL")
     #---------------------------------------------------------------------------
-    @private
+    @public
     def __buildPostgreSqlQuery(self) -> Query:
         """
         Build query by PostgreSQL
@@ -65,17 +66,17 @@ class Decimal(FixedPointType):
         return Query(f"DECIMAL({self.M}, {self.D})")
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query : Any = self.__buildMySqlQuery()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query : Any = self.__buildSqlite3()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query : Any = self.__buildPostgreSqlQuery()
 #-------------------------------------------------------------------------------

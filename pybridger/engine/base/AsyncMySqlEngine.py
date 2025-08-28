@@ -11,6 +11,7 @@ class AsyncMySqlEngine(SqlEngine):
     """
     Asynchronous MySQL engine class
     """
+    __name__    : str = "AsyncMySqlEngine"
     PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
     def __init__(

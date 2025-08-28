@@ -9,7 +9,6 @@ class ModelMeta(type):
         # The model itself does not require columns.
         if name == "Model":
             return super().__new__(mcs, name, bases, namespace)
-        # カラムを自動登録
         columns = []
         for key, value in namespace.items():
             # Column class or field class

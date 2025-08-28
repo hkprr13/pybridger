@@ -28,7 +28,15 @@ class SqlEngine:
         """Implement in the inheritance destination"""
     #---------------------------------------------------------------------------
     @public
+    def executeScript(self) -> None:
+        """Implement in the inheritance destination"""
+    #---------------------------------------------------------------------------
+    @public
     def commit(self) -> None: 
+        """Implement in the inheritance destination"""
+    #---------------------------------------------------------------------------
+    @public
+    def close(self) -> None: 
         """Implement in the inheritance destination"""
     #---------------------------------------------------------------------------
     @public

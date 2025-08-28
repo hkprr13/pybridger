@@ -48,14 +48,15 @@ class SysntaxElement:
     def toQuery(self) -> Any:
         # Check engine
         self.checkSettingEngine()
+        name = self.sqlEngine.__name__
         # MySQL
-        if self.sqlEngine == Config.mySqlEngine:
+        if  name == "MySqlEngine":
             self.mysql()
         # Sqlite3
-        elif self.sqlEngine == Config.sqlite3Engine:
+        elif name == "Sqlite3Engine":
             self.sqlite3()
         # PostgreSQL
-        elif self.sqlEngine == Config.postgreSqlEngine:
+        elif name == "PostgreSqlEngine":
             self.postgresql()
         # Other
         else:

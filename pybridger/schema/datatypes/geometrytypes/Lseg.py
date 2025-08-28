@@ -2,7 +2,7 @@
 from typing         import Any
 from .GeometryType  import GeometryType
 from ....common     import override
-from ....common     import private
+from ....common     import public
 from ....mapper     import Query
 #-------------------------------------------------------------------------------
 class Lseg(GeometryType):
@@ -35,17 +35,17 @@ class Lseg(GeometryType):
         self.y2 = y2
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query : Any = Query(
             f"Lseg(({self.x1}, {self.y1}), ({self.x2}, {self.y2}))"

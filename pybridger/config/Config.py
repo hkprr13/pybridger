@@ -36,11 +36,4 @@ class Config:
                    | None = None
     # database
     database : str | None = None
-    # Engines
-    sqlite3Engine           : Sqlite3Engine
-    mySqlEngine             : MySqlEngine
-    postgreSqlEngine        : PostgreSqlEngine
-    asyncSqlite3Engine      : AsyncSqlite3Engine
-    asyncMySqlEngine        : AsyncMySqlEngine
-    asyncPostgreSqlEngine   : AsyncPostgreSqlEngine
 #-------------------------------------------------------------------------------

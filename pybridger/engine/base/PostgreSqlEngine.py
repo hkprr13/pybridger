@@ -11,6 +11,7 @@ class PostgreSqlEngine(SqlEngine):
     """
     Defined PostgreSQL engine class
     """
+    __name__    : str = "PostgreSqlEngine"
     PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
     def __init__(
@@ -25,23 +26,19 @@ class PostgreSqlEngine(SqlEngine):
         """
         Initialize PostgreSQL engine class
         Args:
-            logFile      (str | None) : ログファイル名
             hostName     (str)        : host
             userName     (str)        : user name
             password     (str)        : password
             databaseName (str)        : database
-            port         (str)        : ポート番号
+            port         (str)        : port
             logFile      (str | None) : Specify to obtain the log file.
         """
         super().__init__()
-        # インスタンス変数
         self.hostName     = hostName
         self.userName     = userName
         self.password     = password
         self.databaseName = databaseName
         self.port         = port
-        # インスタンス変数,(オブジェクト)
-        # インスタンスされたタイミングでインポートを行う
         try:
             import psycopg
             self.sqlEngine  = psycopg
@@ -51,10 +48,8 @@ class PostgreSqlEngine(SqlEngine):
                 "Please execute the following in Terminal\n"
                 "pip install psycopg[binary]"
             )
-        # コネクトオブジェクトとカーソルオブジェクトの初期化
         self.conn = None
         self.cur  = None
-        # ログの初期設定
         self.setLog(logFile)
    #---------------------------------------------------------------------------
     @override
@@ -79,7 +74,7 @@ class PostgreSqlEngine(SqlEngine):
             )
             return self.conn
         except Exception as e:
-            msg = "データベースの接続に失敗しました"
+            msg = "Database connection failed"
             self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------

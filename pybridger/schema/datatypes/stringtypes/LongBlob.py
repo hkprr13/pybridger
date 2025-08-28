@@ -2,7 +2,7 @@
 from typing         import Any
 from .StringType    import StringType
 from ....common     import override
-from ....common     import private
+from ....common     import public
 from ....mapper     import Query
 #-------------------------------------------------------------------------------
 class LongBlob(StringType):
@@ -24,17 +24,17 @@ class LongBlob(StringType):
         super().__init__()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query : Any = Query("LONGBLOB")
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
 #-------------------------------------------------------------------------------

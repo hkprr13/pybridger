@@ -10,6 +10,7 @@ class Sqlite3Engine(SqlEngine):
     """
     Defined Sqlite3 engine class
     """
+    __name__    : str = "Sqlite3Engine"
     PLACEHOLDER : str = "?"
     #---------------------------------------------------------------------------
     def __init__(
@@ -130,6 +131,25 @@ class Sqlite3Engine(SqlEngine):
     #---------------------------------------------------------------------------
     @override
     @public
+    def executeScript(self, sqlFile : str) -> None:
+        """
+        Execute sql file script
+        Args:
+            sqlFile (str): .sql file
+        Raises:
+            Exception: If the SQL file failed
+        """
+        try:
+            with open(sqlFile, "r", encoding = "utf-8") as f:
+                sqlScript = f.read()
+            self.cursor().executescript(sqlScript)
+        except Exception as e:
+            msg  = "Failed to execute SQL file"       
+            self.logError(msg)
+            raise Exception(f"{msg}: {e}")
+    #---------------------------------------------------------------------------
+    @override
+    @public
     def commit(self) -> None:
         """
         Commit the transaction
@@ -143,6 +163,22 @@ class Sqlite3Engine(SqlEngine):
             msg = "Rollback performed due to failed commit"
             self.logError(msg)
             self.rollback()
+            raise Exception(f"{msg}: {e}")
+    #---------------------------------------------------------------------------
+    @override
+    @public
+    def close(self) -> None:
+        """
+        Close the connection
+        Raises:
+            Exception: If closing the connection fails
+        """
+        try:
+            if self.conn:
+                self.conn.close()
+        except Exception as e:
+            msg = "Close failed"
+            self.logError(msg)
             raise Exception(f"{msg}: {e}")
     #---------------------------------------------------------------------------
     @override
@@ -181,12 +217,13 @@ class Sqlite3Engine(SqlEngine):
     @public
     def fetchall(self) -> list[Any] | None:
         """
-        Rollback
-        Raises:
-            Exception : If the rollback fails
+        Fetch a single row from the last executed query
+        Returns:
+            Any | None : single record or None if no data
         """
-        if not self.cur is None:
+        if self.cur:
             return self.cur.fetchall()
+        return None
     #---------------------------------------------------------------------------
     @override
     @public

@@ -1,7 +1,8 @@
 #-------------------------------------------------------------------------------
-from .DateTimeType      import DateTimeType         # 日時型
-from ....common         import override             # オーバライドデコレーター
-from ....mapper         import Query                # クエリクラス
+from .DateTimeType      import DateTimeType
+from ....common         import override
+from ....common         import public
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class Year(DateTimeType):
     """
@@ -10,18 +11,21 @@ class Year(DateTimeType):
     """
     #---------------------------------------------------------------------------
     @override
+    @public
     def mysql(self) -> None:
         self.query  = Query(f"YEAR")
         self.format = "YYYY"
         self.range  = "1901~2155"
     #---------------------------------------------------------------------------
     @override
+    @public
     def sqlite3(self) -> None:
         self.query  = self.TEXTNOTSUPPORTED
         self.format = self.TEXTNOTSUPPORTED
         self.range  = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
+    @public
     def postgresql(self) -> None:
         self.query  = self.TEXTNOTSUPPORTED
         self.format = self.TEXTNOTSUPPORTED

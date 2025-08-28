@@ -9,6 +9,7 @@ class AsyncSqlite3Engine(SqlEngine):
     """
     Asynchronous Sqlite3 engine class
     """
+    __name__    : str = "AsyncSqlite3Engine"
     PLACEHOLDER : str = "?"
     #---------------------------------------------------------------------------
     def __init__(

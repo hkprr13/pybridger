@@ -1,8 +1,9 @@
 #-------------------------------------------------------------------------------
-from .DateTimeType      import DateTimeType         # 日時型
-from ....common         import override             # オーバライドデコレーター
-from ....common         import private              # プライベートデコレーター
-from ....mapper         import Query                # クエリクラス
+from .DateTimeType      import DateTimeType
+from ....common         import override
+from ....common         import private    
+from ....common         import public
+from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class TimeStamp(DateTimeType):
     """
@@ -36,18 +37,21 @@ class TimeStamp(DateTimeType):
         return Query(query)
     #---------------------------------------------------------------------------
     @override
+    @public
     def mysql(self) -> None:
         self.query  = Query(f"TIMESTAMP({self.__precision})")
         self.format = self.__setFormat()
         self.range  = "1970-01-01 00:00:01 UTC~2038-01-19 03:14:07 UTC"
     #---------------------------------------------------------------------------
     @override
+    @public
     def sqlite3(self) -> None:
         self.query  = self.TEXTNOTSUPPORTED
         self.format = self.TEXTNOTSUPPORTED
         self.range  = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
+    @public
     def postgresql(self) -> None:
         self.query  = self.__setPostgresqlQuery()
         self.format = self.__setFormat()

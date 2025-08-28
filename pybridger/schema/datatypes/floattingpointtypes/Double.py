@@ -3,6 +3,7 @@ from typing                     import Any
 from .FloatingPointDataType     import FloatingPointDataType
 from ....common                 import override
 from ....common                 import private
+from ....common                 import public
 from ....mapper                 import Query
 #-------------------------------------------------------------------------------
 class Double(FloatingPointDataType):
@@ -82,17 +83,17 @@ class Double(FloatingPointDataType):
         return Query(query)
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query : Any = self.__buildMySqlQuery()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query : Any = self.__buildSqlite3()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query : Any = self.__buildPostgreSqlQuery()
 #-------------------------------------------------------------------------------

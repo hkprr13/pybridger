@@ -2,7 +2,7 @@
 from typing         import Any
 from .GeometryType  import GeometryType
 from ....common     import override
-from ....common     import private
+from ....common     import public
 from ....mapper     import Query
 #-------------------------------------------------------------------------------
 class Point(GeometryType):
@@ -30,19 +30,19 @@ class Point(GeometryType):
         self.y = y
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query : Any = Query(
             f"POINT({self.x, self.y})"
         )
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query : Any = Query(
             f"POINT({self.x, self.y})"

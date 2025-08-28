@@ -86,7 +86,12 @@ from .schema             import View
 # Models
 from .model             import Model
 from .model             import AsyncModel
-
+#-------------------------------------------------------------------------------
+# Relationships
+from .relationship      import ManyToMany
+from .relationship      import ManyToOne
+from .relationship      import OneToMany
+from .relationship      import OneToOne
 #-------------------------------------------------------------------------------
 # Session
 from .session           import Session
@@ -137,6 +142,8 @@ __all__ = [
     "View",
     # Models
     "Model", "AsyncModel",
+    # Relationships
+    "ManyToMany", "OneToMany", "OneToOne", "ManyToOne",
     # Session
     "Session",
     # CSV

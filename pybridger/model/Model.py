@@ -40,6 +40,8 @@ class Model(metaclass = ModelMeta):
     """
     tableName : str
     columns   : list[dict[str, Column]]
+    __tableName__ : str 
+    __relation__  : dict
     #---------------------------------------------------------------------------
     @classmethod
     @private

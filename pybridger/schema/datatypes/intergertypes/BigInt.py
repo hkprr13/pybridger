@@ -2,7 +2,7 @@
 from typing             import Any
 from .IntegerType       import IntegerType
 from ....common         import override
-from ....common         import private
+from ....common         import public
 from ....mapper         import Query
 #-------------------------------------------------------------------------------
 class BigInt(IntegerType):
@@ -22,7 +22,7 @@ class BigInt(IntegerType):
         super().__init__()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query                : Any = Query("BIGINT")
         self.storage              : Any =                          8
@@ -32,7 +32,7 @@ class BigInt(IntegerType):
         self.minimumUnsignedValue : Any = 18_446_744_073_709_551_615
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query                : Any = Query("INTEGER")
         self.storage              : Any = self.TEXTNOTSUPPORTED
@@ -42,7 +42,7 @@ class BigInt(IntegerType):
         self.minimumUnsignedValue : Any = self.TEXTNOTSUPPORTED
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query                : Any = Query("BIGINT")
         self.storage              : Any =                          8

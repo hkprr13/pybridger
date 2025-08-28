@@ -58,7 +58,6 @@ class Column:
             ```
             
         """
-
         # private attributes
         self.__dataType        = dataType
         self.__isPrimaryKey    = isPrimaryKey

@@ -11,6 +11,7 @@ class AsyncPostgreSqlEngine(SqlEngine):
     """
     Asynchronous PostgreSQL engine class
     """
+    __name__    : str = "AsyncPostgreSqlEngine"
     PLACEHOLDER : str = "%s"
     #---------------------------------------------------------------------------
     def __init__(

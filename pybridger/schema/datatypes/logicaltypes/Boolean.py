@@ -2,7 +2,7 @@
 from typing         import Any
 from .LogicalType   import LogicalType
 from ....common     import override
-from ....common     import private
+from ....common     import public
 from ....mapper     import Query
 #-------------------------------------------------------------------------------
 class Boolean(LogicalType):
@@ -22,17 +22,17 @@ class Boolean(LogicalType):
         super().__init__()
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def mysql(self) -> None:
         self.query : Any = Query("BOOLEAN")
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def sqlite3(self) -> None:
         self.query : Any = Query("BOOLEAN")
     #---------------------------------------------------------------------------
     @override
-    @private
+    @public
     def postgresql(self) -> None:
         self.query : Any = Query("BOOLEAN")
 #-------------------------------------------------------------------------------
