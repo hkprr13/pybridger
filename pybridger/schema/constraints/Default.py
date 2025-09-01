@@ -42,13 +42,13 @@ class Default(Constraint):
     #---------------------------------------------------------------------------
     @override
     def mysql(self) -> None:
-        self.query  = Query(self.__buildDefaultQuery())
+        self.query  = self.__buildDefaultQuery()
     #---------------------------------------------------------------------------
     @override
     def sqlite3(self) -> None:
-        self.query  = Query(self.__buildDefaultQuery())
+        self.query  = self.__buildDefaultQuery()
     #---------------------------------------------------------------------------
     @override
     def postgresql(self) -> None:
-        self.query  = Query(self.__buildDefaultQuery())
+        self.query  = self.__buildDefaultQuery()
 #-------------------------------------------------------------------------------

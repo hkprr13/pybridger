@@ -1,4 +1,5 @@
 #-------------------------------------------------------------------------------
+from turtle import pen
 from typing import Any
 from ..datatypes    import DataType
 from ..constraints  import AutoIncrement
@@ -77,7 +78,6 @@ class Column:
         self.defaultQuery         : Query = self.__buildDefaultQuery()
         self.checkQuery           : Query = self.__buildCheckQuery()
         self.tableLevelCheckQuery : Query = self.__buildTableLevelCheckQuery()
-        self.foreignKeyQuery      : Query = self.__buildForeignKeyQuery()
         # public attributes (column name & table name)
         self.columnName : str
         self.tableName  : str 
@@ -194,7 +194,7 @@ class Column:
             return Query("")
     #---------------------------------------------------------------------------
     @private
-    def __buildForeignKeyQuery(self) -> Query:
+    def buildForeignKeyQuery(self) -> Query:
         """
         private method
         build query for foreign key constraints
@@ -202,12 +202,39 @@ class Column:
             Query : query object
         """
         if self.__foreignKey:
-            return self.__foreignKey.toQuery()
+            self.referencedTable  = self.__foreignKey.referencedTable
+            self.referencedColumn = self.__foreignKey.referencedColumn
+            self.__foreignKey.toQuery()
+            self.__foreignKey.setColumn(self.columnName)
+            return self.__foreignKey.query
         else:
             return Query("")
     #---------------------------------------------------------------------------
     @public
-    def toQuery(self):
+    def buildCreateQuery(self) -> Query:
+        """
+        """
+        parts = []
+        parts.append(self.columnName)
+        parts.append(self.dataTypeQuery.sql)
+        if self.primaryKeyQuery.sql:
+            parts.append(self.primaryKeyQuery.sql)
+        if self.autoIncrementQuery.sql:
+            parts.append(self.autoIncrementQuery.sql)
+        if self.notNullQuery.sql:
+            parts.append(self.notNullQuery.sql)
+        if self.defaultQuery.sql:
+            parts.append(self.defaultQuery.sql)
+        if self.checkQuery.sql:
+            parts.append(self.checkQuery.sql)
+        if self.tableLevelCheckQuery.sql:
+            parts.append(self.tableLevelCheckQuery.sql)
+        if self.buildForeignKeyQuery().sql:
+            parts.append(self.buildForeignKeyQuery().sql)
+        return Query(" ".join(parts))
+    #---------------------------------------------------------------------------
+    @public
+    def toQuery(self) -> tuple[str, list]:
         if hasattr(self, "tableName") and hasattr(self, "columnName"):
             query = f"{self.tableName}.{self.columnName}"
         else:
@@ -215,22 +242,22 @@ class Column:
         return query, []
     #---------------------------------------------------------------------------
     @public
-    def like(self, value):
+    def like(self, value) -> Condition:
         """LINK operator"""
         return Condition(self.tableName, self.columnName, "LIKE", value)
     #---------------------------------------------------------------------------
     @public
-    def In (self, *values):
+    def In (self, *values) -> Condition:
         """IN operator"""
         return Condition(self.tableName, self.columnName, "IN", values)
     #---------------------------------------------------------------------------
     @public
-    def notIn (self, *values):
+    def notIn (self, *values) -> Condition:
         """NOT IN operator"""
         return Condition(self.tableName, self.columnName, "NOT IN", (values))
     #---------------------------------------------------------------------------
     @public
-    def between(self, before, after):
+    def between(self, before, after) -> Condition:
         """BETWEEN operator"""
         return Condition(
             self.tableName, self.columnName, "BETWEEN", (before, after)
@@ -239,51 +266,67 @@ class Column:
     def __str__(self) -> str:
         return self.columnName
     #---------------------------------------------------------------------------
-    def __eq__(self, value):
+    def __eq__(self, value) -> Condition:
         """
         equivalent comparison
+        Returns:
+            Condition : condition
         """
         return Condition(self.tableName, self.columnName, "=", value)
     #---------------------------------------------------------------------------
-    def __ne__(self, value):
+    def __ne__(self, value) -> Condition:
         """
         inequality comparison
+        Returns:
+            Condition : condition
         """
         return Condition(self.tableName, self.columnName, "!=", value)
     #---------------------------------------------------------------------------
-    def __lt__(self, value):
+    def __lt__(self, value) -> Condition:
         """
         less than
+        Returns:
+            Condition : condition
         """
         return Condition(self.tableName, self.columnName, "<", value)
     #---------------------------------------------------------------------------
-    def __le__(self, value):
+    def __le__(self, value) -> Condition:
         """
         Below
+        Returns:
+            Condition : condition
         """
         return Condition(self.tableName, self.columnName, "<=", value)
     #---------------------------------------------------------------------------
-    def __gt__(self, value):
+    def __gt__(self, value) -> Condition:
         """
         Greater than
+        Returns:
+            Condition : condition
         """
         return Condition(self.tableName, self.columnName, ">", value)
     #---------------------------------------------------------------------------
-    def __ge__(self, value):
+    def __ge__(self, value) -> Condition:
         """
         Above
+        Returns:
+            Condition : condition
         """
         return Condition(self.tableName, self.columnName, ">=", value)
     #---------------------------------------------------------------------------
-    def __and__(self, value):
+    def __and__(self, value) -> ConditionGroup:
         """
         AND
+        Returns:
+            Condition : condition
         """
         return ConditionGroup(self.tableName, self.columnName, "AND", value)
     #---------------------------------------------------------------------------
-    def __or__(self, value):
+    def __or__(self, value) -> ConditionGroup:
         """
         OR
+        Returns:
+            Condition : condition
         """
         return ConditionGroup(self.tableName, self.columnName, "OR", value)
 #-------------------------------------------------------------------------------

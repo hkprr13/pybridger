@@ -6,8 +6,10 @@ class ManyToOne(Relation):
     def __init__(self, target : str) -> None:
         self.__target = target
     def __call__(self, cls : type[Model]) -> type[Model]:
-        print("ManyToOne")
+        print("-----")
         print(cls.tableName)
-        print(cls.columns)
+        cls.__relation__.append(self.__target)
+        print(cls.__foreignKey__)
+        print(cls.__relation__)
         return cls
 #-------------------------------------------------------------------------------

@@ -1,6 +1,6 @@
 #-------------------------------------------------------------------------------
-from .Field      import Field   # 基底クラス
-from ..datatypes import Integer # 整数型
+from .Field      import Field
+from ..datatypes import Integer
 #-------------------------------------------------------------------------------
 class IntField(Field):
     """

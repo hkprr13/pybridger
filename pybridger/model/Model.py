@@ -1,4 +1,5 @@
 #-------------------------------------------------------------------------------
+from typing import Any
 from .ModelMeta    import ModelMeta
 from ..config      import Config
 from ..schema      import Column
@@ -40,8 +41,10 @@ class Model(metaclass = ModelMeta):
     """
     tableName : str
     columns   : list[dict[str, Column]]
-    __tableName__ : str 
-    __relation__  : dict
+    __tableName__  : str 
+    __relation__   : list
+    __foreignKey__ : list
+    __createSql__  : str
     #---------------------------------------------------------------------------
     @classmethod
     @private
@@ -51,126 +54,126 @@ class Model(metaclass = ModelMeta):
             cols += col.columnName + ", "
         return cols[:-2]
     #---------------------------------------------------------------------------
-    @classmethod
-    @private
-    def __columnsToCreateQuery(cls) -> str:
-        """
-        Convert columns to query statements.
-        Used when creating tables
-        Returns:
-            str : Create query
-        """
-        cls.__foreignKeyList = []
-        columnDefineLists    = []
-        # Add each column definition to the list
-        for cols in cls.columns:
-            columnQuery = cls.__columnsToQuery(cols)
-            columnDefineLists.append(columnQuery)
-        # If there is a foreign key, add it at the end
-        for fk in cls.__foreignKeyList:
-            columnDefineLists.append(fk)
-        return ", ".join(columnDefineLists)
-    #---------------------------------------------------------------------------
-    @classmethod
-    @private
-    def __columnsToQuery(
-            cls,
-            columns : dict[str, Column]
-        ) -> str:
-        """
-        Convert columns to a query statement.
-        Private method used only in columnsToQuery
-        Args:
-            columns (dict[str, Column]) : Columns
-        Returns:
-            str : the query statement used in the Create statement
-        """
-        columnName, columnObject = next(iter(columns.items()))
-        parts = []
-        parts.append(columnName)
-        if columnObject.dataTypeQuery.sql:
-            parts.append(columnObject.dataTypeQuery.sql)
-        if columnObject.primaryKeyQuery.sql:
-            parts.append(columnObject.primaryKeyQuery.sql)
-        if columnObject.autoIncrementQuery.sql:
-            parts.append((columnObject.autoIncrementQuery.sql))
-        if columnObject.defaultQuery.sql:
-            parts.append(columnObject.defaultQuery.sql)
-        if columnObject.uniqueQuery.sql:
-            parts.append(columnObject.uniqueQuery.sql)
-        if columnObject.notNullQuery.sql:
-            parts.append(columnObject.notNullQuery.sql)
-        # If defined, store separately
-        fk = cls.__foreignKeyToQuery(columnName, columnObject)
-        if fk:
-            cls.__foreignKeyList.append(fk)        
-        return " ".join(parts)
-    #---------------------------------------------------------------------------
-    @classmethod
-    @private
-    def __foreignKeyToQuery(
-            cls,
-            columnName : str,
-            columnObject : Column
-        ) -> str:
-        """
-        Private method that outputs foreign key constraints as a query statement
-        Args:
-            columnName   (str) : Column name.
-            cokumnObject (str) : Column object.
-        Returns:
-            fk : Query statement.
-        """
-        fk = columnObject.foreignKeyQuery.sql
-        if fk:
-            fk = fk.replace("~~~", columnName)
-        else:
-            fk = ""
-        return fk
-    #---------------------------------------------------------------------------
-    @classmethod
-    def checkDatatypes(cls) -> None:
-        print(cls.__dict__)
-    #---------------------------------------------------------------------------
-    @classmethod
-    @public
-    def createTable(cls) -> CreateTable:
-        """
-        Create a table
-        Returns:
-            CreateTable : Table creation object
-        Exemples:
-            ```
-            user = User.createTable()
-            user.execute()
-            user.commit()
-            ```
-        """
-        columns = cls.__columnsToCreateQuery()
-        return CreateTable(
-            tableName = cls.tableName,
-            columns   = columns
-        )
-    #---------------------------------------------------------------------------
-    @classmethod
-    @public
-    def createTableIfNotExists(cls) -> CreateTableIfNotExists:
-        """
-        Create a table if it does not exist
-        Returns:
-            CreateTableIfNotExists : Table creation object
-        Exemples:
-            ```
-            user = User.createTableIfNotExists()
-            user.execute()
-            user.commit()
-            ```
-        """
-        columns = cls.__columnsToCreateQuery()
-        return CreateTableIfNotExists(
-            tableName = cls.tableName,
-            columns   = columns
-        )
+    # @classmethod
+    # @private
+    # def __columnsToCreateQuery(cls) -> str:
+    #     """
+    #     Convert columns to query statements.
+    #     Used when creating tables
+    #     Returns:
+    #         str : Create query
+    #     """
+    #     cls.__foreignKeyList = []
+    #     columnDefineLists    = []
+    #     # Add each column definition to the list
+    #     for cols in cls.columns:
+    #         columnQuery = cls.__columnsToQuery(cols)
+    #         columnDefineLists.append(columnQuery)
+    #     # If there is a foreign key, add it at the end
+    #     for fk in cls.__foreignKeyList:
+    #         columnDefineLists.append(fk)
+    #     return ", ".join(columnDefineLists)
+    # #---------------------------------------------------------------------------
+    # @classmethod
+    # @private
+    # def __columnsToQuery(
+    #         cls,
+    #         columns : dict[str, Column]
+    #     ) -> str:
+    #     """
+    #     Convert columns to a query statement.
+    #     Private method used only in columnsToQuery
+    #     Args:
+    #         columns (dict[str, Column]) : Columns
+    #     Returns:
+    #         str : the query statement used in the Create statement
+    #     """
+    #     columnName, columnObject = next(iter(columns.items()))
+    #     parts = []
+    #     parts.append(columnName)
+    #     if columnObject.dataTypeQuery.sql:
+    #         parts.append(columnObject.dataTypeQuery.sql)
+    #     if columnObject.primaryKeyQuery.sql:
+    #         parts.append(columnObject.primaryKeyQuery.sql)
+    #     if columnObject.autoIncrementQuery.sql:
+    #         parts.append((columnObject.autoIncrementQuery.sql))
+    #     if columnObject.defaultQuery.sql:
+    #         parts.append(columnObject.defaultQuery.sql)
+    #     if columnObject.uniqueQuery.sql:
+    #         parts.append(columnObject.uniqueQuery.sql)
+    #     if columnObject.notNullQuery.sql:
+    #         parts.append(columnObject.notNullQuery.sql)
+    #     # If defined, store separately
+    #     fk = cls.__foreignKeyToQuery(columnName, columnObject)
+    #     if fk:
+    #         cls.__foreignKeyList.append(fk)        
+    #     return " ".join(parts)
+    # #---------------------------------------------------------------------------
+    # @classmethod
+    # @private
+    # def __foreignKeyToQuery(
+    #         cls,
+    #         columnName : str,
+    #         columnObject : Column
+    #     ) -> str:
+    #     """
+    #     Private method that outputs foreign key constraints as a query statement
+    #     Args:
+    #         columnName   (str) : Column name.
+    #         cokumnObject (str) : Column object.
+    #     Returns:
+    #         fk : Query statement.
+    #     """
+    #     fk = columnObject.foreignKeyQuery.sql
+    #     if fk:
+    #         fk = fk.replace("~~~", columnName)
+    #     else:
+    #         fk = ""
+    #     return fk
+    # #---------------------------------------------------------------------------
+    # @classmethod
+    # def checkDatatypes(cls) -> None:
+    #     print(cls.__dict__)
+    # #---------------------------------------------------------------------------
+    # @classmethod
+    # @public
+    # def createTable(cls) -> CreateTable:
+    #     """
+    #     Create a table
+    #     Returns:
+    #         CreateTable : Table creation object
+    #     Exemples:
+    #         ```
+    #         user = User.createTable()
+    #         user.execute()
+    #         user.commit()
+    #         ```
+    #     """
+    #     columns = cls.__columnsToCreateQuery()
+    #     return CreateTable(
+    #         tableName = cls.tableName,
+    #         columns   = columns
+    #     )
+    # #---------------------------------------------------------------------------
+    # @classmethod
+    # @public
+    # def createTableIfNotExists(cls) -> CreateTableIfNotExists:
+    #     """
+    #     Create a table if it does not exist
+    #     Returns:
+    #         CreateTableIfNotExists : Table creation object
+    #     Exemples:
+    #         ```
+    #         user = User.createTableIfNotExists()
+    #         user.execute()
+    #         user.commit()
+    #         ```
+    #     """
+    #     columns = cls.__columnsToCreateQuery()
+    #     return CreateTableIfNotExists(
+    #         tableName = cls.tableName,
+    #         columns   = columns
+    #     )
     #---------------------------------------------------------------------------
     @classmethod
     @public
