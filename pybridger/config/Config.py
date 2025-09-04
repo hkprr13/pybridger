@@ -1,6 +1,7 @@
 #-------------------------------------------------------------------------------
 from __future__ import annotations # To avoid circular imports
-from typing import TYPE_CHECKING   
+from typing import TYPE_CHECKING
+from xmlrpc.client import FastMarshaller   
 #-------------------------------------------------------------------------------
 if TYPE_CHECKING:
     from ..engine import Sqlite3Engine
@@ -34,6 +35,8 @@ class Config:
                    | AsyncMySqlEngine      \
                    | AsyncPostgreSqlEngine \
                    | None = None
-    # database
+    # Database
     database : str | None = None
+    # Auto create Table
+    isAutoCreate : bool = False
 #-------------------------------------------------------------------------------

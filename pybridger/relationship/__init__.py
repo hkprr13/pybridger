@@ -1,13 +1,13 @@
 #-------------------------------------------------------------------------------
-from .relation      import ManyToMany
-from .relation      import ManyToOne
-from .relation      import OneToMany
-from .relation      import OneToOne
+from .relation      import manyToMany
+from .relation      import manyToOne
+from .relation      import oneToMany
+from .relation      import oneToOne
 #-------------------------------------------------------------------------------
 __all__ = [
-    "ManyToMany",
-    "ManyToOne",
-    "OneToMany",
-    "OneToOne"
+    "manyToMany",
+    "manyToOne",
+    "oneToMany",
+    "oneToOne"
 ]
 #-------------------------------------------------------------------------------

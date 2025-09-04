@@ -1,16 +1,11 @@
 #-------------------------------------------------------------------------------
-from typing         import Any
-from .Relation      import Relation
-from ...model       import Model
-#-------------------------------------------------------------------------------
-class OneToOne(Relation):
-    def __init__(self, target : str) -> None:
-        self.__target = target
-    def __call__(self, cls : type[Model]) -> type[Model]:
-        print("-----")
-        print(cls.tableName)
-        cls.__relation__.append(self.__target)
-        print(cls.__foreignKey__)
-        print(cls.__relation__)
+def oneToOne(relation: str):
+    def decorator(cls):# -> Any:
+        if not hasattr(cls, "__relations__"):
+            setattr(cls, "__relations__", [])
+        cls.__relations__.append(
+            (cls.tableName, "o-o", relation)
+        )
         return cls
+    return decorator
 #-------------------------------------------------------------------------------

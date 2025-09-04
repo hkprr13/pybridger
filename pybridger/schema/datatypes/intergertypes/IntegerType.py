@@ -3,6 +3,8 @@ from typing         import Any
 from ..datatype     import DataType
 #-------------------------------------------------------------------------------
 class IntegerType(DataType):
+    PYTHON_TYPE : str = "INT"
+    #---------------------------------------------------------------------------
     def __init__(self) -> None:
         super().__init__()
         self.storage              : Any

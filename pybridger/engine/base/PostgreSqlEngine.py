@@ -163,6 +163,22 @@ class PostgreSqlEngine(SqlEngine):
     #---------------------------------------------------------------------------
     @override
     @public
+    def close(self) -> None:
+        """
+        Close the connection
+        Raises:
+            Exception: If closing the connection fails
+        """
+        try:
+            if self.conn:
+                self.conn.close()
+        except Exception as e:
+            msg = "Close failed"
+            self.logError(msg)
+            raise Exception(f"{msg}: {e}")
+    #---------------------------------------------------------------------------
+    @override
+    @public
     def transaction(self) -> None:
         """
         Transaction

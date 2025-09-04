@@ -3,4 +3,5 @@ from ...sysntaxelement      import SysntaxElement
 #-------------------------------------------------------------------------------
 class DataType(SysntaxElement):
     """Base Data type class"""
+    PYTHON_TYPE : str
 #-------------------------------------------------------------------------------

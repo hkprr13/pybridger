@@ -88,10 +88,10 @@ from .model             import Model
 from .model             import AsyncModel
 #-------------------------------------------------------------------------------
 # Relationships
-from .relationship      import ManyToMany
-from .relationship      import ManyToOne
-from .relationship      import OneToMany
-from .relationship      import OneToOne
+from .relationship      import manyToMany
+from .relationship      import manyToOne
+from .relationship      import oneToMany
+from .relationship      import oneToOne
 #-------------------------------------------------------------------------------
 # Session
 from .session           import Session
@@ -143,7 +143,7 @@ __all__ = [
     # Models
     "Model", "AsyncModel",
     # Relationships
-    "ManyToMany", "OneToMany", "OneToOne", "ManyToOne",
+    "manyToMany", "manyToOne", "oneToMany", "oneToOne",
     # Session
     "Session",
     # CSV

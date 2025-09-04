@@ -68,3 +68,4 @@
     0.1.2 : 2025/08/16 : Mainly fixed CSV class and Engine class
     0.1.3 : 2025/08/25 : Reviewed overall structure and bug fixes
     0.1.4 : 2025/08/26 : Fix import error
+    0.1.5 : 2025/08/26 : Add relation function and auto create table

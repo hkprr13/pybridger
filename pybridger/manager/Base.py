@@ -67,6 +67,13 @@ class Base:
         self.sqlEngine.commit()
     #---------------------------------------------------------------------------
     @public
+    def close(self) -> None:
+        """
+        Connection close
+        """
+        self.sqlEngine.close()
+    #---------------------------------------------------------------------------
+    @public
     def transaction(self) -> None:
         """
         Transaction

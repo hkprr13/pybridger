@@ -5,6 +5,7 @@ class LogicalType(DataType):
     """
     Base logical type class
     """
+    PYTHON_TYPE : str = "BOOL"
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
         """

@@ -1,6 +1,6 @@
 [project]
 name            = "pybriger"
-version         = "0.1.4"
+version         = "0.1.5"
 description     = "python ORM"
 authors         = [{name = "KazuhiroKondo", email = "hkprr13@gmail.com"}]
 readme          = "README.md"

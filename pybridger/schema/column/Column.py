@@ -1,6 +1,5 @@
 #-------------------------------------------------------------------------------
-from turtle import pen
-from typing import Any
+from typing         import Any
 from ..datatypes    import DataType
 from ..constraints  import AutoIncrement
 from ..constraints  import PrimaryKey
@@ -59,6 +58,11 @@ class Column:
             ```
             
         """
+        # public attributes (table and column)
+        self.columnName       : str | None = None
+        self.tableName        : str | None = None
+        self.referencedTable  : str | None = None
+        self.referencedColumn : str | None = None
         # private attributes
         self.__dataType        = dataType
         self.__isPrimaryKey    = isPrimaryKey
@@ -77,10 +81,8 @@ class Column:
         self.uniqueQuery          : Query = self.__buildUniqueQuery()
         self.defaultQuery         : Query = self.__buildDefaultQuery()
         self.checkQuery           : Query = self.__buildCheckQuery()
-        self.tableLevelCheckQuery : Query = self.__buildTableLevelCheckQuery()
-        # public attributes (column name & table name)
-        self.columnName : str
-        self.tableName  : str 
+        # Data types in Python
+        self.PYTHON_TYPE : str = self.__dataType.PYTHON_TYPE
     #---------------------------------------------------------------------------
     @private
     def __buildDataTypeQuery(self) -> Query:
@@ -180,8 +182,8 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
-    @private
-    def __buildTableLevelCheckQuery(self) -> Query:
+    @public
+    def buildTableLevelCheckQuery(self) -> Query:
         """
         private method
         build query for table-level check constraints
@@ -193,26 +195,29 @@ class Column:
         else:
             return Query("")
     #---------------------------------------------------------------------------
-    @private
+    @public
     def buildForeignKeyQuery(self) -> Query:
         """
-        private method
-        build query for foreign key constraints
+        Build query for foreign key constraints.
+        Setting referenced table and column
         Returns:
             Query : query object
         """
         if self.__foreignKey:
             self.referencedTable  = self.__foreignKey.referencedTable
             self.referencedColumn = self.__foreignKey.referencedColumn
-            self.__foreignKey.toQuery()
-            self.__foreignKey.setColumn(self.columnName)
-            return self.__foreignKey.query
+            fk = self.__foreignKey.toQuery().sql
+            fk = fk.replace("~~~", self.columnName)
+            return Query(fk)
         else:
             return Query("")
     #---------------------------------------------------------------------------
     @public
-    def buildCreateQuery(self) -> Query:
+    def buildCreateList(self) -> list:
         """
+        Build create table query
+        Returns:
+            Query : use for create table query 
         """
         parts = []
         parts.append(self.columnName)
@@ -227,11 +232,43 @@ class Column:
             parts.append(self.defaultQuery.sql)
         if self.checkQuery.sql:
             parts.append(self.checkQuery.sql)
-        if self.tableLevelCheckQuery.sql:
-            parts.append(self.tableLevelCheckQuery.sql)
-        if self.buildForeignKeyQuery().sql:
-            parts.append(self.buildForeignKeyQuery().sql)
-        return Query(" ".join(parts))
+        return parts
+    #---------------------------------------------------------------------------
+    def setTableName(self, tableName : str) -> None:
+        """
+        Setter.
+        Setting table name in class
+        Args:
+            tableName (str) : table name
+        """
+        self.tableName = tableName
+    #---------------------------------------------------------------------------
+    def getTableName(self) -> str | None:
+        """
+        Getter.
+        Getting table name for class
+        Returns:
+            str | None : If not set, return None
+        """
+        return self.tableName 
+    #---------------------------------------------------------------------------
+    def setColumnName(self, columnName : str) -> None:
+        """
+        Setter.
+        Setting column name in class
+        Args:
+            columnName (str) : column name
+        """
+        self.columnName = columnName
+    #---------------------------------------------------------------------------
+    def getColumnName(self) -> str | None:
+        """
+        Getter.
+        Getting table name for class
+        Returns:
+            str | None : If not set, return None.
+        """
+        return self.columnName
     #---------------------------------------------------------------------------
     @public
     def toQuery(self) -> tuple[str, list]:
@@ -262,9 +299,6 @@ class Column:
         return Condition(
             self.tableName, self.columnName, "BETWEEN", (before, after)
         )
-    #---------------------------------------------------------------------------
-    def __str__(self) -> str:
-        return self.columnName
     #---------------------------------------------------------------------------
     def __eq__(self, value) -> Condition:
         """

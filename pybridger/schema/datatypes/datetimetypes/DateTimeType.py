@@ -1,12 +1,13 @@
 #-------------------------------------------------------------------------------
 from typing         import Any
 from ..datatype     import DataType
-from ....common     import public 
+from ....common     import public
 #-------------------------------------------------------------------------------
 class DateTimeType(DataType):
     """
     Base Date time class
     """
+    PYTHON_TYPE : str = "DATETIME"
     #---------------------------------------------------------------------------
     def __init__(self) -> None:
         """

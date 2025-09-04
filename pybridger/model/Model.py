@@ -1,4 +1,5 @@
 #-------------------------------------------------------------------------------
+from traceback import print_tb
 from typing import Any
 from .ModelMeta    import ModelMeta
 from ..config      import Config
@@ -42,7 +43,7 @@ class Model(metaclass = ModelMeta):
     tableName : str
     columns   : list[dict[str, Column]]
     __tableName__  : str 
-    __relation__   : list
+    __relations__  : list
     __foreignKey__ : list
     __createSql__  : str
     #---------------------------------------------------------------------------
@@ -669,6 +670,33 @@ class Model(metaclass = ModelMeta):
             if hasattr(isinstance, key):
                 setattr(instance, key, value)
         return instance
+    #---------------------------------------------------------------------------
+    def __init__(self, **args) -> None:
+        self.__args : dict[str, Any] = args
+    #---------------------------------------------------------------------------
+    def save(self) -> None:
+        cols         = ""
+        placeHolders = ""
+        values       = []
+        for key, value in self.__args.items():
+            Model()
+            cols         += f"{key}, "
+            placeHolders += "?, "
+            values.append(value)
+        try:
+            insertRecord = InsertRecord(
+                tableName    = self.tableName,
+                columns      = cols[:-2],
+                values       = tuple(values),
+                placeHolders = placeHolders[:-2]
+            )
+            print(insertRecord.query)
+            print(insertRecord.value)
+            insertRecord.execute()
+            insertRecord.commit()
+        except Exception:
+            raise
+
     #---------------------------------------------------------------------------
     def __and__(self, other) -> str:
         return f"{self} {other}"

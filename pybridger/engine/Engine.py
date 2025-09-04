@@ -10,9 +10,6 @@ from ..config   import Config
 #-------------------------------------------------------------------------------
 class Engine:
     """
-    SQLエンジンを初期化・管理するためのクラス
-    データベースの接続設定、エンジンの初期化、SQL発行に必要な
-    各種情報の取得・設定を提供する
     """
     #---------------------------------------------------------------------------
     def __init__(
@@ -23,8 +20,9 @@ class Engine:
             password      : str | None = None,
             database      : str | None = None,
             port          : int | None = None,
+            isAutoCreate  : bool       = False,
             logFile       : str | None = None
-        ):
+        ) -> None:
         """
         エンジンを初期化し、接続情報を登録する。
         Args:
@@ -41,6 +39,7 @@ class Engine:
         self.database      = database
         self.port          = port
         self.logFile       = logFile
+        self.__isAutoCreate = isAutoCreate
     #---------------------------------------------------------------------------
     @public
     def launch(self) -> None:
@@ -49,6 +48,8 @@ class Engine:
         Raises:
             ModuleNotFoundError : 未対応のエンジン名が指定された場合
         """
+        if self.__isAutoCreate:
+            Config.isAutoCreate = True
         if self.sqlEngineName.lower() == "sqlite3":
             if self.database:
                 self.sqlEngine = Sqlite3Engine(
