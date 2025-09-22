@@ -27,18 +27,18 @@ class ModelMeta(type):
         # The model itself does not require columns.
         if name == "Model":
             return super().__new__(mcs, name, bases, namespace)
-        columns    = []
-        referenced = []
-        colDefs    = []
-        constrains = []
+        columns     = []
+        referenced  = []
+        colDefs     = []
+        constrains  = []
         createSql  = f"CREATE TABLE IF NOT EXISTS {name} ("
         for columnName, column in namespace.items():
             # Column class or field class
             if isinstance(column, Column) \
             or isinstance(column, Field):
                 # Build create table sql
-                column.tableName  = name
-                column.columnName = columnName
+                column.__tableName__  = name
+                column.__columnName__ = columnName
                 colDefs.append(" ".join(column.buildCreateList()))
                 fkQuery           = column.buildForeignKeyQuery()
                 if fkQuery.sql:
@@ -49,22 +49,28 @@ class ModelMeta(type):
                 # Referenced
                 if column.referencedTable: 
                     referenced.append(
-                        (column.referencedTable, column.referencedColumn)
+                        (
+                            columnName,
+                            column.referencedTable, column.referencedColumn
+                        )
                     )
-                columns.append({columnName : column}) # Save in dictionary format
+                columns.append(columnName) # Save in dictionary format
     
         createSql += ", ".join(colDefs + constrains) +");"
         # Exception if there are no columns
         if not columns:
             raise Exception(f"[{name}] No columns are defined in the class.")
         # Add table name and column list as class attributes
-        namespace["tableName"]      = name
-        namespace["columns"]        = columns
+        namespace["__tableName__"]  = name
+        namespace["__columns__"]    = columns
         namespace["__relations__"]  = []
         if referenced:
-            namespace["__foreignKey__"] = referenced
+            namespace["__foreignKeys__"] = referenced
         else:
-            namespace["__foreignKey__"] = []
+            namespace["__foreignKeys__"] = []
+        Config.models.append(
+            [name, columns, referenced]
+        )
         # If auto creation is enabled, create the table
         if Config.isAutoCreate:
             engine = Config.sqlEngine

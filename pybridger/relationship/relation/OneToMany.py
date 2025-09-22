@@ -1,11 +1,14 @@
 #-------------------------------------------------------------------------------
+from ...config      import Config
+#-------------------------------------------------------------------------------
 def oneToMany(relation: str):
     def decorator(cls):# -> Any:
         if not hasattr(cls, "__relations__"):
             setattr(cls, "__relations__", [])
         cls.__relations__.append(
-            (cls.tableName, "o-<", relation)
+            (cls.__tableName__, "o-<", relation)
         )
+        Config.appendModelClasses(cls)
         return cls
     return decorator
 #-------------------------------------------------------------------------------

@@ -45,14 +45,14 @@ class Select(Base):
         if len(columns) == 0:
             cols = "*"
         else:
-            cols = ", ".join(col.columnName for col in columns)
+            cols = ", ".join(col.__columnName__ for col in columns)
         return cols
     #---------------------------------------------------------------------------
     @private
     def __setColumnsList(self, columns : tuple[Column]):# -> list[Any]:
         columnsList = []
         for col in columns:
-            columnsList.append(f"{col.tableName}.{col.columnName}")
+            columnsList.append(f"{col.__tableName__}.{col.__columnName__}")
         return columnsList
     #---------------------------------------------------------------------------
     @public
@@ -70,9 +70,9 @@ class Select(Base):
     @public
     def getAllRecord(self) -> list:
         """
-        テーブル内の全カラムの全てのレコードを取得する
+        Retrieve all records from all columns in the table
         Returns:
-            List : クエリ結果のレコードリスト
+            List : Query result record list
         """
         self.__query = f"SELECT * FROM {self.tableName};"
         cur = self.sqlEngine.cursor()
@@ -126,13 +126,13 @@ class Select(Base):
         """
         query = f"SELECT {self.__columns} FROM {self.tableName} "
         if asc is None and desc is None:
-            raise Exception("ascまたはdescのいずれかを指定してください")
+            raise Exception("Please specify either asc or desc")
         if asc is None and not desc is None:
-            query += f"ORDER BY {desc.columnName} DESC;"
+            query += f"ORDER BY {desc.__columnName__} DESC;"
         if not asc is None and desc is None:  
-            query += f"ORDER BY {asc.columnName} ASC;"
+            query += f"ORDER BY {asc.__columnName__} ASC;"
         if not desc is None and not asc is None:
-            query += f"ORDER BY {asc.columnName} ASC, {desc.columnName} DESC;"
+            query += f"ORDER BY {asc.__columnName__} ASC, {desc.__columnName__} DESC;"
         cur = self.cursor()
         cur.execute(query)
         self.__query = query
@@ -152,7 +152,6 @@ class Select(Base):
         Returns:
             list : Part of the query results.
         """
-        #クエリ
         query = f"SELECT {self.__columns} " \
               + f"FROM {self.tableName} " \
               + f"LIMIT {limit} OFFSET {offset}"
@@ -168,7 +167,6 @@ class Select(Base):
         Returns:
         int: Tuple of number of records
         """
-        # クエリ
         self.__query = f"SELECT COUNT(*) " \
                      + f"FROM {self.tableName} "
         cur = self.sqlEngine.cursor()
@@ -185,7 +183,7 @@ class Select(Base):
         Returns:
             List[Tuple]: Tuple of average values (e.g., [(34.5,]))
         """
-        self.__query = f"SELECT AVG({column.columnName}) " \
+        self.__query = f"SELECT AVG({column.__columnName__}) " \
                      + f"FROM {self.tableName} "    
         cur = self.sqlEngine.cursor()
         cur.execute(self.__query)
@@ -203,7 +201,7 @@ class Select(Base):
         Returns:
             List[Tuple] : Tuple of sum values
         """
-        self.__query = f"SELECT SUM({column.columnName}) " \
+        self.__query = f"SELECT SUM({column.__columnName__}) " \
                      + f"FROM {self.tableName} "    
         cur = self.sqlEngine.cursor()
         cur.execute(self.__query)
@@ -221,7 +219,7 @@ class Select(Base):
         Returns:
             List[Tuple] : Tuple of maximum values
         """
-        self.__query = f"SELECT Max({column.columnName}) " \
+        self.__query = f"SELECT Max({column.__columnName__}) " \
                      + f"FROM {self.tableName} "    
         cur = self.sqlEngine.cursor()
         cur.execute(self.__query)
@@ -239,7 +237,7 @@ class Select(Base):
         Returns:
             List[Tuple] : Tuple of minimum values
         """
-        self.__query = f"SELECT Min({column.columnName}) " \
+        self.__query = f"SELECT Min({column.__columnName__}) " \
                      + f"FROM {self.tableName} "    
         cur = self.sqlEngine.cursor()
         cur.execute(self.__query)
@@ -261,7 +259,7 @@ class Select(Base):
             tableName = self.tableName,
             columns   = self.__columns,
             condition = "",
-            byColumn  = column.columnName
+            byColumn  = column.__columnName__
         )
     #---------------------------------------------------------------------------
     @public
@@ -282,7 +280,7 @@ class Select(Base):
             tableName = self.tableName,
             columns   = self.__columns,
             condition = condition,
-            byColumn  = column.columnName
+            byColumn  = column.__columnName__
         )
     #---------------------------------------------------------------------------
     @public
@@ -300,7 +298,7 @@ class Select(Base):
         """
         return CrossJoin(
             tableName = self.tableName,
-            joinTable = joinTable.tableName
+            joinTable = joinTable.__tableName__
         )
     #---------------------------------------------------------------------------
     @public
@@ -325,7 +323,7 @@ class Select(Base):
         joinSql = " AND ".join(parts)
         return FullOuterJoin(
             tableName = self.tableName,
-            joinTable = joinTable.tableName,
+            joinTable = joinTable.__tableName__,
             joinSql   = joinSql
         )
     #---------------------------------------------------------------------------
@@ -352,7 +350,7 @@ class Select(Base):
         return InnerJoin(
             tableName = self.tableName,
             columns   = self.__columns,
-            joinTable = joinTable.tableName,
+            joinTable = joinTable.__tableName__,
             joinSql   = joinSql
         )
     #---------------------------------------------------------------------------
@@ -383,7 +381,7 @@ class Select(Base):
         return LeftJoin(
             tableName  = self.tableName,
             columns    = columns,
-            joinTable  = joinTable.tableName,
+            joinTable  = joinTable.__tableName__,
             joinSql    = joinSql
         )
     #---------------------------------------------------------------------------
@@ -403,7 +401,7 @@ class Select(Base):
         return NaturalJoin(
             tableName = self.tableName,
             columns   = self.__columns,
-            joinTable = joinTable.tableName,
+            joinTable = joinTable.__tableName__,
         )
     #---------------------------------------------------------------------------
     @public
@@ -433,7 +431,7 @@ class Select(Base):
         return RightJoin(
             tableName  = self.tableName,
             columns    = columns,
-            joinTable  = joinTable.tableName,
+            joinTable  = joinTable.__tableName__,
             joinSql    = joinSql
         )
     #---------------------------------------------------------------------------

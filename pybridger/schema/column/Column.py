@@ -59,8 +59,8 @@ class Column:
             
         """
         # public attributes (table and column)
-        self.columnName       : str | None = None
-        self.tableName        : str | None = None
+        self.__columnName__   : str 
+        self.__tableName__    : str 
         self.referencedTable  : str | None = None
         self.referencedColumn : str | None = None
         # private attributes
@@ -207,7 +207,7 @@ class Column:
             self.referencedTable  = self.__foreignKey.referencedTable
             self.referencedColumn = self.__foreignKey.referencedColumn
             fk = self.__foreignKey.toQuery().sql
-            fk = fk.replace("~~~", self.columnName)
+            fk = fk.replace("~~~", self.__columnName__)
             return Query(fk)
         else:
             return Query("")
@@ -220,7 +220,7 @@ class Column:
             Query : use for create table query 
         """
         parts = []
-        parts.append(self.columnName)
+        parts.append(self.__columnName__)
         parts.append(self.dataTypeQuery.sql)
         if self.primaryKeyQuery.sql:
             parts.append(self.primaryKeyQuery.sql)
@@ -241,7 +241,7 @@ class Column:
         Args:
             tableName (str) : table name
         """
-        self.tableName = tableName
+        self.__tableName__ = tableName
     #---------------------------------------------------------------------------
     def getTableName(self) -> str | None:
         """
@@ -250,7 +250,7 @@ class Column:
         Returns:
             str | None : If not set, return None
         """
-        return self.tableName 
+        return self.__tableName__ 
     #---------------------------------------------------------------------------
     def setColumnName(self, columnName : str) -> None:
         """
@@ -259,7 +259,7 @@ class Column:
         Args:
             columnName (str) : column name
         """
-        self.columnName = columnName
+        self.__columnName__ = columnName
     #---------------------------------------------------------------------------
     def getColumnName(self) -> str | None:
         """
@@ -268,36 +268,43 @@ class Column:
         Returns:
             str | None : If not set, return None.
         """
-        return self.columnName
+        return self.__columnName__
     #---------------------------------------------------------------------------
     @public
     def toQuery(self) -> tuple[str, list]:
-        if hasattr(self, "tableName") and hasattr(self, "columnName"):
-            query = f"{self.tableName}.{self.columnName}"
+        if hasattr(self, "__tableName__") and hasattr(self, "__columnName__"):
+            query = f"{self.__tableName__}.{self.__columnName__}"
         else:
-            query = f"{self.columnName}"
+            query = f"{self.__columnName__}"
         return query, []
     #---------------------------------------------------------------------------
     @public
     def like(self, value) -> Condition:
         """LINK operator"""
-        return Condition(self.tableName, self.columnName, "LIKE", value)
+        return Condition(
+            self.__tableName__, self.__columnName__, "LIKE", value
+        )
     #---------------------------------------------------------------------------
     @public
     def In (self, *values) -> Condition:
         """IN operator"""
-        return Condition(self.tableName, self.columnName, "IN", values)
+        return Condition(
+            self.__tableName__, self.__columnName__, "IN", values
+        )
     #---------------------------------------------------------------------------
     @public
     def notIn (self, *values) -> Condition:
         """NOT IN operator"""
-        return Condition(self.tableName, self.columnName, "NOT IN", (values))
+        return Condition(
+            self.__tableName__, self.__columnName__, "NOT IN", (values)
+        )
     #---------------------------------------------------------------------------
     @public
     def between(self, before, after) -> Condition:
         """BETWEEN operator"""
         return Condition(
-            self.tableName, self.columnName, "BETWEEN", (before, after)
+            self.__tableName__, self.__columnName__,
+            "BETWEEN",          (before, after)
         )
     #---------------------------------------------------------------------------
     def __eq__(self, value) -> Condition:
@@ -306,7 +313,7 @@ class Column:
         Returns:
             Condition : condition
         """
-        return Condition(self.tableName, self.columnName, "=", value)
+        return Condition(self.__tableName__, self.__columnName__, "=", value)
     #---------------------------------------------------------------------------
     def __ne__(self, value) -> Condition:
         """
@@ -314,7 +321,7 @@ class Column:
         Returns:
             Condition : condition
         """
-        return Condition(self.tableName, self.columnName, "!=", value)
+        return Condition(self.__tableName__, self.__columnName__, "!=", value)
     #---------------------------------------------------------------------------
     def __lt__(self, value) -> Condition:
         """
@@ -322,7 +329,7 @@ class Column:
         Returns:
             Condition : condition
         """
-        return Condition(self.tableName, self.columnName, "<", value)
+        return Condition(self.__tableName__, self.__columnName__, "<", value)
     #---------------------------------------------------------------------------
     def __le__(self, value) -> Condition:
         """
@@ -330,7 +337,7 @@ class Column:
         Returns:
             Condition : condition
         """
-        return Condition(self.tableName, self.columnName, "<=", value)
+        return Condition(self.__tableName__, self.__columnName__, "<=", value)
     #---------------------------------------------------------------------------
     def __gt__(self, value) -> Condition:
         """
@@ -338,7 +345,7 @@ class Column:
         Returns:
             Condition : condition
         """
-        return Condition(self.tableName, self.columnName, ">", value)
+        return Condition(self.__tableName__, self.__columnName__, ">", value)
     #---------------------------------------------------------------------------
     def __ge__(self, value) -> Condition:
         """
@@ -346,7 +353,7 @@ class Column:
         Returns:
             Condition : condition
         """
-        return Condition(self.tableName, self.columnName, ">=", value)
+        return Condition(self.__tableName__, self.__columnName__, ">=", value)
     #---------------------------------------------------------------------------
     def __and__(self, value) -> ConditionGroup:
         """
@@ -354,7 +361,9 @@ class Column:
         Returns:
             Condition : condition
         """
-        return ConditionGroup(self.tableName, self.columnName, "AND", value)
+        return ConditionGroup(
+            self.__tableName__, self.__columnName__, "AND", value
+        )
     #---------------------------------------------------------------------------
     def __or__(self, value) -> ConditionGroup:
         """
@@ -362,5 +371,5 @@ class Column:
         Returns:
             Condition : condition
         """
-        return ConditionGroup(self.tableName, self.columnName, "OR", value)
+        return ConditionGroup(self.__tableName__, self.__columnName__, "OR", value)
 #-------------------------------------------------------------------------------

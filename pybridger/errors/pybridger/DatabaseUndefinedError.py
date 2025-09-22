@@ -7,6 +7,6 @@ class DatabaseUndefinedError(PyBridgerError):
         super().__init__()
     #---------------------------------------------------------------------------
     @property
-    def msg(self) -> Literal["Database un degined"]:
-        return "Database un degined" 
+    def msg(self) -> Literal["Database un defined"]:
+        return "Database un defined" 
 #-------------------------------------------------------------------------------

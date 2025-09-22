@@ -40,20 +40,11 @@ class Model(metaclass = ModelMeta):
         tableName (str)                     : Automatically retrieved from class name
         columns   (list[dict[str, Column]]) : List of column definitions
     """
-    tableName : str
-    columns   : list[dict[str, Column]]
-    __tableName__  : str 
-    __relations__  : list
-    __foreignKey__ : list
-    __createSql__  : str
-    #---------------------------------------------------------------------------
-    @classmethod
-    @private
-    def __parameterColumnsToStrings(cls, columns :tuple[Column, ...]) -> str:
-        cols = ""
-        for col in columns:
-            cols += col.columnName + ", "
-        return cols[:-2]
+    __columns__     : list[str]
+    __tableName__   : str 
+    __relations__   : list[tuple[str, str, str]]
+    __foreignKeys__ : list
+    __createSql__   : str
     #---------------------------------------------------------------------------
     # @classmethod
     # @private
@@ -152,7 +143,7 @@ class Model(metaclass = ModelMeta):
     #     """
     #     columns = cls.__columnsToCreateQuery()
     #     return CreateTable(
-    #         tableName = cls.tableName,
+    #         tableName = cls.__tableName__,
     #         columns   = columns
     #     )
     # #---------------------------------------------------------------------------
@@ -172,7 +163,7 @@ class Model(metaclass = ModelMeta):
     #     """
     #     columns = cls.__columnsToCreateQuery()
     #     return CreateTableIfNotExists(
-    #         tableName = cls.tableName,
+    #         tableName = cls.__tableName__,
     #         columns   = columns
     #     )
     #---------------------------------------------------------------------------
@@ -197,11 +188,15 @@ class Model(metaclass = ModelMeta):
             user.commit()
             ```
         """
-        cols = cls.__parameterColumnsToStrings(columns)
+        cols = ""
+        for col in columns:
+            if not col.__columnName__:
+                raise Exception()
+            cols += col.__columnName__ + ", "
         return CreateIndex(
             indexName = indexName,
-            tableName = cls.tableName,
-            columns   = cols
+            tableName = cls.__tableName__,
+            columns   = cols[:-2]
         )
     #---------------------------------------------------------------------------
     @classmethod
@@ -238,7 +233,7 @@ class Model(metaclass = ModelMeta):
             ```
         """
         return CreateTrigger(
-            tableName   = cls.tableName, 
+            tableName   = cls.__tableName__, 
             triggerName = triggerName,
             timing      = timing,
             event       = event,
@@ -260,7 +255,7 @@ class Model(metaclass = ModelMeta):
             DropTable : Table deletion object
         """
         return DropTable(
-            tableName = cls.tableName
+            tableName = cls.__tableName__
         )
     #---------------------------------------------------------------------------
     @classmethod
@@ -278,7 +273,7 @@ class Model(metaclass = ModelMeta):
             DropTableIfExists : Table deletion object
         """
         return DropTableIfExists(
-            tableName = cls.tableName
+            tableName = cls.__tableName__
         )
     #---------------------------------------------------------------------------
     @classmethod
@@ -298,7 +293,7 @@ class Model(metaclass = ModelMeta):
             DropView : View deletion object
         """
         return DropView(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             viewName  = viewName
         )
     #---------------------------------------------------------------------------
@@ -319,7 +314,7 @@ class Model(metaclass = ModelMeta):
             DropViewIfExists : View deletion object
         """
         return DropViewIfExists(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             viewName  = viewName
         )
     #---------------------------------------------------------------------------
@@ -340,7 +335,7 @@ class Model(metaclass = ModelMeta):
             DropIndex : Index deletion object
         """
         return DropIndex(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             indexName = indexName
         )
     #---------------------------------------------------------------------------
@@ -361,7 +356,7 @@ class Model(metaclass = ModelMeta):
             DropIndexIfExists : Index deletion object
         """
         return DropIndexIfExists(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             indexName = indexName
         )
     #---------------------------------------------------------------------------
@@ -382,7 +377,7 @@ class Model(metaclass = ModelMeta):
             DropTrigger : Trigger deletion object
         """
         return DropTrigger(
-            tableName   = cls.tableName,
+            tableName   = cls.__tableName__,
             triggerName = triggerName
         )
     #---------------------------------------------------------------------------
@@ -406,7 +401,7 @@ class Model(metaclass = ModelMeta):
             DropTriggerIfNotExists : Trigger deletion object
         """
         return DropTriggerIfNotExists(
-            tableName   = cls.tableName,
+            tableName   = cls.__tableName__,
             triggerName = triggerName
         )
     #---------------------------------------------------------------------------
@@ -437,7 +432,7 @@ class Model(metaclass = ModelMeta):
             placeHolders += "?, "
             values.append(value)
         return InsertRecord(
-            tableName    = cls.tableName,
+            tableName    = cls.__tableName__,
             columns      = cols[:-2],
             values       = tuple(values),
             placeHolders = placeHolders[:-2]
@@ -474,7 +469,7 @@ class Model(metaclass = ModelMeta):
             cols         += f"{key}, "
             placeHolders += "?, "
         return InsertRecords(
-            tableName    = cls.tableName,
+            tableName    = cls.__tableName__,
             columns      = cols[:-2],        # Pass in the form of id, name,
             data         = list(             # ... and delete the suffix
                 zip(*columns.values())       
@@ -506,7 +501,7 @@ class Model(metaclass = ModelMeta):
             cols += f"{key} = ?, "
             values.append(value)
         return UpdateRecord(
-            tableName    = cls.tableName,
+            tableName    = cls.__tableName__,
             columns      = cols[:-2] + " ", # Insert a space before WHERE
             values       = tuple(values),
         )
@@ -533,7 +528,7 @@ class Model(metaclass = ModelMeta):
         for key, value in updateColumns.items():
             cols += f"{key} = ?, "
         return UpdateRecords(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             columns   = cols[:-2] + " ", # Insert a space before WHERE
             data      = list(zip(*updateColumns.values()))
         )
@@ -561,7 +556,7 @@ class Model(metaclass = ModelMeta):
             cols += f"{key} = ?, "
             values.append(value)
         return DeleteRecord(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             columns   = cols[:-2] + " ", # Insert a space before WHERE
             values    = tuple(values)
         )
@@ -582,18 +577,16 @@ class Model(metaclass = ModelMeta):
         Returns:
             AlterTableAddColumn : Column addition object
         """
-        columnName   : str    # カラム名
-        columnObject : Column # カラムオブジェクト
-        # カラム
+        columnName   : str
+        columnObject : Column
         for key, value in column.items():
             columnName   = key
             columnObject = value
-        # 条件
         constraints = f"{columnObject.notNullQuery.sql} "\
                     + f"{columnObject.notNullQuery.sql} "\
                     + f"{columnObject.uniqueQuery.sql}"
         return AlterTableAddColumn(
-            tableName   = cls.tableName,
+            tableName   = cls.__tableName__,
             column      = columnName,
             dataType    = columnObject.dataTypeQuery.sql,
             constraints = constraints
@@ -618,9 +611,11 @@ class Model(metaclass = ModelMeta):
         Returns:
             AlterTableDropColumn : Column deletion object
         """
+        if not column.__columnName__:
+            raise Exception()
         return AlterTableDropColumn(
-            tableName  = cls.tableName,
-            columnName = column.columnName
+            tableName  = cls.__tableName__,
+            columnName = column.__columnName__
         )
     #---------------------------------------------------------------------------
     @classmethod
@@ -645,7 +640,7 @@ class Model(metaclass = ModelMeta):
             AlterTableRenameColumn : Column name change object
         """
         return AlterTableRenameColumn(
-            tableName = cls.tableName,
+            tableName = cls.__tableName__,
             oldName   = oldName,
             newName   = newName
         )
@@ -671,6 +666,25 @@ class Model(metaclass = ModelMeta):
                 setattr(instance, key, value)
         return instance
     #---------------------------------------------------------------------------
+    @classmethod
+    @public
+    def get(cls):
+        columnTableName = cls.__tableName__
+        models = Config.models
+        relations = cls.__relations__
+        for r in relations:
+            relation = r[1]
+            if relation == "o-o":
+                ...
+            elif relation == "o-<":
+                ...
+            elif relation == ">-o":
+                ...
+            elif relation == ">-<":
+                ...
+            
+            
+    #---------------------------------------------------------------------------
     def __init__(self, **args) -> None:
         self.__args : dict[str, Any] = args
     #---------------------------------------------------------------------------
@@ -682,16 +696,17 @@ class Model(metaclass = ModelMeta):
             Model()
             cols         += f"{key}, "
             placeHolders += "?, "
+            if isinstance(value, Column):
+                value = value.__columnName__
             values.append(value)
+            
         try:
             insertRecord = InsertRecord(
-                tableName    = self.tableName,
+                tableName    = self.__tableName__,
                 columns      = cols[:-2],
                 values       = tuple(values),
                 placeHolders = placeHolders[:-2]
             )
-            print(insertRecord.query)
-            print(insertRecord.value)
             insertRecord.execute()
             insertRecord.commit()
         except Exception:

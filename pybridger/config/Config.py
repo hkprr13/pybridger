@@ -1,7 +1,6 @@
 #-------------------------------------------------------------------------------
 from __future__ import annotations # To avoid circular imports
-from typing import TYPE_CHECKING
-from xmlrpc.client import FastMarshaller   
+from typing import TYPE_CHECKING 
 #-------------------------------------------------------------------------------
 if TYPE_CHECKING:
     from ..engine import Sqlite3Engine
@@ -39,4 +38,13 @@ class Config:
     database : str | None = None
     # Auto create Table
     isAutoCreate : bool = False
+    # models = [[table, ["id", "name"], ["User", "o-<", "Post"]], ...]
+    models : list = []
+    # modelClasses = [object1, object2]
+    modelClasses : list = []
+    @classmethod
+    def appendModelClasses(cls, table):
+        lst = cls.modelClasses
+        if not table in lst:
+            lst.append(table)
 #-------------------------------------------------------------------------------
